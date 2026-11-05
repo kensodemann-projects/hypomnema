@@ -1,0 +1,13 @@
+---
+description: Known product and technical constraints for Hypomnema
+alwaysApply: true
+---
+
+# Hypomnema
+
+Keep these constraints unless the user changes them.
+
+- The client is a Flutter app.
+- Import UI widgets from `package:material_ui/material_ui.dart`.
+- The app connects to Firebase. Persistent data lives in Cloud Firestore.
+- Phone and desktop are both required form factors. Build a layout for each; a phone screen stretched to desktop width is not enough.
