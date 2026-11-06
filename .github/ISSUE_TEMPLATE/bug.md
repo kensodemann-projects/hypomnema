@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: ''
+about: Houston, we have a problem
 title: ''
 type: bug
 assignees: ''
