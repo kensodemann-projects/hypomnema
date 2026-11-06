@@ -1,6 +1,6 @@
 ---
 name: Task
-about: ''
+about: Just do it!
 title: ''
 type: task
 assignees: ''

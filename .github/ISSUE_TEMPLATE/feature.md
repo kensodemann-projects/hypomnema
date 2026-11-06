@@ -1,6 +1,6 @@
 ---
 name: Feature
-about: ''
+about: I have an awesome idea
 title: ''
 type: feature
 assignees: ''
