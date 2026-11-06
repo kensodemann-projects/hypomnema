@@ -1,0 +1,38 @@
+# This workflow runs Flutter checks (dependencies, format, analyze, test)
+# whenever a pull request is opened or updated against the 'main' branch.
+#
+# Flutter 3.47.9 is the stable release that bundles Dart 3.13.7, which matches
+# the SDK constraint in pubspec.yaml. material_ui requires Flutter >= 3.47.0.
+name: Flutter CI
+
+on:
+  pull_request:
+    branches: ['main']
+
+jobs:
+  format_analyze_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.9'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Check Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze
+        run: flutter analyze
+
+      # No test/ directory yet. Restore this step once tests exist.
+      # - name: Run Tests
+      #   run: flutter test
