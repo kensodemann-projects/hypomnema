@@ -48,18 +48,18 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyADkmItJL8OR6Yo5cHLcMNpNxSvrhF-xQE',
-    appId: '1:270119285417:android:37e28c5c6b26ffca3fefb8',
+    appId: '1:270119285417:android:187862b394b56f8f3fefb8',
     messagingSenderId: '270119285417',
     projectId: 'kws-hypomnema',
     storageBucket: 'kws-hypomnema.firebasestorage.app',
   );
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBBUjM5ce9vgnCSc_IdMvyg0WSHA9hTeEY',
-    appId: '1:270119285417:ios:28682e4b74c9d0c23fefb8',
+    appId: '1:270119285417:ios:13691326d5c1f21e3fefb8',
     messagingSenderId: '270119285417',
     projectId: 'kws-hypomnema',
     storageBucket: 'kws-hypomnema.firebasestorage.app',
-    iosBundleId: 'com.example.hypomnema',
+    iosBundleId: 'com.kensodemann.hypomnema',
   );
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyDObqwlldT1U4RMLbSR-MCHj7IdqTte5HE',

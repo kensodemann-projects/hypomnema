@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.hypomnema</string>
+	<string>com.kensodemann.hypomnema</string>
 	<key>PROJECT_ID</key>
 	<string>kws-hypomnema</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:270119285417:ios:28682e4b74c9d0c23fefb8</string>
+	<string>1:270119285417:ios:13691326d5c1f21e3fefb8</string>
 </dict>
 </plist>
