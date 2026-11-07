@@ -22,7 +22,7 @@ Issue: [#6](https://github.com/kensodemann-projects/hypomnema/issues/6) (OPEN). 
 **Commit gate** — the human commits. A spot-check does not replace the gate. From `CONTRIBUTING.md`:
 
 ```bash
-dart format .
+dart format lib test
 flutter analyze
 flutter test
 ```

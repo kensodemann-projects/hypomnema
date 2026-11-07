@@ -4,10 +4,10 @@ get:
 	flutter pub get
 
 format:
-	dart format .
+	dart format lib test
 
 format-check:
-	dart format --output=none --set-exit-if-changed .
+	dart format --output=none --set-exit-if-changed lib test
 
 analyze:
 	flutter analyze

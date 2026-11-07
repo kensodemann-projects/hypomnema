@@ -51,7 +51,7 @@ Firebase Auth and Firestore are connected for Android, macOS, and web. A Windows
 
 ## Format, analyze, and test
 
-`analysis_options.yaml` includes `package:flutter_lints/flutter.yaml`. Before a change is ready:
+`analysis_options.yaml` includes `package:flutter_lints/flutter.yaml`. Formatting covers `lib/` and `test/`. Before a change is ready:
 
 ```sh
 make format
