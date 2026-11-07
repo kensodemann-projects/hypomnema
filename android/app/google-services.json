@@ -7,25 +7,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:270119285417:android:37e28c5c6b26ffca3fefb8",
-        "android_client_info": {
-          "package_name": "com.example.hypomnema"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyADkmItJL8OR6Yo5cHLcMNpNxSvrhF-xQE"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:270119285417:android:187862b394b56f8f3fefb8",
         "android_client_info": {
           "package_name": "com.kensodemann.hypomnema"
