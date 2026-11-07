@@ -35,7 +35,7 @@ Related to [#1](https://github.com/kensodemann-projects/hypomnema/issues/1).
 | Order | Step       | Status | Files |
 | ----- | ---------- | ------ | ----- |
 | 1     | [STEP-001] | complete | `pubspec.yaml`, then `pubspec.lock`, then `lib/firebase_options.dart`, then `android/settings.gradle.kts`, then `android/app/build.gradle.kts`, then `android/app/google-services.json`, then `android/app/src/main/AndroidManifest.xml`, then `macos/Runner/GoogleService-Info.plist`, then `macos/Runner.xcodeproj/project.pbxproj`, then `macos/Runner/DebugProfile.entitlements`, then `macos/Runner/Release.entitlements`, then `.firebaserc`, then `firebase.json`, then `lib/main.dart` |
-| 2     | [STEP-002] |        | `lib/firebase_options.dart`, then `firebase.json`, then `lib/main.dart`, then `android/app/src/debug/AndroidManifest.xml`, then `CONTRIBUTING.md` |
+| 2     | [STEP-002] | complete | `lib/firebase_options.dart`, then `firebase.json`, then `lib/main.dart`, then `android/app/src/debug/AndroidManifest.xml`, then `CONTRIBUTING.md` |
 
 **Commit gate**
 
@@ -83,7 +83,7 @@ In `lib/main.dart`, make `main` async. Call `WidgetsFlutterBinding.ensureInitial
 
 ## [STEP-002] Use the local Auth and Firestore emulators
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** A debug run on the Android emulator, a debug run on macOS, and `flutter run -d chrome` use the local Auth and Firestore emulators. Profile and release runs use the production project. The home screen still shows `Hello World!`.
 
