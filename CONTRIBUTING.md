@@ -27,9 +27,25 @@ flutter devices
 flutter run -d <device>
 ```
 
+Local debug runs on Android, macOS, and Chrome use the Firebase Auth and Firestore emulators. Start them from the repository root before `flutter run` or `flutter run -d chrome`:
+
+```sh
+firebase emulators:start --only auth,firestore
+```
+
 Phone and desktop are both required form factors. Run on a phone (a device or simulator) and on a desktop target before considering a UI change done.
 
 Import UI widgets from `package:material_ui/material_ui.dart`.
+
+## Firebase on other platforms
+
+Firebase Auth and Firestore are connected for Android, macOS, and web. A Windows, Linux, or iOS build starts without calling Firebase. Adding Firebase on one of those targets takes the registration and app changes below.
+
+| Target | What Firebase needs | What the app needs |
+| --- | --- | --- |
+| iOS | A separate iOS app in the Firebase console, with the iOS bundle id. The existing macOS registration does not cover it. | `flutterfire configure` for iOS, `GoogleService-Info.plist` in the iOS Runner target, and `Firebase.initializeApp` for iOS. |
+| Windows | A Firebase web app. The console has no Windows app type. FlutterFire creates one named like `hypomnema (windows)`. | `flutterfire configure` for Windows, and initialization for Windows. |
+| Linux | The same pattern: its own Firebase web app, usually named like `hypomnema (linux)`. | `flutterfire configure` for Linux, and initialization for Linux. |
 
 ## Format, analyze, and test
 
