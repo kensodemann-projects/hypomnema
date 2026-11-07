@@ -1,1 +1,37 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"kws-hypomnema","appId":"1:270119285417:android:37e28c5c6b26ffca3fefb8","fileOutput":"android/app/google-services.json"}},"macos":{"default":{"projectId":"kws-hypomnema","appId":"1:270119285417:ios:28682e4b74c9d0c23fefb8","uploadDebugSymbols":false,"fileOutput":"macos/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"kws-hypomnema","configurations":{"android":"1:270119285417:android:37e28c5c6b26ffca3fefb8","macos":"1:270119285417:ios:28682e4b74c9d0c23fefb8"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "kws-hypomnema",
+          "appId": "1:270119285417:android:37e28c5c6b26ffca3fefb8",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "kws-hypomnema",
+          "appId": "1:270119285417:ios:28682e4b74c9d0c23fefb8",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "kws-hypomnema",
+          "configurations": {
+            "android": "1:270119285417:android:37e28c5c6b26ffca3fefb8",
+            "macos": "1:270119285417:ios:28682e4b74c9d0c23fefb8",
+            "web": "1:270119285417:web:3c0cad7eaece89223fefb8"
+          }
+        }
+      }
+    }
+  },
+  "emulators": {
+    "auth": { "port": 9099 },
+    "firestore": { "port": 8080 },
+    "ui": { "enabled": true },
+    "singleProjectMode": true
+  }
+}

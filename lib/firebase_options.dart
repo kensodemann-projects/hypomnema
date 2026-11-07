@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -56,7 +53,6 @@ class DefaultFirebaseOptions {
     projectId: 'kws-hypomnema',
     storageBucket: 'kws-hypomnema.firebasestorage.app',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBBUjM5ce9vgnCSc_IdMvyg0WSHA9hTeEY',
     appId: '1:270119285417:ios:28682e4b74c9d0c23fefb8',
@@ -64,5 +60,14 @@ class DefaultFirebaseOptions {
     projectId: 'kws-hypomnema',
     storageBucket: 'kws-hypomnema.firebasestorage.app',
     iosBundleId: 'com.example.hypomnema',
+  );
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDObqwlldT1U4RMLbSR-MCHj7IdqTte5HE',
+    appId: '1:270119285417:web:3c0cad7eaece89223fefb8',
+    messagingSenderId: '270119285417',
+    projectId: 'kws-hypomnema',
+    authDomain: 'kws-hypomnema.firebaseapp.com',
+    storageBucket: 'kws-hypomnema.firebasestorage.app',
+    measurementId: 'G-6QN4XB2PNN',
   );
 }

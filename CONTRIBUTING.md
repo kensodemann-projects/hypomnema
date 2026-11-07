@@ -27,6 +27,12 @@ flutter devices
 flutter run -d <device>
 ```
 
+Local debug runs on Android, macOS, and Chrome use the Firebase Auth and Firestore emulators. Start them from the repository root before `flutter run` or `flutter run -d chrome`:
+
+```sh
+firebase emulators:start --only auth,firestore
+```
+
 Phone and desktop are both required form factors. Run on a phone (a device or simulator) and on a desktop target before considering a UI change done.
 
 Import UI widgets from `package:material_ui/material_ui.dart`.
