@@ -15,7 +15,7 @@ flutter doctor
 From the repository root:
 
 ```sh
-flutter pub get
+make get
 ```
 
 ## Run
@@ -23,14 +23,16 @@ flutter pub get
 List devices, then run on one of them:
 
 ```sh
-flutter devices
-flutter run -d <device>
+make devices
+make run DEVICE=<device>
 ```
 
-Local debug runs on Android, macOS, and Chrome use the Firebase Auth and Firestore emulators. Start them from the repository root before `flutter run` or `flutter run -d chrome`:
+`make run` with no `DEVICE` is `flutter run`.
+
+Local debug runs on Android, macOS, and Chrome use the Firebase Auth and Firestore emulators. Start them from the repository root before `make run`:
 
 ```sh
-firebase emulators:start --only auth,firestore
+make emulators
 ```
 
 Phone and desktop are both required form factors. Run on a phone (a device or simulator) and on a desktop target before considering a UI change done.
@@ -52,10 +54,12 @@ Firebase Auth and Firestore are connected for Android, macOS, and web. A Windows
 `analysis_options.yaml` includes `package:flutter_lints/flutter.yaml`. Before a change is ready:
 
 ```sh
-dart format .
-flutter analyze
-flutter test
+make format
+make analyze
+make test
 ```
+
+`make check` runs the same formatting check, analyze, and test steps as CI.
 
 ## Workflow
 
