@@ -28,11 +28,10 @@ jobs:
         run: flutter pub get
 
       - name: Check Formatting
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Analyze
         run: flutter analyze
 
-      # No test/ directory yet. Restore this step once tests exist.
-      # - name: Run Tests
-      #   run: flutter test
+      - name: Run Tests
+        run: flutter test
