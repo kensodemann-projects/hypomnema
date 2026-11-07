@@ -8,18 +8,18 @@ Related to [#1](https://github.com/kensodemann-projects/hypomnema/issues/1).
 
 **Decisions**
 
-- Connect Android and macOS with FlutterFire: `firebase_core`, `firebase_auth`, and `cloud_firestore`. `lib/main.dart` initializes Firebase. iOS, web, Windows, and Linux keep the current `MainApp` and do not call Firebase.
-- Use the existing Firebase project. Register the Android and macOS apps on that project.
+- Connect Android and macOS with FlutterFire: `firebase_core`, `firebase_auth`, and `cloud_firestore`. `lib/main.dart` initializes Firebase for those platforms. STEP-002 also registers the web app and initializes Firebase for web. iOS, Windows, and Linux do not call Firebase.
+- Use the existing Firebase project. Android and macOS apps are already registered. STEP-002 registers the web app on that project.
 - The Android application id and macOS bundle id stay `com.example.hypomnema`.
 - Enable Authentication with the Email/Password provider so users can be added in the Firebase console. The app does not sign in or create users.
-- Debug runs (`kDebugMode`) use the Auth emulator on port 9099 and the Firestore emulator on port 8080. The Android emulator host is `10.0.2.2`. The macOS host is `localhost`. Profile and release builds use the production project and do not call the emulators.
+- Debug runs (`kDebugMode`) use the Auth emulator on port 9099 and the Firestore emulator on port 8080. The Android emulator host is `10.0.2.2`. The macOS host and the web host are `localhost`. On web, detect the browser with `kIsWeb` before `defaultTargetPlatform`, because Chrome on macOS reports `TargetPlatform.macOS`. Profile and release builds use the production project and do not call the emulators.
 - The debug Android manifest allows cleartext traffic so debug builds can reach the local emulator. The release manifest does not.
 
 **Out of scope**
 
 - Note documents and a notes data model.
 - The login screen, the auth gate, and the signed-in shell.
-- Firebase apps for iOS, web, Windows, and Linux.
+- Firebase apps for iOS, Windows, and Linux.
 - Account creation inside the app.
 - Firestore security rules and deploying them.
 - Changing the Android application id or the macOS bundle id.
@@ -28,14 +28,14 @@ Related to [#1](https://github.com/kensodemann-projects/hypomnema/issues/1).
 
 - The home screen still shows `Hello World!`.
 - Auth emulator port `9099`. Firestore emulator port `8080`.
-- Debug Android host `10.0.2.2`. Debug macOS host `localhost`.
+- Debug Android host `10.0.2.2`. Debug macOS host `localhost`. Debug web host `localhost`.
 
 **File order**
 
 | Order | Step       | Status | Files |
 | ----- | ---------- | ------ | ----- |
-| 1     | [STEP-001] |        | `pubspec.yaml`, then `pubspec.lock`, then `lib/firebase_options.dart`, then `android/settings.gradle.kts`, then `android/app/build.gradle.kts`, then `android/app/google-services.json`, then `android/app/src/main/AndroidManifest.xml`, then `macos/Runner/GoogleService-Info.plist`, then `macos/Runner.xcodeproj/project.pbxproj`, then `macos/Runner/DebugProfile.entitlements`, then `macos/Runner/Release.entitlements`, then `.firebaserc`, then `firebase.json`, then `lib/main.dart` |
-| 2     | [STEP-002] |        | `lib/main.dart`, then `firebase.json`, then `android/app/src/debug/AndroidManifest.xml`, then `CONTRIBUTING.md` |
+| 1     | [STEP-001] | complete | `pubspec.yaml`, then `pubspec.lock`, then `lib/firebase_options.dart`, then `android/settings.gradle.kts`, then `android/app/build.gradle.kts`, then `android/app/google-services.json`, then `android/app/src/main/AndroidManifest.xml`, then `macos/Runner/GoogleService-Info.plist`, then `macos/Runner.xcodeproj/project.pbxproj`, then `macos/Runner/DebugProfile.entitlements`, then `macos/Runner/Release.entitlements`, then `.firebaserc`, then `firebase.json`, then `lib/main.dart` |
+| 2     | [STEP-002] |        | `lib/firebase_options.dart`, then `firebase.json`, then `lib/main.dart`, then `android/app/src/debug/AndroidManifest.xml`, then `CONTRIBUTING.md` |
 
 **Commit gate**
 
@@ -48,7 +48,7 @@ flutter analyze
 
 ## [STEP-001] Connect the Firebase project
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** The existing Firebase project is connected, with Authentication (Email/Password) and a Cloud Firestore database. Android and macOS builds start, `Firebase.initializeApp` completes, and the home screen still shows `Hello World!`.
 
@@ -85,20 +85,25 @@ In `lib/main.dart`, make `main` async. Call `WidgetsFlutterBinding.ensureInitial
 
 **Status:**
 
-**Acceptance criteria:** A debug run on the Android emulator and a debug run on macOS use the local Auth and Firestore emulators. Profile and release runs use the production project. The home screen still shows `Hello World!`.
+**Acceptance criteria:** A debug run on the Android emulator, a debug run on macOS, and `flutter run -d chrome` use the local Auth and Firestore emulators. Profile and release runs use the production project. The home screen still shows `Hello World!`.
 
 **Files**
 
-1. `lib/main.dart` — after a successful `Firebase.initializeApp`, connect debug runs to the emulators.
-2. `firebase.json` — add the Auth, Firestore, and emulator UI configuration. Keep any existing `flutter` key.
-3. `android/app/src/debug/AndroidManifest.xml` — allow cleartext traffic on debug builds.
-4. `CONTRIBUTING.md` — document how to start the emulators before `flutter run`.
+1. `lib/firebase_options.dart` — regenerate with FlutterFire so the web app is included. Keep the Android and macOS options.
+2. `firebase.json` — keep the FlutterFire `flutter` platform map, including web, and add the Auth, Firestore, and emulator UI configuration.
+3. `lib/main.dart` — initialize Firebase for web, then connect debug Android, macOS, and web runs to the emulators.
+4. `android/app/src/debug/AndroidManifest.xml` — allow cleartext traffic on debug builds.
+5. `CONTRIBUTING.md` — document how to start the emulators before `flutter run`, including Chrome.
 
 No test files. There is no `test/` directory, and the issue does not ask for tests.
 
 **Change**
 
-In `lib/main.dart`, when Firebase was initialized and `kDebugMode` is true, call `FirebaseAuth.instance.useAuthEmulator` and `FirebaseFirestore.instance.useFirestoreEmulator` before `runApp`. Use host `10.0.2.2` on Android and `localhost` on macOS. Use port `9099` for Auth and port `8080` for Firestore. Profile and release runs skip both calls.
+From the repository root, run `flutterfire configure --project=kws-hypomnema --platforms=android,macos,web` and keep the existing Android and macOS apps. Register the web app on `kws-hypomnema`. Commit the regenerated `lib/firebase_options.dart` and the `flutter` map `firebase.json` gains for web.
+
+In `lib/main.dart`, call `Firebase.initializeApp` with `DefaultFirebaseOptions.currentPlatform` when `kIsWeb` is true, or when `defaultTargetPlatform` is `TargetPlatform.android` or `TargetPlatform.macOS`. Check `kIsWeb` first. Take `kIsWeb` from `package:flutter/foundation.dart`, alongside `defaultTargetPlatform`. Take `WidgetsFlutterBinding` and `TargetPlatform` from `package:material_ui/material_ui.dart`.
+
+When that initialization ran and `kDebugMode` is true, call `FirebaseAuth.instance.useAuthEmulator` and `FirebaseFirestore.instance.useFirestoreEmulator` before `runApp`. Use host `10.0.2.2` on Android. Use host `localhost` on macOS and on web. Use port `9099` for Auth and port `8080` for Firestore. Profile and release runs skip both calls.
 
 Add this `emulators` object to `firebase.json`:
 
@@ -113,7 +118,7 @@ Add this `emulators` object to `firebase.json`:
 
 In `android/app/src/debug/AndroidManifest.xml`, set `android:usesCleartextTraffic="true"` on the application element so the debug manifest merger allows HTTP to the emulator. Do not set that flag on the main or release manifest.
 
-In the Run section of `CONTRIBUTING.md`, state that local debug runs use these emulators and that they are started from the repository root with `firebase emulators:start --only auth,firestore` before `flutter run`.
+In the Run section of `CONTRIBUTING.md`, state that local debug runs on Android, macOS, and Chrome use these emulators, and that they are started from the repository root with `firebase emulators:start --only auth,firestore` before `flutter run` or `flutter run -d chrome`.
 
 **Done when:** The acceptance criteria hold, and the commit-gate commands succeed with no warning or error.
 
