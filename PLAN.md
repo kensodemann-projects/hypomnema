@@ -27,7 +27,7 @@ Issue: [#5](https://github.com/kensodemann-projects/hypomnema/issues/5) (OPEN). 
 
 | Order | Step       | Status | Files                                      |
 | ----- | ---------- | ------ | ------------------------------------------ |
-| 1     | [STEP-001] |        | `lib/main.dart`, then `test/main_test.dart` |
+| 1     | [STEP-001] | complete | `lib/main.dart`, then `test/main_test.dart` |
 
 **Commit gate** — the human commits. A spot-check does not replace the gate. The repository has no separate build command. `make check` runs these three, and CI runs the same three. All three must succeed with no warning or error before that commit.
 
@@ -39,7 +39,7 @@ flutter test
 
 ## [STEP-001] Switch the shell on window width
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** A window 600 logical pixels wide or narrower shows the phone shell. A wider window shows the desktop shell. The strings and structure match the contract.
 
