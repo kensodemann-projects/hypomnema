@@ -49,7 +49,7 @@ Related to [#1](https://github.com/kensodemann-projects/hypomnema/issues/1).
 
 | Order | Step       | Status | Files                                                                                   |
 | ----- | ---------- | ------ | --------------------------------------------------------------------------------------- |
-| 1     | [STEP-001] |        | `lib/data/services/auth_service.dart`, then `test/data/services/auth_service_test.dart` |
+| 1     | [STEP-001] | complete | `lib/data/services/auth_service.dart`, then `test/data/services/auth_service_test.dart` |
 | 2     | [STEP-002] |        | `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`             |
 | 3     | [STEP-003] |        | `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`             |
 
@@ -63,7 +63,7 @@ make test
 
 ## [STEP-001] Forward email sign-in and password reset to Firebase Auth
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** `FirebaseAuthService` forwards each email and password to `FirebaseAuth.signInWithEmailAndPassword`, forwards each reset email to `FirebaseAuth.sendPasswordResetEmail` with no action-code settings, and lets `FirebaseAuthException` propagate. It has no account-creation method.
 
