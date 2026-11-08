@@ -51,7 +51,7 @@ Related to [#1](https://github.com/kensodemann-projects/hypomnema/issues/1).
 | ----- | ---------- | ------ | --------------------------------------------------------------------------------------- |
 | 1     | [STEP-001] | complete | `lib/data/services/auth_service.dart`, then `test/data/services/auth_service_test.dart` |
 | 2     | [STEP-002] | complete | `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`             |
-| 3     | [STEP-003] |        | `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`             |
+| 3     | [STEP-003] | complete | `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`             |
 
 **Commit gate** — the human commits. A spot-check does not replace the gate. The repository has no separate build command. `make check` runs these three, and all three must succeed with no warning or error before that commit:
 
@@ -131,7 +131,7 @@ flutter test test/ui/auth/login_screen_test.dart
 
 ## [STEP-003] Replace the sign-in form with forgot-password
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** **Forgot password** stays disabled until the trimmed email matches the pattern. Pressing it replaces the sign-in form with that email, **Send reset email**, and **Back to sign in**. The email field keeps the same required and format checks. **Send reset email** sends the trimmed email only when it passes. A successful send shows `Check your email for a password reset link.` A `FirebaseAuthException` shows its message or code and does not show that confirmation. **Back to sign in** restores the password field, valid until the user leaves it, and **Sign in** enabled only when the password trim is non-empty.
 
