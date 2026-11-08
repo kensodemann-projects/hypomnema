@@ -50,9 +50,9 @@ class Shell extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth > 600) {
-          return DesktopScaffold();
+          return const DesktopScaffold();
         } else {
-          return PhoneScaffold();
+          return const PhoneScaffold();
         }
       },
     );
