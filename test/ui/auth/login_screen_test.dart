@@ -19,6 +19,7 @@ class _RecordingAuthService implements AuthService {
   Object? error;
   Completer<void>? pending;
   final signInCalls = <({String email, String password})>[];
+  final resetCalls = <String>[];
 
   @override
   Future<void> signInWithEmailAndPassword({
@@ -37,7 +38,17 @@ class _RecordingAuthService implements AuthService {
   }
 
   @override
-  Future<void> sendPasswordResetEmail({required String email}) async {}
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    resetCalls.add(email);
+    final pending = this.pending;
+    if (pending != null) {
+      await pending.future;
+    }
+    final error = this.error;
+    if (error != null) {
+      throw error;
+    }
+  }
 }
 
 Future<void> pumpLoginScreen(
@@ -47,7 +58,9 @@ Future<void> pumpLoginScreen(
 }) async {
   setLogicalViewportSize(tester, size);
   await tester.pumpWidget(
-    MaterialApp(home: LoginScreen(authService: authService)),
+    MaterialApp(
+      home: LoginScreen(key: ValueKey(size), authService: authService),
+    ),
   );
 }
 
@@ -170,7 +183,10 @@ void main() {
       final signIn = tester.getRect(find.byKey(const Key('login-sign-in')));
       expect(password.top - email.bottom, 16);
       expect(signIn.top - password.bottom, 24);
-      expect(find.text('Forgot password'), findsNothing);
+      final forgot = tester.getRect(
+        find.byKey(const Key('login-forgot-password')),
+      );
+      expect(forgot.top - signIn.bottom, 8);
     },
   );
 
@@ -398,11 +414,265 @@ void main() {
 
       // Then
       expect(signInButton(tester).onPressed, isNull);
+      expect(
+        tester
+            .widget<TextButton>(find.byKey(const Key('login-forgot-password')))
+            .onPressed,
+        isNull,
+      );
       expect(auth.signInCalls, hasLength(1));
 
       auth.pending!.complete();
       await tester.pump();
       expect(signInButton(tester).onPressed, isNotNull);
+    },
+  );
+
+  testWidgets(
+    'Given the email field, when it is not a valid address, then Forgot password is disabled',
+    (tester) async {
+      // Given
+      await pumpLoginScreen(
+        tester,
+        authService: _RecordingAuthService(),
+        size: const Size(400, 800),
+      );
+      final forgot = find.byKey(const Key('login-forgot-password'));
+
+      // Then
+      expect(tester.widget<TextButton>(forgot).onPressed, isNull);
+
+      // When
+      await tester.enterText(find.byKey(const Key('login-email')), 'person');
+      await tester.pump();
+
+      // Then
+      expect(tester.widget<TextButton>(forgot).onPressed, isNull);
+
+      // When
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.pump();
+
+      // Then
+      expect(tester.widget<TextButton>(forgot).onPressed, isNotNull);
+    },
+  );
+
+  testWidgets(
+    'Given a valid email, when Forgot password is tapped, then the reset form keeps that email',
+    (tester) async {
+      // Given
+      await pumpLoginScreen(
+        tester,
+        authService: _RecordingAuthService(),
+        size: const Size(400, 800),
+      );
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.pump();
+
+      // When
+      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.pump();
+
+      // Then
+      expect(find.byKey(const Key('login-password')), findsNothing);
+      expect(find.byKey(const Key('login-sign-in')), findsNothing);
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const Key('login-email')))
+            .controller
+            ?.text,
+        'person@example.com',
+      );
+      expect(find.byKey(const Key('login-send-reset')), findsOneWidget);
+      expect(find.byKey(const Key('login-back-to-sign-in')), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'Given the reset form, when the email is cleared, then Send reset email does not call AuthService',
+    (tester) async {
+      // Given
+      final auth = _RecordingAuthService();
+      await pumpLoginScreen(
+        tester,
+        authService: auth,
+        size: const Size(400, 800),
+      );
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.pump();
+
+      // When
+      await tester.enterText(find.byKey(const Key('login-email')), '');
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('login-send-reset')));
+      await tester.pump();
+
+      // Then
+      expect(auth.resetCalls, isEmpty);
+      expect(
+        textField(tester, 'login-email').decoration?.errorText,
+        'Email is required.',
+      );
+    },
+  );
+
+  testWidgets(
+    'Given a valid email, when Send reset email succeeds, then the trimmed email is forwarded and the confirmation is shown',
+    (tester) async {
+      // Given
+      final auth = _RecordingAuthService();
+      await pumpLoginScreen(
+        tester,
+        authService: auth,
+        size: const Size(400, 800),
+      );
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        ' person@example.com ',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.pump();
+
+      // When
+      await tester.tap(find.byKey(const Key('login-send-reset')));
+      await tester.pump();
+
+      // Then
+      expect(auth.resetCalls, ['person@example.com']);
+      expect(find.byKey(const Key('login-reset-confirmation')), findsOneWidget);
+      expect(
+        find.text('Check your email for a password reset link.'),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('login-error')), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'Given a FirebaseAuthException, when the reset email fails, then the message is shown and the confirmation is hidden',
+    (tester) async {
+      // Given
+      final auth = _RecordingAuthService()
+        ..error = FirebaseAuthException(
+          code: 'invalid-email',
+          message: 'That address is not valid.',
+        );
+      await pumpLoginScreen(
+        tester,
+        authService: auth,
+        size: const Size(400, 800),
+      );
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.pump();
+
+      // When
+      await tester.tap(find.byKey(const Key('login-send-reset')));
+      await tester.pump();
+
+      // Then
+      expect(find.text('That address is not valid.'), findsOneWidget);
+      expect(find.byKey(const Key('login-reset-confirmation')), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'Given the reset form, when Back to sign in is tapped, then the password field returns without an error',
+    (tester) async {
+      // Given
+      await pumpLoginScreen(
+        tester,
+        authService: _RecordingAuthService(),
+        size: const Size(400, 800),
+      );
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.pump();
+
+      // When
+      await tester.tap(find.byKey(const Key('login-back-to-sign-in')));
+      await tester.pump();
+
+      // Then
+      expect(textField(tester, 'login-password').decoration?.errorText, isNull);
+      expect(signInButton(tester).onPressed, isNull);
+      await tester.enterText(find.byKey(const Key('login-password')), 'secret');
+      await tester.pump();
+      expect(signInButton(tester).onPressed, isNotNull);
+    },
+  );
+
+  testWidgets(
+    'Given the reset form, when the width changes, then the card and the button gaps follow the sign-in layout',
+    (tester) async {
+      // Given
+      final auth = _RecordingAuthService();
+      await pumpLoginScreen(
+        tester,
+        authService: auth,
+        size: const Size(400, 800),
+      );
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.pump();
+
+      // Then
+      expect(find.byKey(const Key('login-form-card')), findsNothing);
+      final email = tester.getRect(find.byKey(const Key('login-email')));
+      final send = tester.getRect(find.byKey(const Key('login-send-reset')));
+      final back = tester.getRect(
+        find.byKey(const Key('login-back-to-sign-in')),
+      );
+      expect(send.top - email.bottom, 24);
+      expect(back.top - send.bottom, 8);
+
+      // When
+      await pumpLoginScreen(
+        tester,
+        authService: auth,
+        size: const Size(601, 800),
+      );
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.pump();
+
+      // Then
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('login-form-card')),
+          matching: find.byKey(const Key('login-send-reset')),
+        ),
+        findsOneWidget,
+      );
     },
   );
 }

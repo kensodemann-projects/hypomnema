@@ -41,12 +41,19 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _emailError;
   String? _passwordError;
   String? _authError;
+  String? _confirmation;
   var _submitting = false;
+  var _resettingPassword = false;
+
+  bool get _emailIsValid =>
+      _emailValidationError(_emailController.text) == null;
 
   bool get _canSignIn =>
       !_submitting &&
-      _emailValidationError(_emailController.text) == null &&
+      _emailIsValid &&
       _passwordValidationError(_passwordController.text) == null;
+
+  bool get _canResetPassword => !_submitting && _emailIsValid;
 
   @override
   void initState() {
@@ -104,44 +111,133 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _showResetForm() {
+    setState(() {
+      _resettingPassword = true;
+      _authError = null;
+      _confirmation = null;
+      _passwordError = null;
+    });
+  }
+
+  void _showSignInForm() {
+    setState(() {
+      _resettingPassword = false;
+      _authError = null;
+      _confirmation = null;
+      _passwordError = null;
+    });
+  }
+
+  Future<void> _sendResetEmail() async {
+    final emailError = _emailValidationError(_emailController.text);
+    if (emailError != null) {
+      setState(() {
+        _emailError = emailError;
+        _authError = null;
+        _confirmation = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _submitting = true;
+      _authError = null;
+      _confirmation = null;
+    });
+    try {
+      await widget.authService.sendPasswordResetEmail(
+        email: _emailController.text.trim(),
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(
+        () => _confirmation = 'Check your email for a password reset link.',
+      );
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _authError = error.message ?? error.code);
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+    }
+  }
+
+  Widget _emailField() {
+    return TextField(
+      key: const Key('login-email'),
+      controller: _emailController,
+      focusNode: _emailFocus,
+      keyboardType: TextInputType.emailAddress,
+      decoration: InputDecoration(labelText: 'Email', errorText: _emailError),
+      onChanged: (_) => setState(() => _emailError = null),
+    );
+  }
+
+  List<Widget> _feedback() {
+    return [
+      if (_authError != null) ...[
+        const SizedBox(height: 16),
+        Text(_authError!, key: const Key('login-error')),
+      ],
+      if (_confirmation != null) ...[
+        const SizedBox(height: 16),
+        Text(_confirmation!, key: const Key('login-reset-confirmation')),
+      ],
+    ];
+  }
+
   Widget _form() {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        TextField(
-          key: const Key('login-email'),
-          controller: _emailController,
-          focusNode: _emailFocus,
-          keyboardType: TextInputType.emailAddress,
-          decoration: InputDecoration(
-            labelText: 'Email',
-            errorText: _emailError,
+        _emailField(),
+        if (_resettingPassword) ...[
+          ..._feedback(),
+          const SizedBox(height: 24),
+          FilledButton(
+            key: const Key('login-send-reset'),
+            onPressed: _submitting ? null : _sendResetEmail,
+            child: const Text('Send reset email'),
           ),
-          onChanged: (_) => setState(() => _emailError = null),
-        ),
-        const SizedBox(height: 16),
-        TextField(
-          key: const Key('login-password'),
-          controller: _passwordController,
-          focusNode: _passwordFocus,
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: 'Password',
-            errorText: _passwordError,
+          const SizedBox(height: 8),
+          TextButton(
+            key: const Key('login-back-to-sign-in'),
+            onPressed: _showSignInForm,
+            child: const Text('Back to sign in'),
           ),
-          onChanged: (_) => setState(() => _passwordError = null),
-        ),
-        if (_authError != null) ...[
+        ] else ...[
           const SizedBox(height: 16),
-          Text(_authError!, key: const Key('login-error')),
+          TextField(
+            key: const Key('login-password'),
+            controller: _passwordController,
+            focusNode: _passwordFocus,
+            obscureText: true,
+            decoration: InputDecoration(
+              labelText: 'Password',
+              errorText: _passwordError,
+            ),
+            onChanged: (_) => setState(() => _passwordError = null),
+          ),
+          ..._feedback(),
+          const SizedBox(height: 24),
+          FilledButton(
+            key: const Key('login-sign-in'),
+            onPressed: _canSignIn ? _signIn : null,
+            child: const Text('Sign in'),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            key: const Key('login-forgot-password'),
+            onPressed: _canResetPassword ? _showResetForm : null,
+            child: const Text('Forgot password'),
+          ),
         ],
-        const SizedBox(height: 24),
-        FilledButton(
-          key: const Key('login-sign-in'),
-          onPressed: _canSignIn ? _signIn : null,
-          child: const Text('Sign in'),
-        ),
       ],
     );
   }
