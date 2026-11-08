@@ -2,16 +2,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/main.dart';
 import 'package:material_ui/material_ui.dart';
 
+void setLogicalViewportSize(WidgetTester tester, Size size) {
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = size;
+}
+
 void main() {
   testWidgets(
     'Given the platform brightness, when it is light, then MainApp matches it',
     (tester) async {
       // Given
+      setLogicalViewportSize(tester, const Size(400, 800));
       addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(400, 800);
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
 
       // When
@@ -30,11 +34,8 @@ void main() {
     'Given the platform brightness, when it is dark, then MainApp matches it',
     (tester) async {
       // Given
+      setLogicalViewportSize(tester, const Size(400, 800));
       addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(400, 800);
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
 
       // When
@@ -53,10 +54,7 @@ void main() {
     'Given a physical size, when the width is 400, then the phone layout is used',
     (tester) async {
       // Given
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(400, 800);
+      setLogicalViewportSize(tester, const Size(400, 800));
 
       // When
       await tester.pumpWidget(const MainApp());
@@ -74,10 +72,7 @@ void main() {
     'Given a physical size, when the width is 600, then the phone layout is used',
     (tester) async {
       // Given
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(600, 800);
+      setLogicalViewportSize(tester, const Size(600, 800));
 
       // When
       await tester.pumpWidget(const MainApp());
@@ -95,10 +90,7 @@ void main() {
     'Given a physical size, when the width is 601, then the desktop layout is used',
     (tester) async {
       // Given
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(601, 800);
+      setLogicalViewportSize(tester, const Size(601, 800));
 
       // When
       await tester.pumpWidget(const MainApp());
@@ -116,10 +108,7 @@ void main() {
     'Given a physical size, when the width is 1200, then the desktop layout is used',
     (tester) async {
       // Given
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(1200, 800);
+      setLogicalViewportSize(tester, const Size(1200, 800));
 
       // When
       await tester.pumpWidget(const MainApp());
