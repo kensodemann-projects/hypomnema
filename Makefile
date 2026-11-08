@@ -25,3 +25,6 @@ run:
 
 emulators:
 	firebase emulators:start --only auth,firestore
+
+preview:
+	flutter widget-preview start
