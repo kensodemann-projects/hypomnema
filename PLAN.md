@@ -50,7 +50,7 @@ Related to [#1](https://github.com/kensodemann-projects/hypomnema/issues/1).
 | Order | Step       | Status | Files                                                                                   |
 | ----- | ---------- | ------ | --------------------------------------------------------------------------------------- |
 | 1     | [STEP-001] | complete | `lib/data/services/auth_service.dart`, then `test/data/services/auth_service_test.dart` |
-| 2     | [STEP-002] |        | `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`             |
+| 2     | [STEP-002] | complete | `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`             |
 | 3     | [STEP-003] |        | `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`             |
 
 **Commit gate** — the human commits. A spot-check does not replace the gate. The repository has no separate build command. `make check` runs these three, and all three must succeed with no warning or error before that commit:
@@ -92,7 +92,7 @@ flutter test test/data/services/auth_service_test.dart
 
 ## [STEP-002] Sign in from a phone column and a desktop card
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** The login screen collects an email and password and checks each field when it loses focus. **Sign in** stays disabled until the trimmed email matches the pattern and the password trim is non-empty, then calls `AuthService.signInWithEmailAndPassword`. A failing field shows its message in the error color, with the label and border in the error color. Typing in a field clears that field's message and updates whether **Sign in** is enabled. A `FirebaseAuthException` shows its message or code. Width 600 and below is a full-width column inset by 16 pixels. Width above 600 is a centered card of max width 400 with 24 pixels inside the card. Fields are 16 pixels apart, and 24 pixels separate the fields from **Sign in**. A successful sign-in does not navigate and does not show the reset confirmation. Phone and desktop previews sit at the bottom of the login screen file.
 
