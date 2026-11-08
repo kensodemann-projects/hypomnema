@@ -37,7 +37,40 @@ class MainApp extends StatelessWidget {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
-      home: const Scaffold(body: Center(child: Text('Hello World!'))),
+      home: const Shell(),
+    );
+  }
+}
+
+class Shell extends StatelessWidget {
+  const Shell({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 600) {
+          return Scaffold(
+            body: Row(
+              children: [
+                SizedBox(
+                  key: const Key('shell-side-panel'),
+                  width: 72,
+                  height: double.infinity,
+                  child: ColoredBox(
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                  ),
+                ),
+                const Expanded(child: Center(child: Text('Desktop'))),
+              ],
+            ),
+          );
+        }
+        return Scaffold(
+          appBar: AppBar(),
+          body: const Center(child: Text('Phone')),
+        );
+      },
     );
   }
 }

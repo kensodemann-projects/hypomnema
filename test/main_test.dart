@@ -5,14 +5,36 @@ import 'package:material_ui/material_ui.dart';
 void main() {
   testWidgets('MainApp follows the platform brightness', (tester) async {
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.view.devicePixelRatio = 1;
 
     for (final brightness in [Brightness.light, Brightness.dark]) {
       tester.platformDispatcher.platformBrightnessTestValue = brightness;
+
+      tester.view.physicalSize = const Size(400, 800);
       await tester.pumpWidget(const MainApp());
       await tester.pumpAndSettle();
 
+      expect(find.text('Phone'), findsOneWidget);
+      expect(find.text('Desktop'), findsNothing);
+      expect(find.byType(AppBar), findsOneWidget);
+      expect(find.byKey(const Key('shell-side-panel')), findsNothing);
       expect(
-        Theme.of(tester.element(find.text('Hello World!'))).brightness,
+        Theme.of(tester.element(find.text('Phone'))).brightness,
+        brightness,
+      );
+
+      tester.view.physicalSize = const Size(1200, 800);
+      await tester.pumpWidget(const MainApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Desktop'), findsOneWidget);
+      expect(find.text('Phone'), findsNothing);
+      expect(find.byType(AppBar), findsNothing);
+      expect(find.byKey(const Key('shell-side-panel')), findsOneWidget);
+      expect(
+        Theme.of(tester.element(find.text('Desktop'))).brightness,
         brightness,
       );
     }
