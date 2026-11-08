@@ -50,27 +50,46 @@ class Shell extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth > 600) {
-          return Scaffold(
-            body: Row(
-              children: [
-                SizedBox(
-                  key: const Key('shell-side-panel'),
-                  width: 72,
-                  height: double.infinity,
-                  child: ColoredBox(
-                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                  ),
-                ),
-                const Expanded(child: Center(child: Text('Desktop'))),
-              ],
-            ),
-          );
+          return DesktopScaffold();
+        } else {
+          return PhoneScaffold();
         }
-        return Scaffold(
-          appBar: AppBar(),
-          body: const Center(child: Text('Phone')),
-        );
       },
+    );
+  }
+}
+
+class DesktopScaffold extends StatelessWidget {
+  const DesktopScaffold({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          SizedBox(
+            key: const Key('shell-side-panel'),
+            width: 72,
+            height: double.infinity,
+            child: ColoredBox(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            ),
+          ),
+          const Expanded(child: Center(child: Text('Desktop'))),
+        ],
+      ),
+    );
+  }
+}
+
+class PhoneScaffold extends StatelessWidget {
+  const PhoneScaffold({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: const Center(child: Text('Phone')),
     );
   }
 }
