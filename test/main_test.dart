@@ -3,6 +3,13 @@ import 'package:hypomnema/main.dart';
 import 'package:material_ui/material_ui.dart';
 
 void main() {
+  // Given the platform brightness, When light or dark, Then the MainApp matches the platform
+
+  // Given a physical size, when width is less than 600, Then the Phone layout is used
+  // Given a physical size, when width is 600, Then the Phone layout is used
+  // Given a physical size, when width is 601, Then the Desktop layout is used
+  // Given a physical size, when width is greater than 601, Then the Desktop layout is used
+
   testWidgets('MainApp follows the platform brightness', (tester) async {
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
     addTearDown(tester.view.resetPhysicalSize);
