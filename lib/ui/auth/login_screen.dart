@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) {
         return;
       }
-      setState(() => _authError = 'Authentication Failed.');
+      setState(() => _authError = 'Authentication failed.');
     } finally {
       if (mounted) {
         setState(() => _submitting = false);

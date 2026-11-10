@@ -1,4 +1,4 @@
-.PHONY: get format format-check analyze test check devices run emulators
+.PHONY: get format format-check analyze test check devices run emulators preview
 
 get:
 	flutter pub get
