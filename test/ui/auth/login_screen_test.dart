@@ -355,7 +355,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a FirebaseAuthException, when sign-in fails, then the message or code is shown',
+    'Given a FirebaseAuthException, when sign-in fails, then the authentication failed message is shown',
     (tester) async {
       // Given
       final auth = _RecordingAuthService()
