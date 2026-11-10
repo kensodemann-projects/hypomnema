@@ -381,13 +381,12 @@ void main() {
 
       // Then
       expect(find.byKey(const Key('login-error')), findsOneWidget);
-      expect(find.text('Wrong password.'), findsOneWidget);
+      expect(find.text('Authentication Failed.'), findsOneWidget);
 
       auth.error = FirebaseAuthException(code: 'invalid-credential');
       await tester.tap(find.byKey(const Key('login-sign-in')));
       await tester.pump();
-      expect(find.text('invalid-credential'), findsOneWidget);
-      expect(find.text('Wrong password.'), findsNothing);
+      expect(find.text('Authentication Failed.'), findsOneWidget);
     },
   );
 

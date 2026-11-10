@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) {
         return;
       }
-      setState(() => _authError = error.message ?? error.code);
+      setState(() => _authError = 'Authentication Failed.');
     } finally {
       if (mounted) {
         setState(() => _submitting = false);
@@ -182,7 +182,11 @@ class _LoginScreenState extends State<LoginScreen> {
     return [
       if (_authError != null) ...[
         const SizedBox(height: 16),
-        Text(_authError!, key: const Key('login-error')),
+        Text(
+          _authError!,
+          key: const Key('login-error'),
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        ),
       ],
       if (_confirmation != null) ...[
         const SizedBox(height: 16),
