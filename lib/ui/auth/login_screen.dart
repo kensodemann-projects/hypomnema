@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
-    } on FirebaseAuthException catch (error) {
+    } on FirebaseAuthException {
       if (!mounted) {
         return;
       }
@@ -155,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(
         () => _confirmation = 'Check your email for a password reset link.',
       );
-    } on FirebaseAuthException catch (error) {
+    } on FirebaseAuthException {
       if (!mounted) {
         return;
       }

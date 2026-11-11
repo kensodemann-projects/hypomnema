@@ -9,14 +9,14 @@ Based on a code-quality review comparing this branch with `3-argon`, checked aga
 
 ## Loose ends from `756fdc2`
 
-- [ ] **Forgot-password errors still show raw Firebase text.** `_sendResetEmail` still sets `error.message ?? error.code` (line 162 of `lib/ui/auth/login_screen.dart`). Change it to match sign-in or map it to a friendly message, and update the test "when the reset email fails, then the message is shown…".
+- [x] **Forgot-password errors still show raw Firebase text.** `_sendResetEmail` still sets `error.message ?? error.code` (line 162 of `lib/ui/auth/login_screen.dart`). Change it to match sign-in or map it to a friendly message, and update the test "when the reset email fails, then the message is shown…".
 - [x] **Capitalisation doesn't match the other messages.** Change "Authentication Failed." to sentence case ("Authentication failed.") to match "Email is required." and the rest, and update the test.
 - [x] **One test name is now inaccurate.** Rename "Given a FirebaseAuthException, when sign-in fails, then the message or code is shown" (line 358 of the test file). That test also repeats the same assertion twice now; collapse it to one case, or keep the second only to show that a missing message gives the same result.
 - [x] **`PLAN.md` still describes the old behaviour.** It says the message or code is shown, at line 13 and in both step acceptance criteria (lines 97 and 136), and the Contract section doesn't list the new text.
 
 ## Service layer
 
-- [ ] Declare `AuthService` as an `abstract interface class`.
+- [x] Declare `AuthService` as an `abstract interface class`.
 - [ ] Make the injected Firebase field private: `FirebaseAuthService({FirebaseAuth? firebaseAuth}) : _firebaseAuth = firebaseAuth;`.
 - [ ] Consider translating `FirebaseAuthException` into an app-level error inside the service. The screen and its tests would then no longer import `firebase_auth`, and the error-message mapping would live in one place. Any other exception type still goes unhandled.
 - [ ] In `test/data/services/auth_service_test.dart`, use `await expectLater(...)` instead of `expect(() => ..., throwsA(...))` for the async exception tests.
