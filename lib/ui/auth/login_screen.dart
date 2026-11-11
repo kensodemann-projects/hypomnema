@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:hypomnema/data/services/auth_service.dart';
 import 'package:material_ui/material_ui.dart';
@@ -99,6 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      TextInput.finishAutofillContext();
     } on FirebaseAuthException {
       if (!mounted) {
         return;
@@ -173,6 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: _emailController,
       focusNode: _emailFocus,
       keyboardType: TextInputType.emailAddress,
+      autofillHints: const [AutofillHints.email],
       decoration: InputDecoration(labelText: 'Email', errorText: _emailError),
       onChanged: (_) => setState(() => _emailError = null),
     );
@@ -196,53 +199,58 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _form() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _emailField(),
-        if (_resettingPassword) ...[
-          ..._feedback(),
-          const SizedBox(height: 24),
-          FilledButton(
-            key: const Key('login-send-reset'),
-            onPressed: _submitting ? null : _sendResetEmail,
-            child: const Text('Send reset email'),
-          ),
-          const SizedBox(height: 8),
-          TextButton(
-            key: const Key('login-back-to-sign-in'),
-            onPressed: _showSignInForm,
-            child: const Text('Back to sign in'),
-          ),
-        ] else ...[
-          const SizedBox(height: 16),
-          TextField(
-            key: const Key('login-password'),
-            controller: _passwordController,
-            focusNode: _passwordFocus,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: 'Password',
-              errorText: _passwordError,
-            ),
-            onChanged: (_) => setState(() => _passwordError = null),
-          ),
-          ..._feedback(),
-          const SizedBox(height: 24),
-          FilledButton(
-            key: const Key('login-sign-in'),
-            onPressed: _canSignIn ? _signIn : null,
-            child: const Text('Sign in'),
-          ),
-          const SizedBox(height: 8),
-          TextButton(
-            key: const Key('login-forgot-password'),
-            onPressed: _canResetPassword ? _showResetForm : null,
-            child: const Text('Forgot password'),
-          ),
-        ],
-      ],
+    return AutofillGroup(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _emailField(),
+            if (_resettingPassword) ...[
+              ..._feedback(),
+              const SizedBox(height: 24),
+              FilledButton(
+                key: const Key('login-send-reset'),
+                onPressed: _submitting ? null : _sendResetEmail,
+                child: const Text('Send reset email'),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                key: const Key('login-back-to-sign-in'),
+                onPressed: _showSignInForm,
+                child: const Text('Back to sign in'),
+              ),
+            ] else ...[
+              const SizedBox(height: 16),
+              TextField(
+                key: const Key('login-password'),
+                controller: _passwordController,
+                focusNode: _passwordFocus,
+                obscureText: true,
+                autofillHints: const [AutofillHints.password],
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  errorText: _passwordError,
+                ),
+                onChanged: (_) => setState(() => _passwordError = null),
+              ),
+              ..._feedback(),
+              const SizedBox(height: 24),
+              FilledButton(
+                key: const Key('login-sign-in'),
+                onPressed: _canSignIn ? _signIn : null,
+                child: const Text('Sign in'),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                key: const Key('login-forgot-password'),
+                onPressed: _canResetPassword ? _showResetForm : null,
+                child: const Text('Forgot password'),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 
