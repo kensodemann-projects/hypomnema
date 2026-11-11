@@ -561,7 +561,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a FirebaseAuthException, when the reset email fails, then the message is shown and the confirmation is hidden',
+    'Given a FirebaseAuthException, when the reset email fails, then an error message is shown and the confirmation is hidden',
     (tester) async {
       // Given
       final auth = _RecordingAuthService()
@@ -587,7 +587,7 @@ void main() {
       await tester.pump();
 
       // Then
-      expect(find.text('That address is not valid.'), findsOneWidget);
+      expect(find.text('Failed to send password reset email.'), findsOneWidget);
       expect(find.byKey(const Key('login-reset-confirmation')), findsNothing);
     },
   );

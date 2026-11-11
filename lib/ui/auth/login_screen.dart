@@ -159,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) {
         return;
       }
-      setState(() => _authError = error.message ?? error.code);
+      setState(() => _authError = 'Failed to send password reset email.');
     } finally {
       if (mounted) {
         setState(() => _submitting = false);
