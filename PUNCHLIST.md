@@ -17,9 +17,9 @@ Based on a code-quality review comparing this branch with `3-argon`, checked aga
 ## Service layer
 
 - [x] Declare `AuthService` as an `abstract interface class`.
-- [ ] Make the injected Firebase field private: `FirebaseAuthService({FirebaseAuth? firebaseAuth}) : _firebaseAuth = firebaseAuth;`.
-- [ ] Consider translating `FirebaseAuthException` into an app-level error inside the service. The screen and its tests would then no longer import `firebase_auth`, and the error-message mapping would live in one place. Any other exception type still goes unhandled.
-- [ ] In `test/data/services/auth_service_test.dart`, use `await expectLater(...)` instead of `expect(() => ..., throwsA(...))` for the async exception tests.
+- [x] Make the injected Firebase field private: `FirebaseAuthService({FirebaseAuth? firebaseAuth}) : _firebaseAuth = firebaseAuth;`.
+- [-] Consider translating `FirebaseAuthException` into an app-level error inside the service. The screen and its tests would then no longer import `firebase_auth`, and the error-message mapping would live in one place. Any other exception type still goes unhandled.
+- [x] In `test/data/services/auth_service_test.dart`, use `await expectLater(...)` instead of `expect(() => ..., throwsA(...))` for the async exception tests.
 
 ## Login screen
 

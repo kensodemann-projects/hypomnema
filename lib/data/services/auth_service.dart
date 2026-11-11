@@ -10,11 +10,11 @@ abstract interface class AuthService {
 }
 
 class FirebaseAuthService implements AuthService {
-  FirebaseAuthService({this.firebaseAuth});
+  FirebaseAuthService({this._firebaseAuth});
 
-  final FirebaseAuth? firebaseAuth;
+  final FirebaseAuth? _firebaseAuth;
 
-  FirebaseAuth get _auth => firebaseAuth ?? FirebaseAuth.instance;
+  FirebaseAuth get _auth => _firebaseAuth ?? FirebaseAuth.instance;
 
   @override
   Future<void> signInWithEmailAndPassword({

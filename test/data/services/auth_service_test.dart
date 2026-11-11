@@ -72,8 +72,8 @@ void main() {
     final service = FirebaseAuthService(firebaseAuth: fakeAuth);
 
     // When, then
-    expect(
-      () => service.signInWithEmailAndPassword(
+    await expectLater(
+      service.signInWithEmailAndPassword(
         email: 'person@example.com',
         password: 'wrong-password',
       ),
@@ -108,8 +108,8 @@ void main() {
     final service = FirebaseAuthService(firebaseAuth: fakeAuth);
 
     // When, then
-    expect(
-      () => service.sendPasswordResetEmail(email: 'not-an-email'),
+    await expectLater(
+      service.sendPasswordResetEmail(email: 'not-an-email'),
       throwsA(
         isA<FirebaseAuthException>().having(
           (exception) => exception.code,
