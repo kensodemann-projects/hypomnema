@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/data/services/auth_service.dart';
 import 'package:hypomnema/ui/auth/login_screen.dart';
@@ -341,14 +340,10 @@ void main() {
   );
 
   testWidgets(
-    'Given the auth service throws a FirebaseAuthException, when the user taps the sign-in button, then the authentication failed message is shown',
+    'Given the auth service throws an AuthException, when the user taps the sign-in button, then the authentication failed message is shown',
     (tester) async {
       // Given
-      final auth = _RecordingAuthService()
-        ..error = FirebaseAuthException(
-          code: 'invalid-credential',
-          message: 'Wrong password.',
-        );
+      final auth = _RecordingAuthService()..error = const AuthException();
       await pumpLoginScreen(
         tester,
         authService: auth,
@@ -367,11 +362,6 @@ void main() {
 
       // Then
       expect(find.byKey(const Key('login-error')), findsOneWidget);
-      expect(find.text('Authentication failed.'), findsOneWidget);
-
-      auth.error = FirebaseAuthException(code: 'invalid-credential');
-      await tester.tap(find.byKey(const Key('login-sign-in')));
-      await tester.pump();
       expect(find.text('Authentication failed.'), findsOneWidget);
     },
   );
@@ -604,14 +594,10 @@ void main() {
   );
 
   testWidgets(
-    'Given the auth service throws a FirebaseAuthException, when the user taps Send reset email, then an error message is shown and the confirmation is hidden',
+    'Given the auth service throws an AuthException, when the user taps Send reset email, then an error message is shown and the confirmation is hidden',
     (tester) async {
       // Given
-      final auth = _RecordingAuthService()
-        ..error = FirebaseAuthException(
-          code: 'invalid-email',
-          message: 'That address is not valid.',
-        );
+      final auth = _RecordingAuthService()..error = const AuthException();
       await pumpLoginScreen(
         tester,
         authService: auth,

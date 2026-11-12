@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:hypomnema/data/services/auth_service.dart';
@@ -101,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text,
       );
       TextInput.finishAutofillContext();
-    } on FirebaseAuthException {
+    } on AuthException {
       if (!mounted) {
         return;
       }
@@ -163,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(
         () => _confirmation = 'Check your email for a password reset link.',
       );
-    } on FirebaseAuthException {
+    } on AuthException {
       if (!mounted) {
         return;
       }

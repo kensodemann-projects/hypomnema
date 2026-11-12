@@ -65,7 +65,7 @@ void main() {
     ]);
   });
 
-  test('Given FirebaseAuth throws a FirebaseAuthException, when signInWithEmailAndPassword is called, then the exception propagates with its code', () async {
+  test('Given FirebaseAuth throws a FirebaseAuthException, when signInWithEmailAndPassword is called, then an AuthException is thrown', () async {
     // Given
     final fakeAuth = _FakeFirebaseAuth()
       ..exceptionToThrow = FirebaseAuthException(code: 'invalid-credential');
@@ -77,13 +77,7 @@ void main() {
         email: 'person@example.com',
         password: 'wrong-password',
       ),
-      throwsA(
-        isA<FirebaseAuthException>().having(
-          (exception) => exception.code,
-          'code',
-          'invalid-credential',
-        ),
-      ),
+      throwsA(isA<AuthException>()),
     );
   });
 
@@ -101,7 +95,7 @@ void main() {
     ]);
   });
 
-  test('Given FirebaseAuth throws a FirebaseAuthException, when sendPasswordResetEmail is called, then the exception propagates with its code', () async {
+  test('Given FirebaseAuth throws a FirebaseAuthException, when sendPasswordResetEmail is called, then an AuthException is thrown', () async {
     // Given
     final fakeAuth = _FakeFirebaseAuth()
       ..exceptionToThrow = FirebaseAuthException(code: 'invalid-email');
@@ -110,13 +104,7 @@ void main() {
     // When, then
     await expectLater(
       service.sendPasswordResetEmail(email: 'not-an-email'),
-      throwsA(
-        isA<FirebaseAuthException>().having(
-          (exception) => exception.code,
-          'code',
-          'invalid-email',
-        ),
-      ),
+      throwsA(isA<AuthException>()),
     );
   });
 }

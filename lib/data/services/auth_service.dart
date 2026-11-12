@@ -1,5 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
+class AuthException implements Exception {
+  const AuthException();
+}
+
 abstract interface class AuthService {
   Future<void> signInWithEmailAndPassword({
     required String email,
@@ -21,11 +25,19 @@ class FirebaseAuthService implements AuthService {
     required String email,
     required String password,
   }) async {
-    await _auth.signInWithEmailAndPassword(email: email, password: password);
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+    } on FirebaseAuthException {
+      throw const AuthException();
+    }
   }
 
   @override
   Future<void> sendPasswordResetEmail({required String email}) async {
-    await _auth.sendPasswordResetEmail(email: email);
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException {
+      throw const AuthException();
+    }
   }
 }
