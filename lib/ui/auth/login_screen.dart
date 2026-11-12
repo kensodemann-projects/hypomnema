@@ -296,22 +296,11 @@ class _PreviewAuthService implements AuthService {
   Future<void> sendPasswordResetEmail({required String email}) async {}
 }
 
-class LoginScreenPreviewHarness extends StatelessWidget {
-  const LoginScreenPreviewHarness({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.system,
-      home: const LoginScreen(authService: _PreviewAuthService()),
-    );
-  }
-}
-
-@Preview(name: 'Phone', group: 'Login screen', size: Size(400, 800))
-Widget phoneLoginScreenPreview() => const LoginScreenPreviewHarness();
-
-@Preview(name: 'Desktop', group: 'Login screen', size: Size(1200, 800))
-Widget desktopLoginScreenPreview() => const LoginScreenPreviewHarness();
+@Preview(name: 'Login Screen - Phone', size: Size(400, 800))
+@Preview(name: 'Login Screen - Desktop', size: Size(1000, 700))
+Widget previewLoginScreen() => MaterialApp(
+  theme: ThemeData.light(),
+  darkTheme: ThemeData.dark(),
+  themeMode: ThemeMode.system,
+  home: const LoginScreen(authService: _PreviewAuthService()),
+);
