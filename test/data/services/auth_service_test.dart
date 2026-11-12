@@ -65,7 +65,7 @@ void main() {
     ]);
   });
 
-  test('Given FirebaseAuthService, when sign-in throws FirebaseAuthException, then the exception propagates with its code', () async {
+  test('Given FirebaseAuth throws a FirebaseAuthException, when signInWithEmailAndPassword is called, then the exception propagates with its code', () async {
     // Given
     final fakeAuth = _FakeFirebaseAuth()
       ..exceptionToThrow = FirebaseAuthException(code: 'invalid-credential');
@@ -101,7 +101,7 @@ void main() {
     ]);
   });
 
-  test('Given FirebaseAuthService, when password reset throws FirebaseAuthException, then the exception propagates with its code', () async {
+  test('Given FirebaseAuth throws a FirebaseAuthException, when sendPasswordResetEmail is called, then the exception propagates with its code', () async {
     // Given
     final fakeAuth = _FakeFirebaseAuth()
       ..exceptionToThrow = FirebaseAuthException(code: 'invalid-email');

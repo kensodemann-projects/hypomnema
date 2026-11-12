@@ -162,7 +162,7 @@ void main() {
   );
 
   testWidgets(
-    'Given an invalid email, when the field loses focus and then changes, then the error clears while sign-in stays disabled',
+    'Given an invalid email that has lost focus, when the user changes the email, then the validation error clears and Sign in stays disabled',
     (tester) async {
       // Given
       await pumpLoginScreen(
@@ -188,7 +188,7 @@ void main() {
   );
 
   testWidgets(
-    'Given the current field text, when it is not a valid pair, then Sign in is disabled',
+    'Given the sign-in form, when it is first shown or the user enters an incomplete or invalid pair, then Sign in stays disabled',
     (tester) async {
       // Given
       final auth = _RecordingAuthService();
@@ -302,7 +302,7 @@ void main() {
   );
 
   testWidgets(
-    'Given the password field, when Enter is pressed, then sign-in runs only for a valid pair',
+    'Given a valid email and an empty password, when the user presses Enter in the password field, then sign-in is not attempted, and when the user enters a password and presses Enter, then the credentials are forwarded',
     (tester) async {
       // Given
       final auth = _RecordingAuthService();
@@ -341,7 +341,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a FirebaseAuthException, when sign-in fails, then the authentication failed message is shown',
+    'Given the auth service throws a FirebaseAuthException, when the user taps the sign-in button, then the authentication failed message is shown',
     (tester) async {
       // Given
       final auth = _RecordingAuthService()
@@ -377,7 +377,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a sign-in request in progress, when the form is waiting, then Sign in is disabled',
+    'Given the auth service has not completed sign-in, when the user taps the sign-in button, then Sign in and Forgot password are disabled, and when the call completes, then Sign in is enabled',
     (tester) async {
       // Given
       final auth = _RecordingAuthService()..pending = Completer<void>();
@@ -414,7 +414,7 @@ void main() {
   );
 
   testWidgets(
-    'Given the email field, when it is not a valid address, then Forgot password is disabled',
+    'Given the sign-in form, when the user enters an empty, invalid, or valid email, then Forgot password is enabled only for a valid email',
     (tester) async {
       // Given
       await pumpLoginScreen(
@@ -481,7 +481,7 @@ void main() {
   );
 
   testWidgets(
-    'Given the reset form, when the email is not valid, then Send reset email is disabled',
+    'Given the reset form, when the user clears the email or enters an invalid email, then Send reset email stays disabled, and when the user enters a valid email, then Send reset email is enabled',
     (tester) async {
       // Given
       final auth = _RecordingAuthService();
@@ -528,7 +528,7 @@ void main() {
   );
 
   testWidgets(
-    'Given the reset form, when Enter is pressed in the email field, then a reset email is sent only for a valid address',
+    'Given the reset form, when the user presses Enter on an invalid email, then no reset email is sent, and when the user presses Enter on a valid email, then the trimmed address is sent',
     (tester) async {
       // Given
       final auth = _RecordingAuthService();
@@ -571,7 +571,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a valid email, when Send reset email succeeds, then the trimmed email is forwarded and the confirmation is shown',
+    'Given an email with surrounding spaces on the reset form, when the user taps Send reset email, then the trimmed email is forwarded and the confirmation is shown',
     (tester) async {
       // Given
       final auth = _RecordingAuthService();
@@ -604,7 +604,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a FirebaseAuthException, when the reset email fails, then an error message is shown and the confirmation is hidden',
+    'Given the auth service throws a FirebaseAuthException, when the user taps Send reset email, then an error message is shown and the confirmation is hidden',
     (tester) async {
       // Given
       final auth = _RecordingAuthService()
@@ -636,7 +636,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a reset request in progress, when the form is waiting, then Back to sign in is disabled',
+    'Given the auth service has not completed the password reset, when the user taps Send reset email, then Back to sign in is disabled, and when the call completes, then Back to sign in is enabled',
     (tester) async {
       // Given
       final auth = _RecordingAuthService()..pending = Completer<void>();

@@ -11,7 +11,7 @@ void setLogicalViewportSize(WidgetTester tester, Size size) {
 
 void main() {
   testWidgets(
-    'Given the platform brightness, when it is light, then MainApp matches it',
+    'Given light platform brightness, when MainApp builds, then the theme is light',
     (tester) async {
       // Given
       setLogicalViewportSize(tester, const Size(400, 800));
@@ -31,7 +31,7 @@ void main() {
   );
 
   testWidgets(
-    'Given the platform brightness, when it is dark, then MainApp matches it',
+    'Given dark platform brightness, when MainApp builds, then the theme is dark',
     (tester) async {
       // Given
       setLogicalViewportSize(tester, const Size(400, 800));
@@ -51,7 +51,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a physical size, when the width is 400, then the phone layout is used',
+    'Given a width of 400, when MainApp builds, then the phone layout is used',
     (tester) async {
       // Given
       setLogicalViewportSize(tester, const Size(400, 800));
@@ -69,7 +69,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a physical size, when the width is 600, then the phone layout is used',
+    'Given a width of 600, when MainApp builds, then the phone layout is used',
     (tester) async {
       // Given
       setLogicalViewportSize(tester, const Size(600, 800));
@@ -87,7 +87,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a physical size, when the width is 601, then the desktop layout is used',
+    'Given a width of 601, when MainApp builds, then the desktop layout is used',
     (tester) async {
       // Given
       setLogicalViewportSize(tester, const Size(601, 800));
@@ -105,7 +105,7 @@ void main() {
   );
 
   testWidgets(
-    'Given a physical size, when the width is 1200, then the desktop layout is used',
+    'Given a width of 1200, when MainApp builds, then the desktop layout is used',
     (tester) async {
       // Given
       setLogicalViewportSize(tester, const Size(1200, 800));
