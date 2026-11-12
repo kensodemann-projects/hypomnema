@@ -227,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 8),
               TextButton(
                 key: const Key('login-back-to-sign-in'),
-                onPressed: _showSignInForm,
+                onPressed: _submitting ? null : _showSignInForm,
                 child: const Text('Back to sign in'),
               ),
             ] else ...[

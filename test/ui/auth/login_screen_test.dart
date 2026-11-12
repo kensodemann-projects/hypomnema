@@ -636,6 +636,50 @@ void main() {
   );
 
   testWidgets(
+    'Given a reset request in progress, when the form is waiting, then Back to sign in is disabled',
+    (tester) async {
+      // Given
+      final auth = _RecordingAuthService()..pending = Completer<void>();
+      await pumpLoginScreen(
+        tester,
+        authService: auth,
+        size: const Size(400, 800),
+      );
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.pump();
+
+      // When
+      await tester.tap(find.byKey(const Key('login-send-reset')));
+      await tester.pump();
+
+      // Then
+      expect(
+        tester
+            .widget<TextButton>(find.byKey(const Key('login-back-to-sign-in')))
+            .onPressed,
+        isNull,
+      );
+
+      await tester.tap(find.byKey(const Key('login-back-to-sign-in')));
+      await tester.pump();
+
+      auth.pending!.complete();
+      await tester.pump();
+      expect(
+        tester
+            .widget<TextButton>(find.byKey(const Key('login-back-to-sign-in')))
+            .onPressed,
+        isNotNull,
+      );
+    },
+  );
+
+  testWidgets(
     'Given the reset form, when Back to sign in is tapped, then the password field returns without an error',
     (tester) async {
       // Given
