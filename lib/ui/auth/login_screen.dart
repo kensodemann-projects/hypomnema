@@ -288,7 +288,9 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
         return Scaffold(
-          body: Padding(padding: const EdgeInsets.all(16), child: form),
+          body: SafeArea(
+            child: Padding(padding: const EdgeInsets.all(16), child: form),
+          ),
         );
       },
     );
