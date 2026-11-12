@@ -131,17 +131,23 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  Future<void> _sendResetEmail() async {
-    final emailError = _emailValidationError(_emailController.text);
-    if (emailError != null) {
-      setState(() {
-        _emailError = emailError;
-        _authError = null;
-        _confirmation = null;
-      });
+  void _submitEmailField(String _) {
+    if (_resettingPassword) {
+      if (_canResetPassword) {
+        _sendResetEmail();
+      }
       return;
     }
+    _passwordFocus.requestFocus();
+  }
 
+  void _submitPasswordField(String _) {
+    if (_canSignIn) {
+      _signIn();
+    }
+  }
+
+  Future<void> _sendResetEmail() async {
     setState(() {
       _submitting = true;
       _authError = null;
@@ -175,9 +181,13 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: _emailController,
       focusNode: _emailFocus,
       keyboardType: TextInputType.emailAddress,
+      textInputAction: _resettingPassword
+          ? TextInputAction.done
+          : TextInputAction.next,
       autofillHints: const [AutofillHints.email],
       decoration: InputDecoration(labelText: 'Email', errorText: _emailError),
       onChanged: (_) => setState(() => _emailError = null),
+      onSubmitted: _submitEmailField,
     );
   }
 
@@ -211,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
               FilledButton(
                 key: const Key('login-send-reset'),
-                onPressed: _submitting ? null : _sendResetEmail,
+                onPressed: _canResetPassword ? _sendResetEmail : null,
                 child: const Text('Send reset email'),
               ),
               const SizedBox(height: 8),
@@ -227,12 +237,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _passwordController,
                 focusNode: _passwordFocus,
                 obscureText: true,
+                textInputAction: TextInputAction.done,
                 autofillHints: const [AutofillHints.password],
                 decoration: InputDecoration(
                   labelText: 'Password',
                   errorText: _passwordError,
                 ),
                 onChanged: (_) => setState(() => _passwordError = null),
+                onSubmitted: _submitPasswordField,
               ),
               ..._feedback(),
               const SizedBox(height: 24),

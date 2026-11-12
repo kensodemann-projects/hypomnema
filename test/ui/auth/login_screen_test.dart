@@ -355,6 +355,74 @@ void main() {
   );
 
   testWidgets(
+    'Given the sign-in form, when Enter is pressed in the email field, then the password field is focused',
+    (tester) async {
+      // Given
+      final auth = _RecordingAuthService();
+      await pumpLoginScreen(
+        tester,
+        authService: auth,
+        size: const Size(400, 800),
+      );
+      expect(
+        textField(tester, 'login-email').textInputAction,
+        TextInputAction.next,
+      );
+
+      // When
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.next);
+      await tester.pump();
+
+      // Then
+      expect(textField(tester, 'login-password').focusNode!.hasFocus, isTrue);
+      expect(auth.signInCalls, isEmpty);
+    },
+  );
+
+  testWidgets(
+    'Given the password field, when Enter is pressed, then sign-in runs only for a valid pair',
+    (tester) async {
+      // Given
+      final auth = _RecordingAuthService();
+      await pumpLoginScreen(
+        tester,
+        authService: auth,
+        size: const Size(400, 800),
+      );
+      expect(
+        textField(tester, 'login-password').textInputAction,
+        TextInputAction.done,
+      );
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.showKeyboard(find.byKey(const Key('login-password')));
+
+      // When
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+
+      // Then
+      expect(auth.signInCalls, isEmpty);
+
+      // When
+      await tester.enterText(find.byKey(const Key('login-password')), 'secret');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+
+      // Then
+      expect(auth.signInCalls, [
+        (email: 'person@example.com', password: 'secret'),
+      ]);
+    },
+  );
+
+  testWidgets(
     'Given a FirebaseAuthException, when sign-in fails, then the authentication failed message is shown',
     (tester) async {
       // Given
@@ -495,7 +563,7 @@ void main() {
   );
 
   testWidgets(
-    'Given the reset form, when the email is cleared, then Send reset email does not call AuthService',
+    'Given the reset form, when the email is not valid, then Send reset email is disabled',
     (tester) async {
       // Given
       final auth = _RecordingAuthService();
@@ -511,19 +579,76 @@ void main() {
       await tester.pump();
       await tester.tap(find.byKey(const Key('login-forgot-password')));
       await tester.pump();
+      final send = find.byKey(const Key('login-send-reset'));
+      expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
 
       // When
       await tester.enterText(find.byKey(const Key('login-email')), '');
       await tester.pump();
-      await tester.tap(find.byKey(const Key('login-send-reset')));
+
+      // Then
+      expect(tester.widget<FilledButton>(send).onPressed, isNull);
+
+      // When
+      await tester.enterText(find.byKey(const Key('login-email')), 'person');
+      await tester.pump();
+
+      // Then
+      expect(tester.widget<FilledButton>(send).onPressed, isNull);
+      expect(auth.resetCalls, isEmpty);
+
+      // When
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.pump();
+
+      // Then
+      expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
+    },
+  );
+
+  testWidgets(
+    'Given the reset form, when Enter is pressed in the email field, then a reset email is sent only for a valid address',
+    (tester) async {
+      // Given
+      final auth = _RecordingAuthService();
+      await pumpLoginScreen(
+        tester,
+        authService: auth,
+        size: const Size(400, 800),
+      );
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        'person@example.com',
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.pump();
+      expect(
+        textField(tester, 'login-email').textInputAction,
+        TextInputAction.done,
+      );
+
+      // When
+      await tester.enterText(find.byKey(const Key('login-email')), 'person');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
 
       // Then
       expect(auth.resetCalls, isEmpty);
-      expect(
-        textField(tester, 'login-email').decoration?.errorText,
-        'Email is required.',
+
+      // When
+      await tester.enterText(
+        find.byKey(const Key('login-email')),
+        ' person@example.com ',
       );
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+
+      // Then
+      expect(auth.resetCalls, ['person@example.com']);
     },
   );
 

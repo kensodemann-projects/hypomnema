@@ -25,9 +25,9 @@ Based on a code-quality review comparing this branch with `3-argon`, checked aga
 
 - [-] **Password check:** stop trimming the password when checking whether it's empty (`text.trim().isEmpty`, line 20), so whitespace-only passwords are handled the same way as other passwords.
 - [x] **Autofill:** add `autofillHints` (email and password) and wrap the fields in an `AutofillGroup`.
-- [ ] **Enter key:** set `textInputAction` and `onSubmitted` so that Enter moves from email to password and then submits. This matters most on macOS.
+- [x] **Enter key:** set `textInputAction` and `onSubmitted` so that Enter moves from email to password and then submits. This matters most on macOS.
 - [x] **Scroll view:** wrap the form in a `SingleChildScrollView` so the phone layout doesn't overflow with the keyboard open or on short screens.
-- [ ] **Button rules:** make "Send reset email" follow the same rule as "Forgot password" (disabled until the email is valid), or deliberately keep the validate-on-press approach and record that choice in the plan.
+- [x] **Button rules:** make "Send reset email" follow the same rule as "Forgot password" (disabled until the email is valid), or deliberately keep the validate-on-press approach and record that choice in the plan.
 - [f] **Loading indicator:** optionally show progress while a request is running.
 - [x] **Previews:** replace the public `LoginScreenPreviewHarness` class with one private preview function carrying both `@Preview` annotations.
 - [-] **Widget helpers:** optionally turn `_emailField()`, `_feedback()` and `_form()` into small private widget classes.
