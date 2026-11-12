@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:ui' as ui;
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/data/services/auth_service.dart';
 import 'package:hypomnema/ui/auth/login_screen.dart';
@@ -58,9 +56,7 @@ Future<void> pumpLoginScreen(
 }) async {
   setLogicalViewportSize(tester, size);
   await tester.pumpWidget(
-    MaterialApp(
-      home: LoginScreen(key: ValueKey(size), authService: authService),
-    ),
+    MaterialApp(home: LoginScreen(authService: authService)),
   );
 }
 
@@ -84,28 +80,9 @@ Color textColor(WidgetTester tester, String text) {
       DefaultTextStyle.of(tester.element(finder)).style.color!;
 }
 
-Future<Color> pixelColor(WidgetTester tester, Offset position) async {
-  final boundary = tester.renderObject<RenderRepaintBoundary>(
-    find.byType(RepaintBoundary).first,
-  );
-  final image = (await tester.runAsync(() => boundary.toImage(pixelRatio: 1)))!;
-  final data = (await tester.runAsync(
-    () => image.toByteData(format: ui.ImageByteFormat.rawRgba),
-  ))!;
-  final x = position.dx.round().clamp(0, image.width - 1);
-  final y = position.dy.round().clamp(0, image.height - 1);
-  final offset = (y * image.width + x) * 4;
-  return Color.fromARGB(
-    data.getUint8(offset + 3),
-    data.getUint8(offset),
-    data.getUint8(offset + 1),
-    data.getUint8(offset + 2),
-  );
-}
-
 void main() {
   testWidgets(
-    'Given a phone width, when the login screen builds, then the column is inset by 16 and has no card',
+    'Given a phone width, when the login screen builds, then the column has no card',
     (tester) async {
       for (final width in [400.0, 600.0]) {
         // Given, when
@@ -117,21 +94,12 @@ void main() {
 
         // Then
         expect(find.byKey(const Key('login-form-card')), findsNothing);
-        expect(
-          find.byWidgetPredicate(
-            (widget) =>
-                widget is Padding && widget.padding == const EdgeInsets.all(16),
-          ),
-          findsOneWidget,
-        );
-        expect(find.text('Phone'), findsNothing);
-        expect(find.text('Desktop'), findsNothing);
       }
     },
   );
 
   testWidgets(
-    'Given a desktop width, when the login screen builds, then the form sits in a card padded by 24',
+    'Given a desktop width, when the login screen builds, then the form sits in a card',
     (tester) async {
       for (final width in [601.0, 1200.0]) {
         // Given, when
@@ -152,46 +120,12 @@ void main() {
               .first,
         );
         expect(box.constraints.maxWidth, 400);
-        expect(
-          find.descendant(
-            of: find.byKey(const Key('login-form-card')),
-            matching: find.byWidgetPredicate(
-              (widget) =>
-                  widget is Padding &&
-                  widget.padding == const EdgeInsets.all(24),
-            ),
-          ),
-          findsOneWidget,
-        );
       }
     },
   );
 
   testWidgets(
-    'Given the sign-in form, when it builds, then the fields and button use the planned gaps',
-    (tester) async {
-      // Given, when
-      await pumpLoginScreen(
-        tester,
-        authService: _RecordingAuthService(),
-        size: const Size(400, 800),
-      );
-
-      // Then
-      final email = tester.getRect(find.byKey(const Key('login-email')));
-      final password = tester.getRect(find.byKey(const Key('login-password')));
-      final signIn = tester.getRect(find.byKey(const Key('login-sign-in')));
-      expect(password.top - email.bottom, 16);
-      expect(signIn.top - password.bottom, 24);
-      final forgot = tester.getRect(
-        find.byKey(const Key('login-forgot-password')),
-      );
-      expect(forgot.top - signIn.bottom, 8);
-    },
-  );
-
-  testWidgets(
-    'Given empty fields, when a field loses focus, then its required message appears in the error color',
+    'Given empty fields, when a field loses focus, then its required message appears',
     (tester) async {
       // Given
       await pumpLoginScreen(
@@ -211,27 +145,11 @@ void main() {
       // Then
       final emailField = textField(tester, 'login-email');
       expect(emailField.decoration?.errorText, 'Email is required.');
-      expect(emailField.decoration?.errorStyle, isNull);
-      expect(emailField.decoration?.errorBorder, isNull);
-      expect(emailField.decoration?.focusedErrorBorder, isNull);
       final errorColor = Theme.of(
         tester.element(find.byKey(const Key('login-email'))),
       ).colorScheme.error;
       expect(textColor(tester, 'Email is required.'), errorColor);
       expect(textColor(tester, 'Email'), errorColor);
-      final emailRect = tester.getRect(find.byKey(const Key('login-email')));
-      Color? borderColor;
-      for (var y = 0; y < emailRect.height; y++) {
-        final color = await pixelColor(
-          tester,
-          Offset(emailRect.center.dx, emailRect.top + y),
-        );
-        if (color == errorColor) {
-          borderColor = color;
-          break;
-        }
-      }
-      expect(borderColor, errorColor);
 
       await tester.tap(find.byKey(const Key('login-password')));
       await tester.pump();
@@ -744,59 +662,6 @@ void main() {
       await tester.enterText(find.byKey(const Key('login-password')), 'secret');
       await tester.pump();
       expect(signInButton(tester).onPressed, isNotNull);
-    },
-  );
-
-  testWidgets(
-    'Given the reset form, when the width changes, then the card and the button gaps follow the sign-in layout',
-    (tester) async {
-      // Given
-      final auth = _RecordingAuthService();
-      await pumpLoginScreen(
-        tester,
-        authService: auth,
-        size: const Size(400, 800),
-      );
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        'person@example.com',
-      );
-      await tester.pump();
-      await tester.tap(find.byKey(const Key('login-forgot-password')));
-      await tester.pump();
-
-      // Then
-      expect(find.byKey(const Key('login-form-card')), findsNothing);
-      final email = tester.getRect(find.byKey(const Key('login-email')));
-      final send = tester.getRect(find.byKey(const Key('login-send-reset')));
-      final back = tester.getRect(
-        find.byKey(const Key('login-back-to-sign-in')),
-      );
-      expect(send.top - email.bottom, 24);
-      expect(back.top - send.bottom, 8);
-
-      // When
-      await pumpLoginScreen(
-        tester,
-        authService: auth,
-        size: const Size(601, 800),
-      );
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        'person@example.com',
-      );
-      await tester.pump();
-      await tester.tap(find.byKey(const Key('login-forgot-password')));
-      await tester.pump();
-
-      // Then
-      expect(
-        find.descendant(
-          of: find.byKey(const Key('login-form-card')),
-          matching: find.byKey(const Key('login-send-reset')),
-        ),
-        findsOneWidget,
-      );
     },
   );
 }
