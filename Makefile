@@ -1,4 +1,4 @@
-.PHONY: get format format-check analyze test check devices run emulators preview
+.PHONY: get format format-check analyze test check devices run emulators preview seed-data web
 
 get:
 	flutter pub get
@@ -28,3 +28,9 @@ emulators:
 
 preview:
 	flutter widget-preview start
+
+seed-data:
+	firebase emulators:export ./seed-data --force
+
+web:
+	flutter build web
