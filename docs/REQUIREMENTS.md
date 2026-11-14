@@ -1,6 +1,6 @@
 # Hypomnema — Requirements Document
-**Version:** 1.0 (Draft)
-**Status:** For Review
+**Version:** 1.0
+**Status:** Approved 
 
 ---
 
