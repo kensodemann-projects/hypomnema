@@ -35,8 +35,8 @@ Each goal carries the following information:
 - **Description** — Optional. Longer text in which the user can record their own rules for the goal (e.g., "only count sessions of 30 minutes or more").
 - **Type** — One of the four goal types in Section 3.2.
 - **Target** — The type-specific target settings described in Section 3.2.
-- **Start Date** — The date the goal was created.
-- **Status** — Active or Archived (see Section 3.5).
+- **Start Date** — The date tracking begins. It defaults to today, and any goal type can start in the future (e.g., in November, a user plans to give up desserts for December). Avoidance goals can also start in the past, so an existing streak is reflected (e.g., a user who has avoided alcohol for two years). Other goal types cannot start in the past.
+- **Status** — Upcoming, Active, or Archived (see Section 3.5).
 - **Outcome** — For goal types that can end, None, Achieved, or Missed (see Section 3.5).
 
 ### 3.2 Goal Types
@@ -62,6 +62,7 @@ The first release supports four goal types. Additional types may be added later,
 - Target: optional. A goal with no target is open-ended (e.g., someone who wants to stop drinking for good). A goal with a target is a number of consecutive days (e.g., "Dry January," 31 days).
 - The user records only slips. An entry records that a slip happened.
 - The streak counts up automatically from the goal's start date, or from the most recent slip. A slip resets the streak, and the goal keeps running.
+- The streak counts only completed days without a slip. The current day counts once it ends, at midnight. A slip resets the streak to 0, and the day of the slip does not count. For example, a 31-day goal that starts December 1 with no slips shows a streak of 0 during December 1, shows 1 starting at midnight, and becomes Achieved at midnight after December 31.
 
 ### 3.3 Periods
 
@@ -79,13 +80,20 @@ Frequency, accumulation, and journaling goals are measured in calendar periods b
 
 ### 3.5 Goal Lifecycle and Outcomes
 
-A goal is **Active** from the moment it is created until the user archives it or deletes it. Recurring goals (frequency, accumulation, and open-ended avoidance) have no end date.
+A goal with a future start date is **Upcoming**. It is not yet in effect, so no entries can be created for it, and its start date can still be changed. On the start date it becomes **Active**, and its start date can no longer be changed.
+
+A goal stays Active until the user archives it or deletes it. Recurring goals (frequency, accumulation, and open-ended avoidance) have no end date.
 
 Some goals reach a natural end and get an outcome:
 
 - **Target value goal reaches its target before the target date** — The goal is marked **Achieved**. It stays active and continues to accept entries, so the user can confirm the result holds (e.g., that their weight has stabilized) before archiving it.
 - **Target value goal's date passes without reaching the target** — The goal is marked **Missed** and accepts no further entries. To try again, the user creates a new goal.
 - **Avoidance goal with a target reaches its target streak** — The goal is marked **Achieved**.
+
+Outcomes are always calculated from the goal's entries and target history. They are never stored as a separate fact that could disagree with the entries. As a result:
+
+- Achieved means the target was reached at some point. Later entries do not undo it. For example, a target value goal stays Achieved when later weigh-ins drift away from the target, and a slip on January 5 does not undo a completed Dry January.
+- A correction can change an outcome. If the user backdates a slip into a completed streak, or edits or deletes the entry that reached a target value, the outcome is recalculated and may no longer be Achieved.
 
 A goal with an Achieved or Missed outcome stays on the dashboard with an outcome badge until the user archives it.
 
@@ -111,7 +119,7 @@ Every goal type uses the same entry structure:
 
 Mistakes should be easy to correct, but only within limits:
 
-- **Backdating** — An entry's date can be up to 7 days in the past.
+- **Backdating** — An entry's date can be up to 7 days in the past, but not before the goal's start date.
 - **Editing** — An entry can be edited within 24 hours of when it was created.
 - **Deleting** — An entry, including an avoidance slip, can be deleted within 24 hours of when it was created. A deleted entry no longer counts toward the goal. Deleting a mistaken slip restores the streak.
 
@@ -149,7 +157,9 @@ Journaling is a separate feature from goals. Each user has one journal and one j
 
 - Mood is a whole number from 1 to 5, shown as a number.
 - When entering a mood, only the ends are labeled: 1 is "Awful" and 5 is "Great." The values in between mean whatever the user wants them to mean.
-- Each mood value has a color on a gradient from red (1), through yellow (3), to green (5).
+- Each mood value has a color on a gradient from red (1), through yellow (3), to green (5). Values 2 and 4 use the colors in between (orange and yellow-green). The exact colors will be chosen during the mock-up session.
+- The number must be easy to read against its color in both light and dark themes.
+- Color is never the only indicator of mood. The number is always shown, so moods stay readable for users with red-green color blindness.
 - Wherever a mood is displayed, it uses the same look as in the mood picker (e.g., a yellow square containing a 3), without the labels.
 - Any average mood is rounded to the nearest whole number and displayed the same way.
 
@@ -178,6 +188,7 @@ While writing a journal entry, the user can select **I'm Stuck** to get a random
 - The current prompt stays visible in the editor for the rest of the editing session. It is not saved with the entry.
 - Prompts come from a single list shared by all users and stored in Cloud Firestore. For now the list is maintained through the Firebase console. The way prompts are stored must not prevent a future in-app admin page from managing them, but no admin feature is planned.
 - Repeats are kept rare by starting with a large enough list and picking prompts with a uniform random choice.
+- The starting list has at least 100 prompts. They are written as part of building this feature, not listed in this document.
 
 ### 6.5 Journaling Goal
 
@@ -186,6 +197,7 @@ While writing a journal entry, the user can select **I'm Stuck** to get a random
 - The default is once per day.
 - The user changes the journaling goal on the **Journaling Goal** page. Unlike other goals, both the count and the period can be changed.
 - A change starts with the period that contains the moment of the change, and every journal entry already in that period counts toward the new setting. For example, if a user who has journaled daily changes the goal on the 15th to "20 times per month," the entries from the first 15 days of that month count toward the 20. Periods that ended before the change keep their results under the old setting.
+- The journaling goal's history lists each period, newest first, under the setting that judged it. A marker at the point of change shows the new setting and the date it took effect. In the example above, the history shows November (20 per month) in progress, then "Goal changed to 20 per month on Nov 15," then the daily results for November 14, 13, and earlier. Entries from November 1 through 14 appear both in those daily results and in the November total. The marker explains the overlap.
 
 ---
 
@@ -196,9 +208,9 @@ While writing a journal entry, the user can select **I'm Stuck** to get a random
 The dashboard is the home screen, and it is where tracking happens in the first release. It shows one panel per goal, in this order:
 
 1. The journaling goal.
-2. Every active goal, in the order the goals were created. The user cannot reorder panels.
+2. Every upcoming and active goal, in the order the goals were created. The user cannot reorder panels.
 
-This includes goals with an Achieved or Missed outcome that have not been archived. Each panel shows an indicator when the goal has an entry with today's date. Each panel shows progress for the current period and offers a quick way to log:
+This includes goals with an Achieved or Missed outcome that have not been archived. An upcoming goal's panel shows its start date (e.g., "Starts Dec 1") and has no progress or logging controls. Each panel shows an indicator when the goal has an entry with today's date. Each panel shows progress for the current period and offers a quick way to log:
 
 | Goal type | Progress shown | Logging from the panel |
 | --- | --- | --- |
@@ -235,7 +247,7 @@ A list of archived goals. Selecting one opens its goal details, which are read-o
 
 ### 7.5 Navigation and Layout
 
-Phone and desktop each have their own layout. A phone layout stretched to desktop width does not meet this requirement. The top-level areas are **Dashboard**, **Journal**, and **Archive**.
+Phone and desktop each have their own layout. A phone layout stretched to desktop width does not meet this requirement. The top-level areas are **Dashboard**, **Journal**, and **Archive**. A **Sign Out** action is part of the navigation in both layouts.
 
 - **Phone** — A bottom navigation bar for the top-level areas. Goal details, the entry form, and the journal editor open as full-screen pages.
 - **Desktop** — A side navigation rail with list-and-detail layouts. For example, the dashboard shows panels in a grid and opens a goal's details beside them, and the journal shows the entry list beside the selected entry. Forms open in dialogs or side panels instead of full pages.
@@ -248,7 +260,7 @@ This layout is a concept. It will be refined in a separate mock-up session and m
 
 These constraints keep the first release from blocking planned or likely future work:
 
-- **Raw entries** — Tracking entries are stored as raw, timestamped records. Period results (met or not met, totals, streaks) are calculated from the entries and the target history, not stored only as summary flags. This keeps nested goals possible later (e.g., "30 minutes per day, 5 days per week").
+- **Raw entries** — Tracking entries are stored as raw, timestamped records. Period results (met or not met, totals, streaks) and outcomes are calculated from the entries and the target history, not stored as summary values. This avoids edge cases where a stored result disagrees with the entries, and keeps nested goals possible later (e.g., "30 minutes per day, 5 days per week"). If calculating these results becomes a performance problem, storing them may be reconsidered.
 - **Target history** — Each goal keeps the history of its targets, so every period is judged against the target that was in effect at the time.
 - **Shared prompts** — The prompt list is stored separately from user data, in a structure that a future admin page could manage.
 
@@ -291,10 +303,4 @@ The following are out of scope for the first release:
 
 ## 11. Open Questions
 
-- **Sign out** — With no account page, where does the user sign out? For example, from a menu on the navigation bar or rail.
-- **Goal start date** — Can a goal's start date be set in the past? For example, a user who has avoided alcohol for two years and wants the streak to reflect that.
-- **Counting the streak** — How are streak days counted? Does the current day count before it has ended, and does the day of a slip count? This decides exactly when a 31-day goal becomes Achieved.
-- **Outcome after more entries** — What happens to an outcome when later entries change the picture? Examples: a target value goal marked Achieved whose later values move away from the target, a slip recorded after an avoidance goal was Achieved, or a backdated entry that falls before an outcome was set.
-- **Journaling goal history** — When the journaling period changes mid-period, how does the history view show the overlap? In the Section 6.5 example, the first 14 days of the month were judged as days under the old setting and also count toward the new month.
-- **Prompt list size** — How many prompts should the starting list have? At least 100 is suggested.
-- **Mood colors** — What exact colors are used for moods 2 and 4, and how do they meet contrast needs in light and dark themes?
+None at this time.
