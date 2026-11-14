@@ -17,11 +17,11 @@ A goal can be one of four types:
 - **Frequency** — Do something a number of times per day, week, or month (e.g., "exercise daily"). Log each time you do it.
 - **Accumulation** — Reach a total per day, week, or month (e.g., "exercise 30 minutes daily"). Log an amount each time, such as 45 minutes.
 - **Target value** — Reach a value by a date (e.g., "weigh 180 lb by December 31"). Log your current value as you go.
-- **Avoidance** — Stop doing something, either for good or for a set number of days (e.g., "no desserts in December"). Your streak counts up on its own. You record only a slip, which resets the streak.
+- **Avoidance** — Stop doing something, either for good or for a set number of days (e.g., "no desserts in December"). Your streak counts up on its own, and you record only a slip. When you slip on a goal with a set number of days, you choose what happens: start the count over, mark the goal missed but keep going until its original end date, or mark it missed and end it.
 
 Weeks run Sunday through Saturday. A goal can start today or on a future date. An avoidance goal can also start in the past, so it reflects a streak you already have.
 
-You can rename a goal, update its description, or change its target at any time. A new target applies from the current period forward.
+You can rename a goal, update its description, or change its target at any time. A new target applies from the current period forward. A goal's type and period are fixed once the goal starts. Until then, you can change anything about it.
 
 When you no longer want to track a goal, you can **archive** it to keep its history, or **delete** it to remove it completely. Archiving cannot be undone.
 
@@ -53,10 +53,10 @@ Each journal entry has:
 
 Entries are dated automatically when you save them. You can edit an entry within 24 hours of creating it. If you're not sure what to write, select **I'm Stuck** for a random prompt. Select it again for a different one.
 
-Journal entries can't be deleted, but you can make one **private**. A private entry shows only its date, time, and mood until you choose to show its content. You can make it public again at any time.
+Journal entries can't be deleted, but you can make one **private**. A private entry shows only its date, time, and mood. **Show Content** reveals the rest while you have the entry open, and it is hidden again when you leave. To make the entry visible again permanently, make it public, which you can do at any time.
 
 The journal also shows a mood trend over time.
 
 ## Platforms
 
-Hypomnema runs on Android phones and on macOS desktops. Each has its own layout. Your data syncs between devices, and you can keep logging while offline.
+Hypomnema runs on Android phones and on macOS desktops. Each has its own layout. Your data syncs between devices.
