@@ -66,7 +66,7 @@ class _AuthGate extends StatelessWidget {
           );
         }
         if (signedIn) {
-          return const Shell();
+          return Shell(authService: authService);
         }
         return LoginScreen(authService: authService);
       },
@@ -75,16 +75,18 @@ class _AuthGate extends StatelessWidget {
 }
 
 class Shell extends StatelessWidget {
-  const Shell({super.key});
+  const Shell({required this.authService, super.key});
+
+  final AuthService authService;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth > 600) {
-          return const DesktopScaffold();
+          return DesktopScaffold(authService: authService);
         } else {
-          return const PhoneScaffold();
+          return PhoneScaffold(authService: authService);
         }
       },
     );
@@ -92,7 +94,9 @@ class Shell extends StatelessWidget {
 }
 
 class DesktopScaffold extends StatelessWidget {
-  const DesktopScaffold({super.key});
+  const DesktopScaffold({required this.authService, super.key});
+
+  final AuthService authService;
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +109,10 @@ class DesktopScaffold extends StatelessWidget {
             height: double.infinity,
             child: ColoredBox(
               color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: _SignOutButton(authService: authService),
+              ),
             ),
           ),
           const Expanded(child: Center(child: Text('Desktop'))),
@@ -115,13 +123,37 @@ class DesktopScaffold extends StatelessWidget {
 }
 
 class PhoneScaffold extends StatelessWidget {
-  const PhoneScaffold({super.key});
+  const PhoneScaffold({required this.authService, super.key});
+
+  final AuthService authService;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(actions: [_SignOutButton(authService: authService)]),
       body: const Center(child: Text('Phone')),
+    );
+  }
+}
+
+class _SignOutButton extends StatelessWidget {
+  const _SignOutButton({required this.authService});
+
+  final AuthService authService;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      key: const Key('shell-sign-out'),
+      tooltip: 'Sign out',
+      onPressed: () async {
+        try {
+          await authService.signOut();
+        } on AuthException {
+          // Stay on the shell. signedIn does not emit false.
+        }
+      },
+      icon: const Icon(Icons.logout),
     );
   }
 }
