@@ -27,7 +27,7 @@ Related to [#1](https://github.com/kensodemann-projects/hypomnema/issues/1).
 
 | Order | Step       | Status | Files                                                                                                      |
 | ----- | ---------- | ------ | ---------------------------------------------------------------------------------------------------------- |
-| 1     | [STEP-001] |        | `lib/data/services/auth_service.dart`, then `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`, then `test/data/services/auth_service_test.dart` |
+| 1     | [STEP-001] | complete | `lib/data/services/auth_service.dart`, then `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`, then `test/data/services/auth_service_test.dart` |
 | 2     | [STEP-002] |        | `lib/main.dart`, then `test/main_test.dart`                                                                |
 | 3     | [STEP-003] |        | `lib/main.dart`, then `test/main_test.dart`                                                                |
 
@@ -41,7 +41,7 @@ make check
 
 ## [STEP-001] Add sign-out and a signed-in stream to AuthService
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** `AuthService.signOut` forwards to Firebase Auth and maps `FirebaseAuthException` to `AuthException`. `AuthService.signedIn` emits `true` for a Firebase user and `false` for null, in that order, from one stable stream instance.
 

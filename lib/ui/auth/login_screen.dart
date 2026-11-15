@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:hypomnema/data/services/auth_service.dart';
@@ -307,6 +309,12 @@ class _PreviewAuthService implements AuthService {
 
   @override
   Future<void> sendPasswordResetEmail({required String email}) async {}
+
+  @override
+  Future<void> signOut() async {}
+
+  @override
+  Stream<bool> get signedIn => const Stream<bool>.empty();
 }
 
 @Preview(name: 'Login Screen - Phone', size: Size(400, 800))

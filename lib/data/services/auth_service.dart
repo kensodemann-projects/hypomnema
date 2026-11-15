@@ -11,14 +11,24 @@ abstract interface class AuthService {
   });
 
   Future<void> sendPasswordResetEmail({required String email});
+
+  Future<void> signOut();
+
+  Stream<bool> get signedIn;
 }
 
 class FirebaseAuthService implements AuthService {
-  FirebaseAuthService({this._firebaseAuth});
+  FirebaseAuthService({FirebaseAuth? firebaseAuth})
+    : _firebaseAuth = firebaseAuth; // ignore: prefer_initializing_formals
 
   final FirebaseAuth? _firebaseAuth;
 
   FirebaseAuth get _auth => _firebaseAuth ?? FirebaseAuth.instance;
+
+  @override
+  late final Stream<bool> signedIn = _auth.authStateChanges().map(
+    (user) => user != null,
+  );
 
   @override
   Future<void> signInWithEmailAndPassword({
@@ -36,6 +46,15 @@ class FirebaseAuthService implements AuthService {
   Future<void> sendPasswordResetEmail({required String email}) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException {
+      throw const AuthException();
+    }
+  }
+
+  @override
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
     } on FirebaseAuthException {
       throw const AuthException();
     }
