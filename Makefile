@@ -24,7 +24,7 @@ run:
 	flutter run$(if $(DEVICE), -d $(DEVICE))
 
 emulators:
-	firebase emulators:start --only auth,firestore
+	firebase emulators:start --only auth,firestore --import seed-data
 
 preview:
 	flutter widget-preview start
