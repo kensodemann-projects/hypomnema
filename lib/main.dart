@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kDebugMode, kIsWeb;
+import 'package:hypomnema/data/services/auth_service.dart';
+import 'package:hypomnema/ui/auth/login_screen.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'firebase_options.dart';
@@ -29,15 +31,45 @@ Future<void> main() async {
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  const MainApp({super.key, this.authService});
+
+  final AuthService? authService;
 
   @override
   Widget build(BuildContext context) {
+    final authService = this.authService ?? FirebaseAuthService();
     return MaterialApp(
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
-      home: const Shell(),
+      home: _AuthGate(authService: authService),
+    );
+  }
+}
+
+class _AuthGate extends StatelessWidget {
+  const _AuthGate({required this.authService});
+
+  final AuthService authService;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<bool>(
+      stream: authService.signedIn,
+      builder: (context, snapshot) {
+        final signedIn = snapshot.data;
+        if (signedIn == null) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(key: Key('auth-gate-progress')),
+            ),
+          );
+        }
+        if (signedIn) {
+          return const Shell();
+        }
+        return LoginScreen(authService: authService);
+      },
     );
   }
 }
