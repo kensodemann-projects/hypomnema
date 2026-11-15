@@ -1,6 +1,6 @@
 ## Summary
 
-Reviewed the resulting diff for [PR #16](https://github.com/kensodemann-projects/hypomnema/pull/16) (`4-gate-the-shell-behind-sign-in-and-add-sign-out` → `main`), which implements issue #4: gate the shell behind `AuthService.signedIn`, show a loading state then login or shell, and add phone/desktop sign-out. The auth gate, service API, and widget tests are solid and match the stated acceptance criteria. **Request changes** before merge: the PR title/body describe the opposite of the change, and `PLAN.md` still lists STEP-003 as unfinished while that work is already in the tree. SEC-001 is **won't fix**: the committed email is already public, and the emulator password is not used anywhere else.
+Reviewed the resulting diff for [PR #16](https://github.com/kensodemann-projects/hypomnema/pull/16) (`4-gate-the-shell-behind-sign-in-and-add-sign-out` → `main`), which implements issue #4: gate the shell behind `AuthService.signedIn`, show a loading state then login or shell, and add phone/desktop sign-out. The auth gate, service API, and widget tests are solid and match the stated acceptance criteria. **Request changes** before merge: the PR title/body describe the opposite of the change, and `PLAN.md` still lists STEP-003 as unfinished while that work is already in the tree. SEC-001 is **won't fix**: the committed email is already public, and the emulator password is not used anywhere else. CLN-001 is **done**: `main` creates one `FirebaseAuthService` and passes it into `MainApp`. CLN-002 is **done**: `make emulators` imports `seed-data`.
 
 ## Finding counts
 
@@ -31,6 +31,8 @@ Reviewed the resulting diff for [PR #16](https://github.com/kensodemann-projects
 
 [CLN-001]
 
+**Status:** Done. `main` creates one `FirebaseAuthService` and passes it to `MainApp`. `authService` is required, so `build` no longer constructs a replacement.
+
 **Issue:** `MainApp.build` constructs a new `FirebaseAuthService()` whenever `authService` is null:
 
 ```dart
@@ -42,6 +44,8 @@ final authService = this.authService ?? FirebaseAuthService();
 **Why:** A new service yields a new `signedIn` stream. `StreamBuilder` would resubscribe and can briefly return to the progress state on otherwise unrelated rebuilds.
 
 [CLN-002]
+
+**Status:** Done. `make emulators` starts the Auth and Firestore emulators with `--import seed-data`.
 
 **Issue:** `Makefile` adds `seed-data` and `web` targets that are outside issue #4’s auth-gate scope. `make emulators` still starts without `--import=./seed-data`, so the committed export is unused by the documented workflow.
 
