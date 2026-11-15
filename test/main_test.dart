@@ -56,7 +56,7 @@ void main() {
 
       // Then
       expect(
-        Theme.of(tester.element(find.text('Phone'))).brightness,
+        Theme.of(tester.element(find.byType(Shell))).brightness,
         Brightness.light,
       );
     },
@@ -76,7 +76,7 @@ void main() {
 
       // Then
       expect(
-        Theme.of(tester.element(find.text('Phone'))).brightness,
+        Theme.of(tester.element(find.byType(Shell))).brightness,
         Brightness.dark,
       );
     },
@@ -93,8 +93,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Then
-      expect(find.text('Phone'), findsOneWidget);
-      expect(find.text('Desktop'), findsNothing);
+      expect(find.byType(Shell), findsOneWidget);
+      expect(find.byType(PhoneScaffold), findsOneWidget);
+      expect(find.byType(DesktopScaffold), findsNothing);
       expect(find.byType(AppBar), findsOneWidget);
       expect(find.byKey(const Key('shell-side-panel')), findsNothing);
     },
@@ -111,8 +112,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Then
-      expect(find.text('Phone'), findsOneWidget);
-      expect(find.text('Desktop'), findsNothing);
+      expect(find.byType(Shell), findsOneWidget);
+      expect(find.byType(PhoneScaffold), findsOneWidget);
+      expect(find.byType(DesktopScaffold), findsNothing);
       expect(find.byType(AppBar), findsOneWidget);
       expect(find.byKey(const Key('shell-side-panel')), findsNothing);
     },
@@ -129,8 +131,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Then
-      expect(find.text('Desktop'), findsOneWidget);
-      expect(find.text('Phone'), findsNothing);
+      expect(find.byType(Shell), findsOneWidget);
+      expect(find.byType(DesktopScaffold), findsOneWidget);
+      expect(find.byType(PhoneScaffold), findsNothing);
       expect(find.byType(AppBar), findsNothing);
       expect(find.byKey(const Key('shell-side-panel')), findsOneWidget);
     },
@@ -147,8 +150,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Then
-      expect(find.text('Desktop'), findsOneWidget);
-      expect(find.text('Phone'), findsNothing);
+      expect(find.byType(Shell), findsOneWidget);
+      expect(find.byType(DesktopScaffold), findsOneWidget);
+      expect(find.byType(PhoneScaffold), findsNothing);
       expect(find.byType(AppBar), findsNothing);
       expect(find.byKey(const Key('shell-side-panel')), findsOneWidget);
     },
@@ -171,8 +175,7 @@ void main() {
         isA<CircularProgressIndicator>(),
       );
       expect(find.byKey(const Key('login-email')), findsNothing);
-      expect(find.text('Phone'), findsNothing);
-      expect(find.text('Desktop'), findsNothing);
+      expect(find.byType(Shell), findsNothing);
     },
   );
 
@@ -189,8 +192,7 @@ void main() {
 
       // Then
       expect(find.byKey(const Key('login-email')), findsOneWidget);
-      expect(find.text('Phone'), findsNothing);
-      expect(find.text('Desktop'), findsNothing);
+      expect(find.byType(Shell), findsNothing);
       expect(find.byKey(const Key('shell-side-panel')), findsNothing);
     },
   );
@@ -218,7 +220,8 @@ void main() {
       expect(auth.signInCalls, [
         (email: 'person@example.com', password: 'secret'),
       ]);
-      expect(find.text('Phone'), findsOneWidget);
+      expect(find.byType(Shell), findsOneWidget);
+      expect(find.byType(PhoneScaffold), findsOneWidget);
       expect(find.byKey(const Key('login-sign-in')), findsNothing);
     },
   );
