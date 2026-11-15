@@ -165,7 +165,11 @@ void main() {
       await tester.pumpWidget(MainApp(authService: auth));
 
       // Then
-      expect(find.byKey(const Key('auth-gate-progress')), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(
+        tester.widget(find.byKey(const Key('auth-gate-progress'))),
+        isA<CircularProgressIndicator>(),
+      );
       expect(find.byKey(const Key('login-email')), findsNothing);
       expect(find.text('Phone'), findsNothing);
       expect(find.text('Desktop'), findsNothing);
