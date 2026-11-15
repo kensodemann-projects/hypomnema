@@ -28,7 +28,7 @@ Related to [#1](https://github.com/kensodemann-projects/hypomnema/issues/1).
 | Order | Step       | Status | Files                                                                                                      |
 | ----- | ---------- | ------ | ---------------------------------------------------------------------------------------------------------- |
 | 1     | [STEP-001] | complete | `lib/data/services/auth_service.dart`, then `lib/ui/auth/login_screen.dart`, then `test/ui/auth/login_screen_test.dart`, then `test/data/services/auth_service_test.dart` |
-| 2     | [STEP-002] |        | `lib/main.dart`, then `test/main_test.dart`                                                                |
+| 2     | [STEP-002] | complete | `lib/main.dart`, then `test/main_test.dart`                                                                |
 | 3     | [STEP-003] |        | `lib/main.dart`, then `test/main_test.dart`                                                                |
 
 ## Commit gate
@@ -95,7 +95,7 @@ flutter test test/data/services/auth_service_test.dart test/ui/auth/login_screen
 
 ## [STEP-002] Show login until the signed-in stream emits true
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** With no `signedIn` event yet, `MainApp` shows the progress indicator and hides the login screen and the shell. After `false`, it shows `LoginScreen` and hides the shell. After a successful email-and-password sign-in, it shows the shell. The existing phone and desktop shell tests still pass for a stream that emits `true`, including widths 400, 600, 601, and 1200, and light and dark theme.
 
