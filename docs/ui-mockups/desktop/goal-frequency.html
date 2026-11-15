@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exercise 4 times per week — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+</head>
+<body>
+
+<nav class="rail">
+  <img class="rail-logo" src="logo.svg" alt="Hypomnema">
+  <a class="rail-item active" href="dashboard.html"><span class="rail-indicator"><span class="material-symbols-outlined">space_dashboard</span></span>Dashboard</a>
+  <a class="rail-item" href="journal.html"><span class="rail-indicator"><span class="material-symbols-outlined">book_2</span></span>Journal</a>
+  <a class="rail-item" href="archive.html"><span class="rail-indicator"><span class="material-symbols-outlined">inventory_2</span></span>Archive</a>
+  <div class="rail-spacer"></div>
+  <div class="rail-divider"></div>
+  <a class="rail-item" href="dialog-sign-out.html"><span class="rail-indicator"><span class="material-symbols-outlined">logout</span></span>Sign Out</a>
+</nav>
+
+<div class="main">
+  <header class="page-header">
+    <a class="icon-btn" href="dashboard.html" title="Back to grid"><span class="material-symbols-outlined">grid_view</span></a>
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <div class="page-subtitle">Saturday, November 14 · Week of Nov 8–14</div>
+    </div>
+    <div class="spacer"></div>
+    <a class="btn btn-filled" href="goal-add.html"><span class="material-symbols-outlined">add</span>Add Goal</a>
+  </header>
+
+  <div class="split">
+    <!-- Goal list (the dashboard grid collapses to a single column) -->
+    <aside class="list-pane">
+      <a class="goal-row" href="journal.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">edit_note</span><span class="goal-row-name">Journal once per day</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">1 of 1 today · mood <span class="mood mood-sm mood-4">4</span></div>
+      </a>
+      <div class="goal-row">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">event_repeat</span><span class="goal-row-name">Meditate daily</span></div>
+        <div class="goal-row-sub muted">0 of 1 today</div>
+        <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <a class="goal-row selected" href="goal-frequency.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined">event_repeat</span><span class="goal-row-name">Exercise 4 times per week</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">3 of 4 this week</div>
+        <div class="progress-track"><div class="progress-fill" style="width:75%"></div></div>
+      </a>
+      <a class="goal-row" href="goal-accumulation.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">stacked_bar_chart</span><span class="goal-row-name">Read 300 pages per month</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">142 of 300 pages this month</div>
+        <div class="progress-track"><div class="progress-fill" style="width:47%"></div></div>
+      </a>
+      <a class="goal-row" href="goal-target-value.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">flag</span><span class="goal-row-name">Lose 20 pounds by Dec 31</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">188.4 lb → 180 lb · 58%</div>
+        <div class="progress-track"><div class="progress-fill" style="width:58%"></div></div>
+      </a>
+      <div class="goal-row">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No alcohol</span></div>
+        <div class="goal-row-sub muted">741 days · longest 741</div>
+      </div>
+      <div class="goal-row">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No social media for 30 days</span></div>
+        <div class="goal-row-sub muted">13 of 30 days</div>
+        <div class="progress-track"><div class="progress-fill" style="width:43%"></div></div>
+      </div>
+      <a class="goal-row" href="goal-avoidance.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No soda for 30 days</span><span class="chip chip-missed">Missed</span></div>
+        <div class="goal-row-sub muted">0 days · longest 12 · <span style="color:var(--warning)">Slipped today</span></div>
+      </a>
+      <a class="goal-row" href="goal-upcoming.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No desserts in December</span><span class="chip chip-upcoming">Upcoming</span></div>
+        <div class="goal-row-sub muted">Starts Dec 1</div>
+      </a>
+      <a class="goal-row" href="goal-closed.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">Sober October</span><span class="chip chip-achieved">Achieved</span></div>
+        <div class="goal-row-sub muted">31 of 31 days · closed</div>
+      </a>
+      <a class="goal-row" href="goal-closed-missed.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">flag</span><span class="goal-row-name">Bench press 185 lb by Nov 1</span><span class="chip chip-missed">Missed</span></div>
+        <div class="goal-row-sub muted">172.5 lb · 64% · closed</div>
+      </a>
+    </aside>
+
+    <!-- Goal details -->
+    <section class="detail-pane">
+      <div class="detail-header">
+        <div>
+          <h2 class="detail-title">Exercise 4 times per week</h2>
+          <div class="detail-tags">
+            <span class="type-label"><span class="material-symbols-outlined">event_repeat</span>Frequency · 4 per week</span>
+            <span class="chip chip-neutral">Active since Sep 30</span>
+          </div>
+          <p class="detail-desc">Only count sessions of 30 minutes or more. Walks count if they're brisk enough to get my heart rate up.</p>
+        </div>
+        <div class="detail-actions">
+          <a class="btn btn-outlined btn-sm" href="goal-edit.html"><span class="material-symbols-outlined">edit</span>Edit</a>
+          <button class="btn btn-text btn-sm"><span class="material-symbols-outlined">archive</span>Archive</button>
+          <button class="btn btn-danger-text btn-sm"><span class="material-symbols-outlined">delete</span>Delete</button>
+        </div>
+      </div>
+
+      <div class="card summary-card">
+        <div class="stat"><span class="stat-label">This week</span><span class="stat-value">3 of 4</span></div>
+        <div class="stat-sep"></div>
+        <div class="stat"><span class="stat-label">Current streak</span><span class="stat-value">4 weeks</span></div>
+        <div class="stat"><span class="stat-label">Longest streak</span><span class="stat-value">4 weeks</span></div>
+        <div class="log-controls">
+          <span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Logged today</span>
+          <button class="btn btn-filled"><span class="material-symbols-outlined">check</span>Done</button>
+          <a class="btn btn-outlined" href="dialog-entry-details.html">Add details</a>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- History -->
+        <div class="card card-flush">
+          <div class="card-header"><span class="material-symbols-outlined">history</span><div class="card-title">History</div></div>
+          <ul class="list">
+            <li class="list-item">
+              <span class="result-icon result-progress"><span class="material-symbols-outlined">pending</span></span>
+              <div class="grow"><div class="primary-text">Week of Nov 8</div><div class="secondary-text">In progress</div></div>
+              <div class="trailing">3 of 4</div>
+            </li>
+            <li class="list-item">
+              <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+              <div class="grow"><div class="primary-text">Week of Nov 1</div><div class="secondary-text">Met</div></div>
+              <div class="trailing">4 of 4</div>
+            </li>
+            <li class="list-item">
+              <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+              <div class="grow"><div class="primary-text">Week of Oct 25</div><div class="secondary-text">Met · 1 extra</div></div>
+              <div class="trailing">5 of 4</div>
+            </li>
+            <li class="list-item">
+              <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+              <div class="grow"><div class="primary-text">Week of Oct 18</div><div class="secondary-text">Met · target raised to 4</div></div>
+              <div class="trailing">4 of 4</div>
+            </li>
+            <li class="list-item">
+              <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+              <div class="grow"><div class="primary-text">Week of Oct 11</div><div class="secondary-text">Met</div></div>
+              <div class="trailing">3 of 3</div>
+            </li>
+            <li class="list-item">
+              <span class="result-icon result-missed"><span class="material-symbols-outlined">close</span></span>
+              <div class="grow"><div class="primary-text">Week of Oct 4</div><div class="secondary-text">Missed</div></div>
+              <div class="trailing">2 of 3</div>
+            </li>
+            <li class="list-item">
+              <span class="result-icon result-partial"><span class="material-symbols-outlined">contrast</span></span>
+              <div class="grow"><div class="primary-text">Week of Sep 27</div><div class="secondary-text">Partial · started Wed, Sep 30</div></div>
+              <div class="trailing">2 of 3</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div class="card card-flush">
+          <div class="card-header">
+            <span class="material-symbols-outlined">bookmarks</span><div class="card-title">Resources</div>
+            <a class="btn btn-text btn-sm" href="dialog-resource.html"><span class="material-symbols-outlined">add</span>Add</a>
+          </div>
+          <div class="resource">
+            <div class="resource-icon"><span class="material-symbols-outlined">link</span></div>
+            <div class="grow" style="flex:1">
+              <div class="resource-subject">Boxing fundamentals: footwork</div>
+              <div class="resource-url">youtube.com/watch?v=boxing-footwork-101</div>
+            </div>
+            <a class="icon-btn" href="dialog-resource.html" title="Edit"><span class="material-symbols-outlined">edit</span></a>
+          </div>
+          <div class="resource">
+            <div class="resource-icon"><span class="material-symbols-outlined">notes</span></div>
+            <div style="flex:1">
+              <div class="resource-subject">Heavy / light alternating weeks</div>
+              <div class="resource-url">strengthlog.com/heavy-light-training</div>
+              <div class="resource-desc">Alternate a hard week with an easier one so joints recover. Light week = same exercises at ~60% effort.</div>
+            </div>
+            <a class="icon-btn" href="dialog-resource.html" title="Edit"><span class="material-symbols-outlined">edit</span></a>
+          </div>
+          <div class="resource">
+            <div class="resource-icon"><span class="material-symbols-outlined">notes</span></div>
+            <div style="flex:1">
+              <div class="resource-subject">15-minute mobility routine</div>
+              <div class="resource-desc">Cat-cow ×10, world's greatest stretch ×5/side, hip 90/90 ×8, thoracic rotations ×10/side.</div>
+            </div>
+            <a class="icon-btn" href="dialog-resource.html" title="Edit"><span class="material-symbols-outlined">edit</span></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Entries -->
+      <div class="card card-flush">
+        <div class="card-header"><span class="material-symbols-outlined">list_alt</span><div class="card-title">Entries</div><span class="muted small">Edit and delete are available for 24 hours after an entry is created</span></div>
+        <table class="table">
+          <thead><tr><th>Date</th><th>Time</th><th>Memo</th><th class="actions"></th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Sat, Nov 14</td><td>7:15 AM</td><td>Bob kicked my butt</td>
+              <td class="actions"><span class="window-hint">until 7:16 AM tomorrow</span> <button class="icon-btn" title="Edit"><span class="material-symbols-outlined">edit</span></button><button class="icon-btn danger" title="Delete"><span class="material-symbols-outlined">delete</span></button></td>
+            </tr>
+            <tr>
+              <td>Wed, Nov 11</td><td>6:30 PM</td><td>Vigorous walk</td><td class="actions"></td>
+            </tr>
+            <tr>
+              <td>Mon, Nov 9</td><td>6:10 PM</td><td>Boxing</td><td class="actions"></td>
+            </tr>
+            <tr>
+              <td>Sat, Nov 7</td><td>9:00 AM</td><td>Long hike</td><td class="actions"></td>
+            </tr>
+            <tr>
+              <td>Thu, Nov 5</td><td>6:15 PM</td><td>Boxing</td><td class="actions"></td>
+            </tr>
+            <tr>
+              <td>Tue, Nov 3</td><td>7:00 AM</td><td class="muted">—</td><td class="actions"></td>
+            </tr>
+            <tr>
+              <td>Sun, Nov 1</td><td>4:45 PM</td><td>Swim, 40 laps</td><td class="actions"></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:10px 20px;border-top:1px solid var(--outline-variant)"><button class="btn btn-text btn-sm">Show older entries</button></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+</body>
+</html>

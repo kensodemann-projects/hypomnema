@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Edit resource — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+</head>
+<body>
+<iframe class="bg-frame" src="goal-frequency.html" title="Goal details" tabindex="-1"></iframe>
+
+<div class="scrim">
+  <div class="dialog" role="dialog" aria-labelledby="dlg-title">
+    <div>
+      <div class="type-label"><span class="material-symbols-outlined">event_repeat</span>Exercise 4 times per week</div>
+      <h2 class="dialog-title" id="dlg-title">Edit resource</h2>
+    </div>
+    <div class="field">
+      <label>Subject <span class="req">*</span></label>
+      <input type="text" value="Heavy / light alternating weeks">
+    </div>
+    <div class="field">
+      <label>URL</label>
+      <input type="url" value="https://strengthlog.com/heavy-light-training">
+      <span class="helper">Optional</span>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea rows="6">Alternate a hard week with an easier one so joints recover. Light week = same exercises at ~60% effort.</textarea>
+      <span class="helper">Optional</span>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-danger-text left"><span class="material-symbols-outlined">delete</span>Delete</button>
+      <a class="btn btn-text" href="goal-frequency.html">Cancel</a>
+      <a class="btn btn-filled" href="goal-frequency.html">Save</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

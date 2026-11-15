@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Goal details · Target Value · Phone — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="../desktop/shared.css">
+<link rel="stylesheet" href="../desktop/journal.css">
+<link rel="stylesheet" href="phone.css">
+<script src="../desktop/shared.js"></script>
+<script src="phone.js"></script>
+</head>
+<body class="phone">
+<div class="stage">
+<div class="device">
+
+<div class="statusbar "><span>11:51</span><span class="sys"><span class="material-symbols-outlined">signal_cellular_alt</span><span class="material-symbols-outlined">wifi</span><span class="material-symbols-outlined">battery_full</span></span></div>
+<header class="topbar with-nav"><a class="icon-btn" href="dashboard.html" title="Back"><span class="material-symbols-outlined">arrow_back</span></a><div class="tb-text"><div class="tb-title sm">Lose 20 pounds by Dec 31</div></div><button class="icon-btn" title="Edit"><span class="material-symbols-outlined">edit</span></button><button class="icon-btn" title="More"><span class="material-symbols-outlined">more_vert</span></button></header>
+<div class="screen flush">
+  <div style="padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px;background:var(--surface)">
+    <div class="detail-tags" style="margin-top:0"><span class="type-label"><span class="material-symbols-outlined">flag</span>200 → 180 lb by Dec 31</span><span class="chip chip-neutral">Since Sep 1</span></div>
+    <div class="card" style="background:var(--surface-low)">
+      <div class="summary-grid">
+        <div class="stat"><span class="stat-label">Latest</span><span class="stat-value">188.4 lb</span></div>
+        <div class="stat"><span class="stat-label">Target</span><span class="stat-value">180 lb</span></div>
+        <div class="stat"><span class="stat-label">Progress</span><span class="stat-value">58%</span></div>
+        <div class="stat"><span class="stat-label">Time remaining</span><span class="stat-value">47 days</span></div>
+      </div>
+      <div class="progress-track" style="margin-top:12px"><div class="progress-fill" style="width:58%"></div></div>
+      <div class="log-row"><button class="btn btn-filled"><span class="material-symbols-outlined">add</span>Log weight</button></div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:6px"><span class="material-symbols-outlined">show_chart</span><div class="card-title">History</div></div>
+      <div id="chart"></div>
+    </div>
+  </div>
+  <nav class="ptabs" data-tabs><button class="ptab active" data-tab="entries"><span class="material-symbols-outlined">list_alt</span>Entries</button><button class="ptab" data-tab="resources"><span class="material-symbols-outlined">bookmarks</span>Resources</button></nav>
+  <div data-panel="entries" style="background:var(--surface)">
+    <div class="entry-li"><div class="grow"><div class="l1">After a big week</div><div class="l2">Sat, Nov 14 · 6:52 AM</div></div><span class="val">188.4 lb</span><button class="icon-btn" title="Edit"><span class="material-symbols-outlined">edit</span></button><button class="icon-btn danger" title="Delete"><span class="material-symbols-outlined">delete</span></button></div>
+    <div class="entry-li"><div class="grow"><div class="l1"><span class="muted">No memo</span></div><div class="l2">Tue, Nov 10 · 7:05 AM</div></div><span class="val">189 lb</span></div>
+    <div class="entry-li"><div class="grow"><div class="l1"><span class="muted">No memo</span></div><div class="l2">Tue, Nov 3 · 6:58 AM</div></div><span class="val">190.2 lb</span></div>
+    <div class="entry-li"><div class="grow"><div class="l1">Halloween candy incoming</div><div class="l2">Tue, Oct 27 · 7:10 AM</div></div><span class="val">191.4 lb</span></div>
+    <div class="entry-li"><div class="grow"><div class="l1"><span class="muted">No memo</span></div><div class="l2">Tue, Oct 20 · 6:45 AM</div></div><span class="val">192 lb</span></div>
+  </div>
+  <div data-panel="resources" hidden style="background:var(--surface)">
+    <div style="padding:8px 16px 0;display:flex;justify-content:flex-end"><a class="btn btn-text btn-sm" href="resource-form.html"><span class="material-symbols-outlined">add</span>Add resource</a></div>
+    <div class="resource"><div class="resource-icon"><span class="material-symbols-outlined">link</span></div><div style="flex:1;min-width:0"><div class="resource-subject">Protein targets for cutting</div><div class="resource-url">examine.com/guides/protein-intake</div></div><a class="icon-btn" href="resource-form.html" title="Edit"><span class="material-symbols-outlined">edit</span></a></div>
+  </div>
+</div>
+<div class="gesture surface"></div>
+
+</div>
+<aside class="notes">
+  <a class="back" href="index.html"><span class="material-symbols-outlined">arrow_back</span>All phone screens</a>
+  <h1>Goal details · Target Value</h1>
+  <p>The line chart fits the phone width. The target value and target date are marked, along with today.</p>
+  <ul><li>Progress is the share of the distance from the start covered by the latest value, shown between 0% and 100%.</li></ul>
+  <div class="refs">Requirements: §3.2, §7.2</div>
+  <div class="links"><a href="dashboard.html">Dashboard</a></div>
+
+</aside>
+</div>
+<script>
+hmChart(document.getElementById('chart'), {
+  label: 'Weight over time', start: '2026-09-01', end: '2026-12-31', height: 200,
+  yMin: 176, yMax: 202, yTicks: [180, 190, 200], yFormat: (v) => v + ' lb',
+  xTicks: [['2026-09-01', 'Sep'], ['2026-10-01', 'Oct'], ['2026-11-01', 'Nov'], ['2026-12-01', 'Dec']],
+  target: { value: 180, label: 'Target 180 lb' }, targetDate: { date: '2026-12-31', label: 'Dec 31' }, today: '2026-11-14',
+  points: [['2026-09-01', 200], ['2026-09-08', 198.6], ['2026-09-15', 197.2], ['2026-09-22', 196.8], ['2026-09-29', 195],
+    ['2026-10-06', 194.2], ['2026-10-13', 193.6], ['2026-10-20', 192], ['2026-10-27', 191.4], ['2026-11-03', 190.2],
+    ['2026-11-10', 189], ['2026-11-14', 188.4]]
+});
+</script>
+</body>
+</html>

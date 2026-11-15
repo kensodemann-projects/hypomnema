@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hypomnema — Desktop mock-ups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+<style>
+  body { display: block; overflow-y: auto; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 32px 64px; display: flex; flex-direction: column; gap: 28px; }
+  .head { display: flex; align-items: center; gap: 16px; }
+  .head img { width: 56px; height: 56px; border-radius: 14px; }
+  h1 { font-size: 30px; font-weight: 400; }
+  h2 { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--on-surface-variant); margin-bottom: 10px; }
+  .screens { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .screen { display: flex; gap: 12px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--outline-variant); border-radius: 14px; }
+  .screen:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+  .screen .material-symbols-outlined { color: var(--primary); margin-top: 2px; }
+  .screen .t { font-weight: 600; }
+  .screen .d { font-size: 13px; color: var(--on-surface-variant); }
+  .screen .r { font-size: 11px; color: var(--outline); margin-top: 4px; }
+  .moods { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .decisions { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+  .decisions li { margin-left: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <img src="logo.svg" alt="">
+    <div>
+      <h1>Hypomnema · Desktop mock-ups</h1>
+      <div class="muted">Static HTML concepts for docs/REQUIREMENTS.md. Sample date: Saturday, Nov 14, 2026. Use the yellow MOCK button to review the dark theme. See also the <a href="../phone/index.html" style="color:var(--primary)">phone set</a>.</div>
+    </div>
+  </div>
+
+  <section>
+    <h2>Proposals for the items deferred to mock-ups (Section 11)</h2>
+    <div class="card decisions">
+      <ul>
+        <li><strong>Desktop layout:</strong> a navigation rail with Dashboard, Journal, and Archive. Goal details open beside the goal list; the journal list sits beside the selected entry. Entry, resource, slip, and archive forms are dialogs. Add Goal and Edit Goal are side sheets.</li>
+        <li><strong>Sign Out:</strong> at the bottom of the navigation rail, separated by a divider. It asks for confirmation before signing out.</li>
+        <li><strong>Mood colors:</strong> the number is always shown, in near-black, on every color in both themes.
+          <div class="moods" style="margin-top:8px">
+            <span class="mood mood-1">1</span><code>#E5534B</code>
+            <span class="mood mood-2">2</span><code>#F28C38</code>
+            <span class="mood mood-3">3</span><code>#F5C842</code>
+            <span class="mood mood-4">4</span><code>#A8CC4A</code>
+            <span class="mood mood-5">5</span><code>#4CAF50</code>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Access</h2>
+    <div class="screens">
+      <a class="screen" href="sign-in.html"><span class="material-symbols-outlined">login</span><div><div class="t">Sign In</div><div class="d">Email and password, error state, Forgot password</div><div class="r">§2</div></div></a>
+      <a class="screen" href="dialog-sign-out.html"><span class="material-symbols-outlined">logout</span><div><div class="t">Sign out confirmation</div><div class="d">Opened from Sign Out in the rail</div><div class="r">§7.5</div></div></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Dashboard and goals</h2>
+    <div class="screens">
+      <a class="screen" href="dashboard.html"><span class="material-symbols-outlined">space_dashboard</span><div><div class="t">Dashboard</div><div class="d">Panel grid covering every goal type and state, plus the "No" affirmation snackbar</div><div class="r">§7.1</div></div></a>
+      <a class="screen" href="goal-frequency.html"><span class="material-symbols-outlined">event_repeat</span><div><div class="t">Goal details · Frequency</div><div class="d">Period history with met, missed, partial, and a target change. Entries and resources</div><div class="r">§3.3, §3.4, §7.2</div></div></a>
+      <a class="screen" href="goal-target-value.html"><span class="material-symbols-outlined">flag</span><div><div class="t">Goal details · Target Value</div><div class="d">Line chart with target value and target date marked</div><div class="r">§3.2, §7.2</div></div></a>
+      <a class="screen" href="goal-avoidance.html"><span class="material-symbols-outlined">block</span><div><div class="t">Goal details · Avoidance</div><div class="d">Missed but still running until its end date, slipped today, slip list</div><div class="r">§3.2, §3.5, §7.2</div></div></a>
+      <a class="screen" href="goal-accumulation.html"><span class="material-symbols-outlined">stacked_bar_chart</span><div><div class="t">Goal details · Accumulation</div><div class="d">Monthly totals against the target, partial first month, entries with amounts</div><div class="r">§3.2, §3.3, §7.2</div></div></a>
+      <a class="screen" href="goal-upcoming.html"><span class="material-symbols-outlined">schedule</span><div><div class="t">Goal details · Upcoming</div><div class="d">No logging, the days to come, every field still editable</div><div class="r">§3.4, §3.5, §7.2</div></div></a>
+      <a class="screen" href="goal-closed.html"><span class="material-symbols-outlined">emoji_events</span><div><div class="t">Goal details · Closed, Achieved</div><div class="d">Avoidance goal that reached its streak, Archive as the main action</div><div class="r">§3.5, §7.2</div></div></a>
+      <a class="screen" href="goal-closed-missed.html"><span class="material-symbols-outlined">event_busy</span><div><div class="t">Goal details · Closed, Missed</div><div class="d">Target value goal whose date passed, no new entries</div><div class="r">§3.5, §7.2</div></div></a>
+      <a class="screen" href="dialog-archive.html"><span class="material-symbols-outlined">archive</span><div><div class="t">Archive confirmation</div><div class="d">Warns that archiving can't be undone</div><div class="r">§3.5</div></div></a>
+      <a class="screen" href="dialog-delete.html"><span class="material-symbols-outlined">delete_forever</span><div><div class="t">Delete confirmation</div><div class="d">Points to Archive as the way to keep history</div><div class="r">§3.5</div></div></a>
+      <a class="screen" href="dialog-resource.html"><span class="material-symbols-outlined">bookmarks</span><div><div class="t">Resource dialog</div><div class="d">Subject, URL, description, delete</div><div class="r">§5</div></div></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Logging and corrections</h2>
+    <div class="screens">
+      <a class="screen" href="dialog-log-entry.html"><span class="material-symbols-outlined">add_circle</span><div><div class="t">Log entry dialog</div><div class="d">Accumulation entry: value focused, date and time prefilled, memo</div><div class="r">§4, §7.1</div></div></a>
+      <a class="screen" href="dialog-entry-details.html"><span class="material-symbols-outlined">edit_calendar</span><div><div class="t">Add details dialog</div><div class="d">Frequency entry with a memo, backdated to yesterday</div><div class="r">§4.2, §7.1</div></div></a>
+      <a class="screen" href="dialog-slip.html"><span class="material-symbols-outlined">restart_alt</span><div><div class="t">Record slip dialog</div><div class="d">Confirmation with the three slip options for a goal with a target</div><div class="r">§3.2, §7.1</div></div></a>
+      <a class="screen" href="dialog-entry-edit.html"><span class="material-symbols-outlined">edit</span><div><div class="t">Edit entry dialog</div><div class="d">Inside the 24-hour window, with Delete (confirmed first)</div><div class="r">§4.2, §7.2</div></div></a>
+      <a class="screen" href="dialog-slip-edit.html"><span class="material-symbols-outlined">edit_note</span><div><div class="t">Edit slip dialog</div><div class="d">Says what deleting the slip does to the streak and outcome</div><div class="r">§3.2, §4.2</div></div></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Adding and editing goals</h2>
+    <div class="screens">
+      <a class="screen" href="goal-add-frequency.html"><span class="material-symbols-outlined">event_repeat</span><div><div class="t">Add Goal · Frequency</div><div class="d">Count and period, partial first week explained</div><div class="r">§3.1, §3.3</div></div></a>
+      <a class="screen" href="goal-add-accumulation.html"><span class="material-symbols-outlined">stacked_bar_chart</span><div><div class="t">Add Goal · Accumulation</div><div class="d">Amount, unit, and period, future start date</div><div class="r">§3.1, §3.2</div></div></a>
+      <a class="screen" href="goal-add.html"><span class="material-symbols-outlined">flag</span><div><div class="t">Add Goal · Target Value</div><div class="d">Start, target, unit, and date, with increase or decrease derived</div><div class="r">§3.1, §3.2</div></div></a>
+      <a class="screen" href="goal-add-avoidance.html"><span class="material-symbols-outlined">block</span><div><div class="t">Add Goal · Avoidance</div><div class="d">Open-ended or a number of days, start date in the past</div><div class="r">§3.1, §3.2</div></div></a>
+      <a class="screen" href="goal-edit.html"><span class="material-symbols-outlined">edit</span><div><div class="t">Edit Goal · Active</div><div class="d">Target editable going forward, other fields locked</div><div class="r">§3.4</div></div></a>
+      <a class="screen" href="goal-edit-upcoming.html"><span class="material-symbols-outlined">edit_calendar</span><div><div class="t">Edit Goal · Upcoming</div><div class="d">Every field open, including type and start date</div><div class="r">§3.4</div></div></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>First sign-in and empty states</h2>
+    <div class="screens">
+      <a class="screen" href="dashboard-empty.html"><span class="material-symbols-outlined">space_dashboard</span><div><div class="t">Dashboard · First sign-in</div><div class="d">Only the journaling goal, plus a prompt to add a goal</div><div class="r">§6.5, §7.1</div></div></a>
+      <a class="screen" href="journal-empty.html"><span class="material-symbols-outlined">book_2</span><div><div class="t">Journal · Empty</div><div class="d">Invitation to write, pointing to I'm Stuck</div><div class="r">§6.4, §7.3</div></div></a>
+      <a class="screen" href="mood-trend-empty.html"><span class="material-symbols-outlined">show_chart</span><div><div class="t">Mood Trend · Empty</div><div class="d">Explains that the trend starts with the first entry</div><div class="r">§7.3</div></div></a>
+      <a class="screen" href="archive-empty.html"><span class="material-symbols-outlined">inventory_2</span><div><div class="t">Archive · Empty</div><div class="d">Explains what archiving does</div><div class="r">§7.4</div></div></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Journal</h2>
+    <div class="screens">
+      <a class="screen" href="journal.html"><span class="material-symbols-outlined">book_2</span><div><div class="t">Journal list and entry</div><div class="d">List beside the selected entry, edit window, Make Private</div><div class="r">§6.1, §7.3</div></div></a>
+      <a class="screen" href="journal-private.html"><span class="material-symbols-outlined">lock</span><div><div class="t">Private entry</div><div class="d">Hidden content, Show Content for this viewing, Make Public</div><div class="r">§6.3</div></div></a>
+      <a class="screen" href="journal-editor.html"><span class="material-symbols-outlined">edit_note</span><div><div class="t">Journal editor</div><div class="d">Mood picker labeled only at the ends, I'm Stuck prompt, Private switch</div><div class="r">§6.2, §6.4</div></div></a>
+      <a class="screen" href="mood-trend.html"><span class="material-symbols-outlined">show_chart</span><div><div class="t">Mood Trend</div><div class="d">30-day, 90-day, and 1-year views, with line breaks across gaps of 7+ days</div><div class="r">§7.3</div></div></a>
+      <a class="screen" href="journaling-goal.html"><span class="material-symbols-outlined">flag</span><div><div class="t">Journaling Goal</div><div class="d">Change form with preview, history with change marker and interrupted period</div><div class="r">§6.5</div></div></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Archive</h2>
+    <div class="screens">
+      <a class="screen" href="archive.html"><span class="material-symbols-outlined">inventory_2</span><div><div class="t">Archive</div><div class="d">Archived goal list beside read-only details</div><div class="r">§7.4</div></div></a>
+      <a class="screen" href="dialog-delete-archived.html"><span class="material-symbols-outlined">delete_forever</span><div><div class="t">Delete archived goal</div><div class="d">The only action on an archived goal</div><div class="r">§3.5, §7.4</div></div></a>
+    </div>
+  </section>
+</div>
+</body>
+</html>

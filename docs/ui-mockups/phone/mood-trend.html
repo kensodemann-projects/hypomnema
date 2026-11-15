@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mood Trend · Phone — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="../desktop/shared.css">
+<link rel="stylesheet" href="../desktop/journal.css">
+<link rel="stylesheet" href="phone.css">
+<script src="../desktop/shared.js"></script>
+<script src="phone.js"></script>
+</head>
+<body class="phone">
+<div class="stage">
+<div class="device">
+
+<div class="statusbar "><span>11:51</span><span class="sys"><span class="material-symbols-outlined">signal_cellular_alt</span><span class="material-symbols-outlined">wifi</span><span class="material-symbols-outlined">battery_full</span></span></div>
+<header class="topbar"><div class="tb-text"><div class="tb-title">Journal</div></div><a class="goal-pill" href="journaling-goal.html" style="margin-right:12px"><span class="material-symbols-outlined icon-filled">check_circle</span>1 of 1 today</a></header><nav class="ptabs"><a class="ptab" href="journal.html"><span class="material-symbols-outlined">list</span>Entries</a><a class="ptab active" href="mood-trend.html"><span class="material-symbols-outlined">show_chart</span>Mood</a><a class="ptab" href="journaling-goal.html"><span class="material-symbols-outlined">flag</span>Goal</a></nav>
+<div class="screen">
+  <div class="segmented" id="range" style="display:flex">
+    <button class="active" data-r="30" style="flex:1;justify-content:center">30 days</button>
+    <button data-r="90" style="flex:1;justify-content:center">90 days</button>
+    <button data-r="365" style="flex:1;justify-content:center">1 year</button>
+  </div>
+  <div class="card">
+    <div class="card-header" style="margin-bottom:4px"><div class="card-title" id="chart-title">Daily mood</div></div>
+    <div class="muted small" id="chart-range" style="margin-bottom:8px">Oct 16 – Nov 14 · swipe for earlier days</div>
+    <div style="display:flex;margin-right:-16px">
+      <svg width="30" height="230" style="flex-shrink:0" aria-hidden="true"><rect x="4" y="172.8" width="18" height="18" rx="5" fill="var(--mood-1)"/><text class="mood-pt-text" x="13" y="185.3" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--on-mood)">1</text><rect x="4" y="136.4" width="18" height="18" rx="5" fill="var(--mood-2)"/><text class="mood-pt-text" x="13" y="148.9" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--on-mood)">2</text><rect x="4" y="100.0" width="18" height="18" rx="5" fill="var(--mood-3)"/><text class="mood-pt-text" x="13" y="112.5" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--on-mood)">3</text><rect x="4" y="63.6" width="18" height="18" rx="5" fill="var(--mood-4)"/><text class="mood-pt-text" x="13" y="76.1" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--on-mood)">4</text><rect x="4" y="27.2" width="18" height="18" rx="5" fill="var(--mood-5)"/><text class="mood-pt-text" x="13" y="39.7" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--on-mood)">5</text></svg>
+      <div class="chart-scroll" id="scroll" style="flex:1;margin:0;padding:0 16px 0 0"><div id="chart"></div></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+    <div class="card" style="padding:12px;text-align:center"><span class="mood mood-lg mood-3" id="avg">3</span><div class="stat-label" style="margin-top:6px">Avg mood</div></div>
+    <div class="card" style="padding:12px;text-align:center"><div class="stat-value" id="count">20</div><div class="stat-label">Entries</div></div>
+    <div class="card" style="padding:12px;text-align:center"><div class="stat-value" id="days">19</div><div class="stat-label" id="days-label">Days</div></div>
+  </div>
+  <div class="muted small" style="display:flex;flex-direction:column;gap:6px;padding:0 4px">
+    <span id="note-unit">One point per day: that day's average mood, rounded.</span>
+    <span>No point means no entries. The line breaks after 7 or more days without entries.</span>
+    <span>Private entries are included.</span>
+  </div>
+</div>
+<nav class="bottom-nav"><a class="bn-item" href="dashboard.html"><span class="bn-ind"><span class="material-symbols-outlined">space_dashboard</span></span>Dashboard</a><a class="bn-item active" href="journal.html"><span class="bn-ind"><span class="material-symbols-outlined">book_2</span></span>Journal</a><a class="bn-item" href="archive.html"><span class="bn-ind"><span class="material-symbols-outlined">inventory_2</span></span>Archive</a><a class="bn-item" href="dialog-sign-out.html"><span class="bn-ind"><span class="material-symbols-outlined">logout</span></span>Sign Out</a></nav>
+<div class="gesture"></div>
+
+</div>
+<aside class="notes">
+  <a class="back" href="index.html"><span class="material-symbols-outlined">arrow_back</span>All phone screens</a>
+  <h1>Mood Trend</h1>
+  <p>Mood over time. On a phone, the 30-day and 1-year charts are wider than the screen and scroll sideways. They open at the most recent end, so every point keeps its readable number.</p>
+  <ul><li>Switch between 30 days, 90 days, and 1 year.</li><li>The 90-day view fits without scrolling.</li></ul>
+  <div class="refs">Requirements: §6.2, §7.3</div>
+  <div class="links"><a href="journal.html">Journal list</a><a href="journaling-goal.html">Journaling Goal</a></div>
+
+</aside>
+</div>
+<script>
+const ranges = {
+  30: { title: 'Daily mood', range: 'Oct 16 – Nov 14 · swipe for earlier days', unit: "One point per day: that day's average mood, rounded.",
+    avg: 3, count: 20, days: 19, daysLabel: 'Days', width: 680, start: '2026-10-15', end: '2026-11-15',
+    xTicks: [['2026-10-18', 'Oct 18'], ['2026-10-25', 'Oct 25'], ['2026-11-01', 'Nov 1'], ['2026-11-08', 'Nov 8'], ['2026-11-14', 'Nov 14']],
+    points: [['2026-10-16', 2], ['2026-10-18', 3], ['2026-10-19', 2], ['2026-10-20', 1], ['2026-10-29', 3], ['2026-10-30', 3],
+      ['2026-10-31', 4], ['2026-11-01', 4], ['2026-11-03', 3], ['2026-11-04', 4], ['2026-11-05', 3], ['2026-11-06', 4],
+      ['2026-11-08', 5], ['2026-11-09', 4], ['2026-11-10', 3], ['2026-11-11', 4], ['2026-11-12', 2], ['2026-11-13', 4], ['2026-11-14', 4]] },
+  90: { title: 'Weekly mood', range: 'Aug 16 – Nov 14', unit: "One point per week: that week's average mood, rounded.",
+    avg: 3, count: 44, days: 11, daysLabel: 'Weeks', width: null, start: '2026-08-13', end: '2026-11-15',
+    xTicks: [['2026-09-01', 'Sep'], ['2026-10-01', 'Oct'], ['2026-11-01', 'Nov']],
+    points: [['2026-08-16', 3], ['2026-08-23', 3], ['2026-08-30', 4], ['2026-09-06', 3], ['2026-09-27', 2], ['2026-10-04', 3],
+      ['2026-10-11', 3], ['2026-10-18', 2], ['2026-10-25', 3], ['2026-11-01', 4], ['2026-11-08', 4]] },
+  365: { title: 'Weekly mood', range: 'Nov 15, 2025 – Nov 14, 2026 · swipe for earlier weeks', unit: "One point per week: that week's average mood, rounded.",
+    avg: 3, count: 163, days: 44, daysLabel: 'Weeks', width: 1000, start: '2025-11-12', end: '2026-11-15',
+    xTicks: [['2025-12-01', 'Dec'], ['2026-02-01', 'Feb'], ['2026-04-01', 'Apr'], ['2026-06-01', 'Jun'], ['2026-08-01', 'Aug'], ['2026-10-01', 'Oct']],
+    points: (() => {
+      const vals = [3,3,2,2,3,null,null,null,4,4,3,4,3,3,4,4,5,4,4,3,3,4,null,null,null,null,3,3,2,3,3,4,4,3,3,4,3,3,4,3,null,null,2,3,3,2,3,4,4];
+      const out = []; const d = new Date('2025-11-16T00:00:00');
+      vals.forEach((v) => { if (v !== null) out.push([d.toISOString().slice(0, 10), v]); d.setDate(d.getDate() + 7); });
+      out.push(['2026-11-01', 4], ['2026-11-08', 4]); return out;
+    })() }
+};
+function show(r) {
+  const c = ranges[r];
+  const opts = { label: c.title, mood: true, noYAxis: true, height: 230, start: c.start, end: c.end, yMin: 0.5, yMax: 5.5,
+    yTicks: [1, 2, 3, 4, 5], xTicks: c.xTicks, breakDays: 7, today: '2026-11-14', points: c.points };
+  if (c.width) opts.width = c.width;
+  hmChart(document.getElementById('chart'), opts);
+  const sc = document.getElementById('scroll'); sc.scrollLeft = sc.scrollWidth;
+  document.getElementById('chart-title').textContent = c.title;
+  document.getElementById('chart-range').textContent = c.range;
+  document.getElementById('note-unit').textContent = c.unit;
+  const avg = document.getElementById('avg'); avg.textContent = c.avg; avg.className = 'mood mood-lg mood-' + c.avg;
+  document.getElementById('count').textContent = c.count;
+  document.getElementById('days').textContent = c.days;
+  document.getElementById('days-label').textContent = c.daysLabel;
+}
+document.querySelectorAll('#range button').forEach((b) => b.addEventListener('click', () => show(b.dataset.r)));
+show(30);
+</script>
+</body>
+</html>

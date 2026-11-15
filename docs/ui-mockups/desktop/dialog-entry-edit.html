@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Edit entry — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+</head>
+<body>
+<iframe class="bg-frame" src="goal-accumulation.html" title="Background" tabindex="-1"></iframe>
+
+<div class="scrim">
+  <div class="dialog" role="dialog" aria-labelledby="dlg-title" style="width:440px">
+    <div>
+      <div class="type-label"><span class="material-symbols-outlined">stacked_bar_chart</span>Read 300 pages per month</div>
+      <h2 class="dialog-title" id="dlg-title">Edit entry</h2>
+    </div>
+    <div class="kbd-note"><span class="material-symbols-outlined">schedule</span>Editable until 7:10 AM tomorrow, 24 hours after it was created</div>
+    <div class="field focused">
+      <label>Pages <span class="req">*</span></label>
+      <div class="input-suffix"><input type="text" value="24" autofocus><span class="suffix">pages</span></div>
+      <span class="helper">Greater than 0 · decimals allowed</span>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" value="2026-11-14" min="2026-11-07" max="2026-11-14">
+        <span class="helper">Nov 7 – today</span>
+      </div>
+      <div class="field">
+        <label>Time</label>
+        <input type="time" value="07:10">
+        <span class="helper">Can't be later than now</span>
+      </div>
+      <div class="field span-2">
+        <label>Memo</label>
+        <input type="text" value="Project Hail Mary, ch. 9–11">
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <a class="btn btn-danger-text" href="goal-accumulation.html" style="margin-right:auto"><span class="material-symbols-outlined">delete</span>Delete entry</a>
+      <a class="btn btn-text" href="goal-accumulation.html">Cancel</a>
+      <a class="btn btn-filled" href="goal-accumulation.html">Save</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Write — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="journal.css">
+<script src="shared.js"></script>
+</head>
+<body>
+<iframe class="bg-frame" src="journal.html" title="Journal" tabindex="-1"></iframe>
+
+<div class="scrim">
+  <div class="dialog dialog-wide" role="dialog" aria-labelledby="dlg-title">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="flex:1">
+        <h2 class="dialog-title" id="dlg-title">New journal entry</h2>
+        <div class="muted small">Date and time are set when you save</div>
+      </div>
+      <a class="icon-btn" href="journal.html" title="Close"><span class="material-symbols-outlined">close</span></a>
+    </div>
+
+    <div class="field">
+      <label>Subject</label>
+      <input type="text" placeholder="Optional. Lists show the first line of your text when it's blank.">
+    </div>
+
+    <div class="field">
+      <label>Mood <span class="req">*</span></label>
+      <div class="mood-picker" id="moods">
+        <div class="mood-option"><span class="mood mood-lg mood-1">1</span><span class="mood-label">Awful</span></div>
+        <div class="mood-option"><span class="mood mood-lg mood-2">2</span><span class="mood-label"></span></div>
+        <div class="mood-option selected"><span class="mood mood-lg mood-3">3</span><span class="mood-label"></span></div>
+        <div class="mood-option"><span class="mood mood-lg mood-4">4</span><span class="mood-label"></span></div>
+        <div class="mood-option"><span class="mood mood-lg mood-5">5</span><span class="mood-label">Great</span></div>
+      </div>
+    </div>
+
+    <div class="prompt-card" id="prompt">
+      <span class="material-symbols-outlined">lightbulb</span>
+      <div class="prompt-text"><div class="prompt-label">Prompt</div><span id="prompt-text">What's something you're looking forward to this week, and why does it matter to you?</span></div>
+    </div>
+
+    <div class="field">
+      <div style="display:flex;align-items:center">
+        <label style="flex:1">Journal <span class="req">*</span></label>
+        <button class="btn btn-text btn-sm" id="stuck"><span class="material-symbols-outlined">lightbulb</span>I'm Stuck</button>
+      </div>
+      <textarea class="editor-text" placeholder="Write whatever is on your mind…">Honestly, Thanksgiving. Not the food so much as having everyone in one room again. Last year Jess couldn't come and it felt</textarea>
+    </div>
+
+    <div class="switch-row">
+      <span class="switch"></span>
+      <div><div style="font-weight:500">Private</div><div class="muted small">Hide the subject and text until you choose Show Content</div></div>
+    </div>
+
+    <div class="dialog-actions">
+      <a class="btn btn-text" href="journal.html">Cancel</a>
+      <a class="btn btn-filled" href="journal.html"><span class="material-symbols-outlined">check</span>Save</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.mood-option').forEach((o) => o.addEventListener('click', () => {
+    document.querySelectorAll('.mood-option').forEach((x) => x.classList.remove('selected'));
+    o.classList.add('selected');
+  }));
+  document.querySelector('.switch').addEventListener('click', (e) => e.currentTarget.classList.toggle('on'));
+  const prompts = [
+    "What's something you're looking forward to this week, and why does it matter to you?",
+    'Describe a small moment from today that you want to remember.',
+    'What is taking up the most space in your head right now?',
+    'Who made your day better recently? What did they do?',
+    'What would you tell yourself from one year ago?',
+    "What's one thing you've been avoiding, and what's the smallest step toward it?"
+  ];
+  let i = 0;
+  document.getElementById('stuck').addEventListener('click', () => {
+    i = (i + 1 + Math.floor(Math.random() * (prompts.length - 1))) % prompts.length;
+    document.getElementById('prompt-text').textContent = prompts[i];
+  });
+</script>
+</body>
+</html>

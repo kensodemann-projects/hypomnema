@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Archived goal · Phone — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="../desktop/shared.css">
+<link rel="stylesheet" href="../desktop/journal.css">
+<link rel="stylesheet" href="phone.css">
+<script src="../desktop/shared.js"></script>
+<script src="phone.js"></script>
+</head>
+<body class="phone">
+<div class="stage">
+<div class="device">
+
+<div class="statusbar "><span>11:51</span><span class="sys"><span class="material-symbols-outlined">signal_cellular_alt</span><span class="material-symbols-outlined">wifi</span><span class="material-symbols-outlined">battery_full</span></span></div>
+<header class="topbar with-nav"><a class="icon-btn" href="archive.html" title="Back"><span class="material-symbols-outlined">arrow_back</span></a><div class="tb-text"><div class="tb-title sm">Save $2,000 by June 30</div></div><a class="icon-btn danger" href="dialog-delete-archived.html" title="Delete"><span class="material-symbols-outlined">delete</span></a></header>
+<div class="screen flush">
+  <div style="padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px;background:var(--surface)">
+    <div class="detail-tags" style="margin-top:0"><span class="type-label"><span class="material-symbols-outlined">flag</span>$0 → $2,000 by Jun 30</span><span class="chip chip-missed">Missed</span></div>
+    <div class="banner banner-neutral"><span class="material-symbols-outlined">inventory_2</span><span>Archived Jul 6, 2026. Read-only.</span></div>
+    <div class="card" style="background:var(--surface-low)">
+      <div class="summary-grid">
+        <div class="stat"><span class="stat-label">Final value</span><span class="stat-value">$1,640</span></div>
+        <div class="stat"><span class="stat-label">Target</span><span class="stat-value">$2,000</span></div>
+      </div>
+      <div class="stat" style="margin-top:10px"><span class="stat-label">Progress · 82%</span><div class="progress-track" style="margin-top:6px"><div class="progress-fill missed" style="width:82%"></div></div></div>
+    </div>
+    <div class="card"><div id="chart"></div></div>
+  </div>
+  <nav class="ptabs" data-tabs><button class="ptab active" data-tab="entries"><span class="material-symbols-outlined">list_alt</span>Entries</button><button class="ptab" data-tab="resources"><span class="material-symbols-outlined">bookmarks</span>Resources</button></nav>
+  <div data-panel="entries" style="background:var(--surface)">
+    <div class="entry-li"><div class="grow"><div class="l1">Last push, not quite</div><div class="l2">Tue, Jun 30 · 8:10 PM</div></div><span class="val">$1,640</span></div>
+    <div class="entry-li"><div class="grow"><div class="l1"><span class="muted">No memo</span></div><div class="l2">Tue, Jun 23 · 7:30 PM</div></div><span class="val">$1,600</span></div>
+    <div class="entry-li"><div class="grow"><div class="l1">Car repair set me back</div><div class="l2">Tue, Jun 9 · 7:45 PM</div></div><span class="val">$1,520</span></div>
+    <div class="entry-li"><div class="grow"><div class="l1"><span class="muted">No memo</span></div><div class="l2">Tue, May 26 · 8:00 PM</div></div><span class="val">$1,420</span></div>
+  </div>
+  <div data-panel="resources" hidden style="background:var(--surface)">
+    <div class="resource"><div class="resource-icon"><span class="material-symbols-outlined">link</span></div><div style="flex:1;min-width:0"><div class="resource-subject">How big should an emergency fund be?</div><div class="resource-url">consumerfinance.gov/emergency-savings</div></div></div>
+    <div class="resource"><div class="resource-icon"><span class="material-symbols-outlined">notes</span></div><div style="flex:1;min-width:0"><div class="resource-subject">Auto-transfer plan</div><div class="resource-desc">$75 every payday into savings.</div></div></div>
+  </div>
+</div>
+<div class="gesture surface"></div>
+
+</div>
+<aside class="notes">
+  <a class="back" href="index.html"><span class="material-symbols-outlined">arrow_back</span>All phone screens</a>
+  <h1>Archived goal</h1>
+  <p>An archived goal's details: no logging, no edit icons, and read-only resources. The only action is Delete, in the top bar.</p>
+  <ul><li>Deleting asks for confirmation, the same as on an active goal.</li></ul>
+  <div class="refs">Requirements: §3.5, §7.4</div>
+  <div class="links"><a href="archive.html">Archive</a></div>
+
+</aside>
+</div>
+<script>
+hmChart(document.getElementById('chart'), {
+  label: 'Savings over time', start: '2026-01-01', end: '2026-06-30', height: 190,
+  yMin: 0, yMax: 2200, yTicks: [0, 1000, 2000], yFormat: (v) => '$' + v.toLocaleString(),
+  xTicks: [['2026-01-01', 'Jan'], ['2026-03-01', 'Mar'], ['2026-05-01', 'May']],
+  target: { value: 2000, label: 'Target $2,000' }, targetDate: { date: '2026-06-30', label: 'Jun 30' },
+  points: [['2026-01-05', 150], ['2026-01-20', 300], ['2026-02-03', 420], ['2026-02-17', 560], ['2026-03-03', 700],
+    ['2026-03-17', 820], ['2026-03-31', 900], ['2026-04-14', 1050], ['2026-04-28', 1180], ['2026-05-12', 1300],
+    ['2026-05-26', 1420], ['2026-06-09', 1520], ['2026-06-23', 1600], ['2026-06-30', 1640]]
+});
+</script>
+</body>
+</html>

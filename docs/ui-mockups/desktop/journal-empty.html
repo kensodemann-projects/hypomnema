@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Journal · Empty — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="journal.css">
+<script src="shared.js"></script>
+</head>
+<body>
+
+<nav class="rail">
+  <img class="rail-logo" src="logo.svg" alt="Hypomnema">
+  <a class="rail-item" href="dashboard.html"><span class="rail-indicator"><span class="material-symbols-outlined">space_dashboard</span></span>Dashboard</a>
+  <a class="rail-item active" href="journal.html"><span class="rail-indicator"><span class="material-symbols-outlined">book_2</span></span>Journal</a>
+  <a class="rail-item" href="archive.html"><span class="rail-indicator"><span class="material-symbols-outlined">inventory_2</span></span>Archive</a>
+  <div class="rail-spacer"></div>
+  <div class="rail-divider"></div>
+  <a class="rail-item" href="dialog-sign-out.html"><span class="rail-indicator"><span class="material-symbols-outlined">logout</span></span>Sign Out</a>
+</nav>
+
+<div class="main">
+  <header class="page-header">
+    <h1 class="page-title">Journal</h1>
+    <a class="goal-pill" href="journaling-goal.html" style="background:var(--surface-high);color:var(--on-surface-variant)"><span class="material-symbols-outlined">radio_button_unchecked</span>0 of 1 today</a>
+    <div class="spacer"></div>
+    <a class="btn btn-filled" href="journal-editor.html"><span class="material-symbols-outlined">edit</span>Write</a>
+  </header>
+  <nav class="tabs">
+    <a class="tab active" href="journal-empty.html"><span class="material-symbols-outlined">list</span>Entries</a>
+    <a class="tab" href="mood-trend-empty.html"><span class="material-symbols-outlined">show_chart</span>Mood Trend</a>
+    <a class="tab" href="journaling-goal.html"><span class="material-symbols-outlined">flag</span>Journaling Goal</a>
+  </nav>
+  <div class="split">
+    <aside class="list-pane">
+      <div class="empty" style="padding:32px 16px">No entries yet.</div>
+    </aside>
+    <section class="detail-pane" style="justify-content:center">
+      <div class="empty" style="text-align:center;padding:48px 32px;display:flex;flex-direction:column;align-items:center;gap:10px"><span class="material-symbols-outlined" style="font-size:48px;color:var(--primary);opacity:.8">edit_note</span><div style="font-size:18px;font-weight:600;color:var(--on-surface)">Start your journal</div><p style="max-width:380px">Write about anything: how today went, something on your mind, or one good thing. If you're not sure where to start, I'm Stuck gives you a prompt.</p><a class="btn btn-filled" href="journal-editor.html" style="margin-top:6px"><span class="material-symbols-outlined">edit</span>Write your first entry</a></div>
+    </section>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Private entry — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="journal.css">
+<script src="shared.js"></script>
+</head>
+<body>
+
+<nav class="rail">
+  <img class="rail-logo" src="logo.svg" alt="Hypomnema">
+  <a class="rail-item" href="dashboard.html"><span class="rail-indicator"><span class="material-symbols-outlined">space_dashboard</span></span>Dashboard</a>
+  <a class="rail-item active" href="journal.html"><span class="rail-indicator"><span class="material-symbols-outlined">book_2</span></span>Journal</a>
+  <a class="rail-item" href="archive.html"><span class="rail-indicator"><span class="material-symbols-outlined">inventory_2</span></span>Archive</a>
+  <div class="rail-spacer"></div>
+  <div class="rail-divider"></div>
+  <a class="rail-item" href="dialog-sign-out.html"><span class="rail-indicator"><span class="material-symbols-outlined">logout</span></span>Sign Out</a>
+</nav>
+
+<div class="main">
+  <header class="page-header">
+    <h1 class="page-title">Journal</h1>
+    <a class="goal-pill" href="journaling-goal.html"><span class="material-symbols-outlined icon-filled">check_circle</span>1 of 1 today</a>
+    <div class="spacer"></div>
+    <a class="btn btn-filled" href="journal-editor.html"><span class="material-symbols-outlined">edit</span>Write</a>
+  </header>
+  <nav class="tabs">
+    <a class="tab active" href="journal.html"><span class="material-symbols-outlined">list</span>Entries</a>
+    <a class="tab" href="mood-trend.html"><span class="material-symbols-outlined">show_chart</span>Mood Trend</a>
+    <a class="tab" href="journaling-goal.html"><span class="material-symbols-outlined">flag</span>Journaling Goal</a>
+  </nav>
+
+  <div class="split">
+    <aside class="list-pane">
+      <div class="list-pane-label">This week</div>
+      <a class="entry-row" href="journal.html">
+        <span class="mood mood-4">4</span>
+        <div class="entry-main"><div class="entry-subject">Early run before the rain</div><div class="entry-when">Today · 8:02 AM</div></div>
+      </a>
+      <a class="entry-row" href="journal.html">
+        <span class="mood mood-4">4</span>
+        <div class="entry-main"><div class="entry-subject">Dinner with Maya</div><div class="entry-when">Yesterday · 9:40 PM</div></div>
+      </a>
+      <a class="entry-row selected" href="journal-private.html">
+        <span class="mood mood-2">2</span>
+        <div class="entry-main"><div class="entry-subject private"><span class="material-symbols-outlined">lock</span>Private entry</div><div class="entry-when">Thu, Nov 12 · 10:15 PM</div></div>
+      </a>
+      <a class="entry-row" href="journal.html">
+        <span class="mood mood-4">4</span>
+        <div class="entry-main"><div class="entry-subject first-line">Slept well for the first time in a week, and the whole day felt lighter because of it…</div><div class="entry-when">Wed, Nov 11 · 7:30 AM</div></div>
+      </a>
+      <a class="entry-row" href="journal.html">
+        <span class="mood mood-3">3</span>
+        <div class="entry-main"><div class="entry-subject">Quarterly review prep</div><div class="entry-when">Tue, Nov 10 · 9:05 PM</div></div>
+      </a>
+      <a class="entry-row" href="journal.html">
+        <span class="mood mood-4">4</span>
+        <div class="entry-main"><div class="entry-subject">Sunday hike at Devil's Lake</div><div class="entry-when">Mon, Nov 9 · 8:30 PM</div></div>
+      </a>
+      <a class="entry-row" href="journal.html">
+        <span class="mood mood-5">5</span>
+        <div class="entry-main"><div class="entry-subject">Finished the bookshelf!</div><div class="entry-when">Sun, Nov 8 · 6:12 PM</div></div>
+      </a>
+      <div class="list-pane-label">Last week</div>
+      <a class="entry-row" href="journal.html">
+        <span class="mood mood-4">4</span>
+        <div class="entry-main"><div class="entry-subject">Long call with Mom</div><div class="entry-when">Fri, Nov 6 · 9:50 PM</div></div>
+      </a>
+      <a class="entry-row" href="journal.html">
+        <span class="mood mood-3">3</span>
+        <div class="entry-main"><div class="entry-subject first-line">Not much to say today. Work was work. Made soup…</div><div class="entry-when">Thu, Nov 5 · 10:02 PM</div></div>
+      </a>
+      <a class="entry-row" href="journal.html">
+        <span class="mood mood-4">4</span>
+        <div class="entry-main"><div class="entry-subject">Back to daily journaling</div><div class="entry-when">Wed, Nov 4 · 7:45 AM</div></div>
+      </a>
+    </aside>
+
+    <section class="detail-pane">
+      <article class="entry-detail">
+        <div class="entry-detail-head">
+          <span class="mood mood-lg mood-2">2</span>
+          <div style="flex:1">
+            <div class="entry-detail-when">Thursday, November 12, 2026 · 10:15 PM</div>
+            <h2 class="entry-detail-subject" style="display:flex;align-items:center;gap:8px;color:var(--on-surface-variant)"><span class="material-symbols-outlined" style="font-size:24px">lock</span>Private entry</h2>
+          </div>
+          <div class="detail-actions">
+            <button class="btn btn-text btn-sm"><span class="material-symbols-outlined">lock_open</span>Make Public</button>
+          </div>
+        </div>
+        <div class="private-cover">
+          <span class="material-symbols-outlined big">visibility_off</span>
+          <h3>This entry is private</h3>
+          <p>The subject and text are hidden. Showing them is for this viewing only and won't change the private setting.</p>
+          <button class="btn btn-tonal" onclick="document.getElementById('revealed').hidden=false;this.closest('.private-cover').hidden=true;"><span class="material-symbols-outlined">visibility</span>Show Content</button>
+        </div>
+        <div id="revealed" hidden>
+          <div class="banner banner-neutral" style="margin-bottom:14px">
+            <span class="material-symbols-outlined">visibility</span>
+            <span style="flex:1"><strong>Hard conversation with Dad</strong> · Showing private content for this viewing</span>
+            <button class="btn btn-text btn-sm" onclick="location.reload()">Hide</button>
+          </div>
+          <div class="entry-body">
+            <p>Called Dad about the house. It went about how I expected, which is to say badly. I said I was worried and he heard that I think he can't take care of himself.</p>
+            <p>Writing it down so I remember that I tried, and that it's okay to try again next week when we've both cooled off.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+  </div>
+</div>
+
+</body>
+</html>

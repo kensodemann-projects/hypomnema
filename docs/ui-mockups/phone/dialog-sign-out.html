@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign out confirmation · Phone — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="../desktop/shared.css">
+<link rel="stylesheet" href="../desktop/journal.css">
+<link rel="stylesheet" href="phone.css">
+<script src="../desktop/shared.js"></script>
+<script src="phone.js"></script>
+</head>
+<body class="phone">
+<div class="stage">
+<div class="device">
+<iframe class="device-bg" src="dashboard.html" title="Background screen" tabindex="-1"></iframe>
+
+<div class="p-scrim"><div class="p-dialog" role="alertdialog">
+  <div class="dialog-icon"><span class="material-symbols-outlined">logout</span></div>
+  <h2 class="dialog-title center" style="font-size:20px">Sign out?</h2>
+  <p class="muted" style="font-size:14px">You'll need your email and password to sign back in.</p>
+  <div class="dialog-actions"><a class="btn btn-text" href="dashboard.html">Cancel</a><a class="btn btn-filled" href="sign-in.html">Sign out</a></div>
+</div></div>
+</div>
+<aside class="notes">
+  <a class="back" href="index.html"><span class="material-symbols-outlined">arrow_back</span>All phone screens</a>
+  <h1>Sign out confirmation</h1>
+  <p>Tapping Sign Out in the bottom bar opens this dialog, so a stray tap doesn't end the session. Cancel leaves the user on the screen they were on.</p>
+  <div class="refs">Requirements: §7.5</div>
+  <div class="links"><a href="dashboard.html">Dashboard</a><a href="sign-in.html">Sign In</a></div>
+
+</aside>
+</div>
+</body>
+</html>

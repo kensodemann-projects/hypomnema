@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Goal details · Upcoming · Phone — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="../desktop/shared.css">
+<link rel="stylesheet" href="../desktop/journal.css">
+<link rel="stylesheet" href="phone.css">
+<script src="../desktop/shared.js"></script>
+<script src="phone.js"></script>
+<style>
+  .streak-strip { display: flex; gap: 3px; flex-wrap: wrap; }
+  .streak-day { width: 22px; height: 22px; border-radius: 5px; font-size: 10px; display: flex; align-items: center; justify-content: center; background: var(--success-container); color: var(--success); font-weight: 600; }
+  .streak-day.slip { background: var(--error-container); color: var(--error); }
+  .streak-day.future { background: var(--surface-high); color: var(--on-surface-variant); font-weight: 400; }
+  .legend { display: flex; gap: 12px; font-size: 11px; color: var(--on-surface-variant); margin-top: 10px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+</style>
+</head>
+<body class="phone">
+<div class="stage">
+<div class="device">
+
+<div class="statusbar "><span>11:51</span><span class="sys"><span class="material-symbols-outlined">signal_cellular_alt</span><span class="material-symbols-outlined">wifi</span><span class="material-symbols-outlined">battery_full</span></span></div>
+<header class="topbar with-nav"><a class="icon-btn" href="dashboard.html" title="Back"><span class="material-symbols-outlined">arrow_back</span></a><div class="tb-text"><div class="tb-title sm">No desserts in December</div></div><a class="icon-btn" href="goal-edit-upcoming.html" title="Edit"><span class="material-symbols-outlined">edit</span></a><a class="icon-btn" href="goal-menu.html" title="More"><span class="material-symbols-outlined">more_vert</span></a></header>
+<div class="screen flush">
+  <div style="padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px;background:var(--surface)">
+    <div class="detail-tags" style="margin-top:0"><span class="type-label"><span class="material-symbols-outlined">block</span>31-day target</span><span class="chip chip-upcoming"><span class="material-symbols-outlined">schedule</span>Upcoming</span></div>
+    <p class="muted" style="font-size:13px">Fruit is fine. Birthday cake at Mom's party on the 12th is not an exception.</p>
+    <div class="banner banner-info" style="align-items:flex-start"><span class="material-symbols-outlined">event_upcoming</span><span>Tracking begins <strong>Tue, Dec 1</strong>, in 17 days. Until then, every field can change.</span></div>
+    <div class="card" style="background:var(--surface-low)">
+      <div class="summary-grid">
+        <div class="stat"><span class="stat-label">Starts</span><span class="stat-value">Dec 1</span></div>
+        <div class="stat"><span class="stat-label">Target</span><span class="stat-value">31 days</span></div>
+      </div>
+      <div class="muted small" style="margin-top:10px">No logging until Dec 1.</div>
+    </div>
+    <div class="card">
+      <div class="card-header" style="margin-bottom:10px"><span class="material-symbols-outlined">calendar_month</span><div class="card-title">Dec 1 – Dec 31</div></div>
+      <div class="streak-strip"><div class="streak-day future">1</div><div class="streak-day future">2</div><div class="streak-day future">3</div><div class="streak-day future">4</div><div class="streak-day future">5</div><div class="streak-day future">6</div><div class="streak-day future">7</div><div class="streak-day future">8</div><div class="streak-day future">9</div><div class="streak-day future">10</div><div class="streak-day future">11</div><div class="streak-day future">12</div><div class="streak-day future">13</div><div class="streak-day future">14</div><div class="streak-day future">15</div><div class="streak-day future">16</div><div class="streak-day future">17</div><div class="streak-day future">18</div><div class="streak-day future">19</div><div class="streak-day future">20</div><div class="streak-day future">21</div><div class="streak-day future">22</div><div class="streak-day future">23</div><div class="streak-day future">24</div><div class="streak-day future">25</div><div class="streak-day future">26</div><div class="streak-day future">27</div><div class="streak-day future">28</div><div class="streak-day future">29</div><div class="streak-day future">30</div><div class="streak-day future">31</div></div>
+      <div class="legend"><span><i style="background:var(--surface-high)"></i>To come</span></div>
+    </div>
+  </div>
+  <nav class="ptabs" data-tabs><button class="ptab active" data-tab="slips"><span class="material-symbols-outlined">list_alt</span>Slips</button><button class="ptab" data-tab="resources"><span class="material-symbols-outlined">bookmarks</span>Resources</button></nav>
+  <div data-panel="slips" style="background:var(--surface)">
+    <div class="empty"><span class="material-symbols-outlined">event_upcoming</span><p style="margin-top:8px">Slips can be recorded from Dec 1.</p></div>
+  </div>
+  <div data-panel="resources" hidden style="background:var(--surface)">
+    <div style="padding:8px 16px 0;display:flex;justify-content:flex-end"><a class="btn btn-text btn-sm" href="resource-form.html"><span class="material-symbols-outlined">add</span>Add resource</a></div>
+    <div class="resource"><div class="resource-icon"><span class="material-symbols-outlined">notes</span></div><div style="flex:1;min-width:0"><div class="resource-subject">After-dinner swaps</div><div class="resource-desc">Frozen grapes, Greek yogurt with cinnamon, or a cup of rooibos.</div></div><a class="icon-btn" href="resource-form.html" title="Edit"><span class="material-symbols-outlined">edit</span></a></div>
+  </div>
+</div>
+<div class="gesture surface"></div>
+
+</div>
+<aside class="notes">
+  <a class="back" href="index.html"><span class="material-symbols-outlined">arrow_back</span>All phone screens</a>
+  <h1>Goal details · Upcoming</h1>
+  <p>A goal that hasn't started: no logging controls, a calendar of the days to come, and Edit with every field open.</p>
+  <ul><li>Edit opens the upcoming-goal form, where the type and start date can still change.</li><li>Archive and Delete stay in the overflow menu.</li></ul>
+  <div class="refs">Requirements: §3.4, §3.5, §7.2</div>
+  <div class="links"><a href="goal-edit-upcoming.html">Edit upcoming goal</a><a href="dashboard.html">Dashboard</a></div>
+
+</aside>
+</div>
+
+</body>
+</html>

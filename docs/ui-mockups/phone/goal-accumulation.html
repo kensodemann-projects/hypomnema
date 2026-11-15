@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Goal details · Accumulation · Phone — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="../desktop/shared.css">
+<link rel="stylesheet" href="../desktop/journal.css">
+<link rel="stylesheet" href="phone.css">
+<script src="../desktop/shared.js"></script>
+<script src="phone.js"></script>
+</head>
+<body class="phone">
+<div class="stage">
+<div class="device">
+
+<div class="statusbar "><span>11:51</span><span class="sys"><span class="material-symbols-outlined">signal_cellular_alt</span><span class="material-symbols-outlined">wifi</span><span class="material-symbols-outlined">battery_full</span></span></div>
+<header class="topbar with-nav"><a class="icon-btn" href="dashboard.html" title="Back"><span class="material-symbols-outlined">arrow_back</span></a><div class="tb-text"><div class="tb-title sm">Read 300 pages per month</div></div><button class="icon-btn" title="Edit"><span class="material-symbols-outlined">edit</span></button><a class="icon-btn" href="goal-menu.html" title="More"><span class="material-symbols-outlined">more_vert</span></a></header>
+<div class="screen flush">
+  <div style="padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px;background:var(--surface)">
+    <div class="detail-tags" style="margin-top:0"><span class="type-label"><span class="material-symbols-outlined">stacked_bar_chart</span>Accumulation · 300 pages per month</span><span class="chip chip-neutral">Since May 12</span></div>
+    <p class="muted" style="font-size:13px">Books only, not articles. Audiobooks count at about one page per minute.</p>
+    <div class="card" style="background:var(--surface-low)">
+      <div class="summary-grid">
+        <div class="stat" style="grid-column:span 2"><span class="stat-label">This month</span><span class="stat-value">142 of 300 pages</span><div class="progress-track" style="margin-top:6px"><div class="progress-fill" style="width:47%"></div></div></div>
+        <div class="stat"><span class="stat-label">Current streak</span><span class="stat-value">2 months</span></div>
+        <div class="stat"><span class="stat-label">Longest streak</span><span class="stat-value">2 months</span></div>
+      </div>
+      <div class="log-row"><a class="btn btn-filled" href="entry-form.html"><span class="material-symbols-outlined">add</span>Log pages</a><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Logged today</span></div>
+    </div>
+  </div>
+  <nav class="ptabs" data-tabs><button class="ptab active" data-tab="history"><span class="material-symbols-outlined">history</span>History</button><button class="ptab" data-tab="entries"><span class="material-symbols-outlined">list_alt</span>Entries</button><button class="ptab" data-tab="resources"><span class="material-symbols-outlined">bookmarks</span>Resources</button></nav>
+  <ul class="list" data-panel="history" style="background:var(--surface)">
+    <li class="list-item"><span class="result-icon result-progress"><span class="material-symbols-outlined">pending</span></span><div class="grow"><div class="primary-text">November</div><div class="secondary-text">In progress · 158 to go</div></div><div class="trailing">142 of 300</div></li>
+    <li class="list-item"><span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span><div class="grow"><div class="primary-text">October</div><div class="secondary-text">Met · 18 extra</div></div><div class="trailing">318 of 300</div></li>
+    <li class="list-item"><span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span><div class="grow"><div class="primary-text">September</div><div class="secondary-text">Met · 5 extra</div></div><div class="trailing">305 of 300</div></li>
+    <li class="list-item"><span class="result-icon result-missed"><span class="material-symbols-outlined">close</span></span><div class="grow"><div class="primary-text">August</div><div class="secondary-text">Missed</div></div><div class="trailing">240 of 300</div></li>
+    <li class="list-item"><span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span><div class="grow"><div class="primary-text">July</div><div class="secondary-text">Met · 30 extra</div></div><div class="trailing">330 of 300</div></li>
+    <li class="list-item"><span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span><div class="grow"><div class="primary-text">June</div><div class="secondary-text">Met</div></div><div class="trailing">300 of 300</div></li>
+    <li class="list-item"><span class="result-icon result-partial"><span class="material-symbols-outlined">contrast</span></span><div class="grow"><div class="primary-text">May</div><div class="secondary-text">Partial · started May 12</div></div><div class="trailing">210 of 300</div></li>
+  </ul>
+  <div data-panel="entries" hidden style="background:var(--surface)">
+    <div class="entry-li"><div class="grow"><div class="l1">Project Hail Mary, ch. 9–11</div><div class="l2">Sat, Nov 14 · 7:10 AM</div><div class="window-hint">Editable until 7:10 AM tomorrow</div></div><span class="val">24 pp</span><a class="icon-btn" href="entry-edit.html" title="Edit"><span class="material-symbols-outlined">edit</span></a><a class="icon-btn danger" href="entry-edit.html" title="Delete"><span class="material-symbols-outlined">delete</span></a></div>
+    <div class="entry-li"><div class="grow"><div class="l1">Couldn't put it down</div><div class="l2">Thu, Nov 12 · 9:30 PM</div></div><span class="val">36 pp</span></div>
+    <div class="entry-li"><div class="grow"><div class="l1"><span class="muted">No memo</span></div><div class="l2">Tue, Nov 10 · 10:05 PM</div></div><span class="val">18 pp</span></div>
+    <div class="entry-li"><div class="grow"><div class="l1">Rainy afternoon on the couch</div><div class="l2">Sun, Nov 8 · 3:20 PM</div></div><span class="val">40 pp</span></div>
+    <div class="entry-li"><div class="grow"><div class="l1">Started Project Hail Mary</div><div class="l2">Thu, Nov 5 · 9:45 PM</div></div><span class="val">24 pp</span></div>
+  </div>
+  <div data-panel="resources" hidden style="background:var(--surface)">
+    <div style="padding:8px 16px 0;display:flex;justify-content:flex-end"><a class="btn btn-text btn-sm" href="resource-form.html"><span class="material-symbols-outlined">add</span>Add resource</a></div>
+    <div class="resource"><div class="resource-icon"><span class="material-symbols-outlined">link</span></div><div style="flex:1;min-width:0"><div class="resource-subject">2026 reading list</div><div class="resource-url">goodreads.com/review/list/to-read</div></div><a class="icon-btn" href="resource-form.html" title="Edit"><span class="material-symbols-outlined">edit</span></a></div>
+    <div class="resource"><div class="resource-icon"><span class="material-symbols-outlined">notes</span></div><div style="flex:1;min-width:0"><div class="resource-subject">Read before bed</div><div class="resource-desc">Phone charges in the kitchen. 20 pages before lights out covers the month.</div></div><a class="icon-btn" href="resource-form.html" title="Edit"><span class="material-symbols-outlined">edit</span></a></div>
+  </div>
+</div>
+<div class="gesture surface"></div>
+
+</div>
+<aside class="notes">
+  <a class="back" href="index.html"><span class="material-symbols-outlined">arrow_back</span>All phone screens</a>
+  <h1>Goal details · Accumulation</h1>
+  <p>An accumulation goal: the summary adds up this month's pages, and History shows each month's total against 300.</p>
+  <ul><li>Log pages opens the accumulation entry form.</li><li>Today's entry is still inside its 24-hour window, so it has edit and delete icons. Both open the edit form.</li><li>History includes a partial first month (May) and a month with extra pages.</li></ul>
+  <div class="refs">Requirements: §3.2, §3.3, §7.2</div>
+  <div class="links"><a href="entry-edit.html">Edit entry</a><a href="entry-form.html">Log pages</a><a href="dashboard.html">Dashboard</a></div>
+
+</aside>
+</div>
+
+</body>
+</html>
