@@ -191,6 +191,27 @@ void main() {
   );
 
   testWidgets(
+    'Given the phone shell is showing, when MainApp rebuilds with the same auth service, then the shell stays',
+    (tester) async {
+      // Given
+      final auth = _authEmitting(true);
+      setLogicalViewportSize(tester, const Size(400, 800));
+      await tester.pumpWidget(MainApp(authService: auth));
+      await tester.pumpAndSettle();
+      expectPhoneShellExists();
+
+      // When
+      await tester.pumpWidget(MainApp(authService: auth));
+      await tester.pump();
+
+      // Then
+      expect(find.byKey(const Key('auth-gate-progress')), findsNothing);
+      expectPhoneShellExists();
+      expectLoginFormNotExists();
+    },
+  );
+
+  testWidgets(
     'Given signedIn has not emitted, when MainApp builds, then the progress indicator is shown',
     (tester) async {
       // Given

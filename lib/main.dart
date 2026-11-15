@@ -27,17 +27,16 @@ Future<void> main() async {
       FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
     }
   }
-  runApp(const MainApp());
+  runApp(MainApp(authService: FirebaseAuthService()));
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key, this.authService});
+  const MainApp({required this.authService, super.key});
 
-  final AuthService? authService;
+  final AuthService authService;
 
   @override
   Widget build(BuildContext context) {
-    final authService = this.authService ?? FirebaseAuthService();
     return MaterialApp(
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
