@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Log entry — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+</head>
+<body>
+<iframe class="bg-frame" src="dashboard.html" title="Dashboard" tabindex="-1"></iframe>
+
+<div class="scrim">
+  <div class="dialog" role="dialog" aria-labelledby="dlg-title">
+    <div>
+      <div class="type-label"><span class="material-symbols-outlined">stacked_bar_chart</span>Read 300 pages per month</div>
+      <h2 class="dialog-title" id="dlg-title">Log pages</h2>
+    </div>
+    <div class="banner banner-neutral" style="padding:8px 12px">
+      <span class="material-symbols-outlined">donut_large</span>
+      <span>142 of 300 pages this month</span>
+    </div>
+
+    <div class="field focused">
+      <label>Pages <span class="req">*</span></label>
+      <div class="input-suffix">
+        <input type="text" value="36" autofocus>
+        <span class="suffix">pages</span>
+      </div>
+      <span class="helper">Greater than 0 · decimals allowed</span>
+    </div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" value="2026-11-14" min="2026-11-07" max="2026-11-14">
+        <span class="helper">Nov 7 – today</span>
+      </div>
+      <div class="field">
+        <label>Time</label>
+        <input type="time" value="11:51">
+        <span class="helper">Can't be later than now</span>
+      </div>
+      <div class="field span-2">
+        <label>Memo</label>
+        <input type="text" placeholder="Optional, one line" value="Project Hail Mary, ch. 12–15">
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <a class="btn btn-text" href="dashboard.html">Cancel</a>
+      <a class="btn btn-filled" href="dashboard.html"><span class="material-symbols-outlined">check</span>Save</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

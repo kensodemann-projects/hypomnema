@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Record slip dialog · Phone — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="../desktop/shared.css">
+<link rel="stylesheet" href="../desktop/journal.css">
+<link rel="stylesheet" href="phone.css">
+<script src="../desktop/shared.js"></script>
+<script src="phone.js"></script>
+</head>
+<body class="phone">
+<div class="stage">
+<div class="device">
+<iframe class="device-bg" src="dashboard.html" title="Background screen" tabindex="-1"></iframe>
+
+<div class="p-scrim"><div class="p-dialog" role="alertdialog">
+  <div class="dialog-icon"><span class="material-symbols-outlined">restart_alt</span></div>
+  <h2 class="dialog-title center" style="font-size:20px">Record a slip?</h2>
+  <p class="muted" style="text-align:center;font-size:13px;margin-top:-6px"><strong>No social media for 30 days</strong><br>A slip ends your 13-day streak.</p>
+  <div class="radio-option selected"><span class="radio"></span><div><div class="opt-title">Reset the streak</div><div class="opt-desc">Keep going and start counting again.</div></div></div>
+  <div class="radio-option"><span class="radio"></span><div><div class="opt-title">Mark missed and keep going</div><div class="opt-desc">Missed, but streaks count until Nov 30.</div></div></div>
+  <div class="radio-option"><span class="radio"></span><div><div class="opt-title">Mark missed and end it</div><div class="opt-desc">Missed and closed now.</div></div></div>
+  <div class="field"><label>Memo</label><input type="text" placeholder="Optional, one line"></div>
+  <div class="dialog-actions"><a class="btn btn-text" href="dashboard.html">Cancel</a><a class="btn btn-danger" href="dashboard.html">Record slip</a></div>
+</div></div>
+</div>
+<aside class="notes">
+  <a class="back" href="index.html"><span class="material-symbols-outlined">arrow_back</span>All phone screens</a>
+  <h1>Record slip dialog</h1>
+  <p>Confirmation for a slip on a goal with a target and no outcome yet. Option descriptions are shorter than on desktop to fit the width.</p>
+  <ul><li>Open-ended goals, and goals already Missed, skip the three options and only confirm.</li></ul>
+  <div class="refs">Requirements: §3.2, §7.1</div>
+  <div class="links"><a href="dashboard.html">Dashboard</a></div>
+
+</aside>
+</div>
+</body>
+</html>

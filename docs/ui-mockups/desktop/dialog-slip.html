@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Record a slip — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+</head>
+<body>
+<iframe class="bg-frame" src="dashboard.html" title="Dashboard" tabindex="-1"></iframe>
+
+<div class="scrim">
+  <div class="dialog" role="alertdialog" aria-labelledby="dlg-title">
+    <div class="dialog-icon"><span class="material-symbols-outlined" style="color:var(--warning)">restart_alt</span></div>
+    <h2 class="dialog-title center" id="dlg-title">Record a slip?</h2>
+    <p class="dialog-sub" style="text-align:center;margin-top:-8px">
+      <strong>No social media for 30 days</strong> · 13 of 30 days<br>
+      A slip ends your current 13-day streak.
+    </p>
+
+    <div class="form-section-title">What would you like to do?</div>
+    <div class="radio-option selected">
+      <span class="radio"></span>
+      <div>
+        <div class="opt-title">Reset the streak</div>
+        <div class="opt-desc">Keep the goal running and start counting again. It can still be achieved once a new streak reaches 30 days.</div>
+      </div>
+    </div>
+    <div class="radio-option">
+      <span class="radio"></span>
+      <div>
+        <div class="opt-title">Mark missed and keep going</div>
+        <div class="opt-desc">The goal is marked Missed, but streaks keep counting until Nov 30, when it closes.</div>
+      </div>
+    </div>
+    <div class="radio-option">
+      <span class="radio"></span>
+      <div>
+        <div class="opt-title">Mark missed and end it</div>
+        <div class="opt-desc">The goal is marked Missed and closed now. It stays on the dashboard until you archive it.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Memo</label>
+      <input type="text" placeholder="Optional, one line">
+    </div>
+    <div class="kbd-note"><span class="material-symbols-outlined">undo</span>You can delete this slip within 24 hours if it was a mistake.</div>
+
+    <div class="dialog-actions">
+      <a class="btn btn-text" href="dashboard.html">Cancel</a>
+      <a class="btn btn-danger" href="dashboard.html">Record slip</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

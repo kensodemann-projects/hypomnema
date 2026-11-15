@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add Goal · Avoidance · Phone — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="../desktop/shared.css">
+<link rel="stylesheet" href="../desktop/journal.css">
+<link rel="stylesheet" href="phone.css">
+<script src="../desktop/shared.js"></script>
+<script src="phone.js"></script>
+<style>
+  .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .type-card { border: 1px solid var(--outline-variant); border-radius: 12px; padding: 10px 12px; cursor: pointer; display: flex; gap: 8px; align-items: center; font-weight: 600; font-size: 13px; color: inherit; text-decoration: none; }
+  .type-card .material-symbols-outlined { color: var(--primary); }
+  .type-card.selected { border: 2px solid var(--primary); padding: 9px 11px; background: var(--primary-container); color: var(--on-primary-container); }
+  .type-card.selected .material-symbols-outlined { color: var(--on-primary-container); }
+</style>
+</head>
+<body class="phone">
+<div class="stage">
+<div class="device">
+
+<div class="statusbar plain"><span>11:51</span><span class="sys"><span class="material-symbols-outlined">signal_cellular_alt</span><span class="material-symbols-outlined">wifi</span><span class="material-symbols-outlined">battery_full</span></span></div>
+<header class="topbar with-nav"><a class="icon-btn" href="dashboard.html" title="Close"><span class="material-symbols-outlined">close</span></a><div class="tb-text"><div class="tb-title sm">New goal</div></div><a class="btn btn-text" href="dashboard.html">Add</a></header>
+<div class="form-screen">
+  <div class="field"><label>Name <span class="req">*</span></label><input type="text" value="No smoking"></div>
+  <div class="field"><label>Description</label><textarea rows="2" style="min-height:64px" placeholder="Optional. Your own rules for this goal.">Includes vaping. Nicotine gum is fine.</textarea></div>
+  <div class="form-section-title">Type</div>
+  <div class="type-grid">
+    <a class="type-card" href="goal-add-frequency.html"><span class="material-symbols-outlined">event_repeat</span>Frequency</a>
+    <a class="type-card" href="goal-add-accumulation.html"><span class="material-symbols-outlined">stacked_bar_chart</span>Accumulation</a>
+    <a class="type-card" href="goal-add.html"><span class="material-symbols-outlined">flag</span>Target Value</a>
+    <a class="type-card selected" href="goal-add-avoidance.html"><span class="material-symbols-outlined">block</span>Avoidance</a>
+  </div>
+  <div class="muted small" style="margin-top:-8px">Stop doing something and build a streak.</div>
+  <div class="form-section-title">Target</div>
+  <div class="field"><label>Streak target</label><div class="segmented" style="display:flex"><button class="active" style="flex:1;justify-content:center">Open-ended</button><button style="flex:1;justify-content:center">Number of days</button></div><span class="helper">Choose Number of days for a goal like Dry January.</span></div>
+  <div class="field focused"><label>Start date <span class="req">*</span></label><input type="text" value="Mar 2, 2026"><span class="helper">Avoidance goals can start in the past.</span></div>
+  <div class="banner banner-info" style="align-items:flex-start"><span class="material-symbols-outlined">local_fire_department</span><span>Your streak starts at <strong>257 days</strong> (Mar 2 – Nov 13). Today counts at midnight.</span></div>
+  <div class="kbd-note"><span class="material-symbols-outlined">info</span>You'll record only slips. The streak counts up on its own.</div>
+</div>
+<div class="gesture surface"></div>
+
+</div>
+<aside class="notes">
+  <a class="back" href="index.html"><span class="material-symbols-outlined">arrow_back</span>All phone screens</a>
+  <h1>Add Goal · Avoidance</h1>
+  <p>The avoidance fields: an optional streak target, and a start date that can be in the past.</p>
+  <ul><li>Open-ended hides the days field.</li><li>A past start date carries an existing streak into the app.</li></ul>
+  <div class="refs">Requirements: §3.1, §3.2, §3.3</div>
+  <div class="links"><a href="goal-add-frequency.html">Frequency</a><a href="goal-add-accumulation.html">Accumulation</a><a href="goal-add.html">Target Value</a></div>
+
+</aside>
+</div>
+
+</body>
+</html>

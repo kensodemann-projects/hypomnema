@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Archive goal — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+</head>
+<body>
+<iframe class="bg-frame" src="goal-avoidance.html" title="Goal details" tabindex="-1"></iframe>
+
+<div class="scrim">
+  <div class="dialog" role="alertdialog" aria-labelledby="dlg-title" style="width:440px">
+    <div class="dialog-icon"><span class="material-symbols-outlined" style="color:var(--on-surface-variant)">archive</span></div>
+    <h2 class="dialog-title center" id="dlg-title">Archive "No soda for 30 days"?</h2>
+    <p class="muted">
+      Tracking stops and the goal moves to the Archive. Its history, entries, and resources are kept but become read-only.
+    </p>
+    <div class="banner banner-warn">
+      <span class="material-symbols-outlined">warning</span>
+      <span><strong>This can't be undone.</strong> Archived goals can't be unarchived.</span>
+    </div>
+    <div class="dialog-actions">
+      <a class="btn btn-text" href="goal-avoidance.html">Cancel</a>
+      <a class="btn btn-filled" href="archive.html">Archive</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

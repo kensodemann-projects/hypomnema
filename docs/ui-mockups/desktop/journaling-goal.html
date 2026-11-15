@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Journaling Goal — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="journal.css">
+<script src="shared.js"></script>
+<style>
+  .goal-layout { display: grid; grid-template-columns: minmax(360px, 440px) 1fr; gap: 20px; align-items: start; max-width: 1180px; margin: 0 auto; }
+  .goal-layout .left { display: flex; flex-direction: column; gap: 20px; }
+  .result-icon.interrupted { background: var(--surface-high); color: var(--on-surface-variant); }
+  .setting-big { font-size: 28px; font-weight: 400; letter-spacing: -.3px; }
+</style>
+</head>
+<body>
+
+<nav class="rail">
+  <img class="rail-logo" src="logo.svg" alt="Hypomnema">
+  <a class="rail-item" href="dashboard.html"><span class="rail-indicator"><span class="material-symbols-outlined">space_dashboard</span></span>Dashboard</a>
+  <a class="rail-item active" href="journal.html"><span class="rail-indicator"><span class="material-symbols-outlined">book_2</span></span>Journal</a>
+  <a class="rail-item" href="archive.html"><span class="rail-indicator"><span class="material-symbols-outlined">inventory_2</span></span>Archive</a>
+  <div class="rail-spacer"></div>
+  <div class="rail-divider"></div>
+  <a class="rail-item" href="dialog-sign-out.html"><span class="rail-indicator"><span class="material-symbols-outlined">logout</span></span>Sign Out</a>
+</nav>
+
+<div class="main">
+  <header class="page-header">
+    <h1 class="page-title">Journal</h1>
+    <a class="goal-pill" href="journaling-goal.html"><span class="material-symbols-outlined icon-filled">check_circle</span>1 of 1 today</a>
+    <div class="spacer"></div>
+    <a class="btn btn-filled" href="journal-editor.html"><span class="material-symbols-outlined">edit</span>Write</a>
+  </header>
+  <nav class="tabs">
+    <a class="tab" href="journal.html"><span class="material-symbols-outlined">list</span>Entries</a>
+    <a class="tab" href="mood-trend.html"><span class="material-symbols-outlined">show_chart</span>Mood Trend</a>
+    <a class="tab active" href="journaling-goal.html"><span class="material-symbols-outlined">flag</span>Journaling Goal</a>
+  </nav>
+
+  <div class="page-body">
+    <div class="goal-layout">
+      <div class="left">
+        <div class="card">
+          <div class="card-header"><span class="material-symbols-outlined">edit_note</span><div class="card-title">Current goal</div><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+          <div class="setting-big">Once per day</div>
+          <div class="panel-progress" style="margin-top:12px"><span class="big-number">1 of 1</span><span class="big-unit">today</span></div>
+          <div class="progress-track" style="margin:8px 0 16px"><div class="progress-fill met" style="width:100%"></div></div>
+          <div style="display:flex;gap:28px">
+            <div class="stat"><span class="stat-label">Current streak</span><span class="stat-value">7 days</span></div>
+            <div class="stat"><span class="stat-label">Longest streak</span><span class="stat-value">7 days</span></div>
+            <div class="stat"><span class="stat-label">Latest mood</span><span class="mood mood-4" style="margin-top:4px">4</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="material-symbols-outlined">tune</span><div class="card-title">Change goal</div></div>
+          <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+            <div class="field" style="width:96px">
+              <label>Times</label>
+              <input type="number" value="20" min="1">
+            </div>
+            <div class="field">
+              <label>Per</label>
+              <div class="segmented">
+                <button>Day</button>
+                <button>Week</button>
+                <button class="active">Month</button>
+              </div>
+            </div>
+          </div>
+          <div class="banner banner-info" style="margin-top:16px;align-items:flex-start">
+            <span class="material-symbols-outlined">info</span>
+            <span>Takes effect today. <strong>November</strong> will be judged against 20 per month, and the <strong>12 entries</strong> you've made since Nov 1 count toward it. Daily results through Nov 13 stay in your history.</span>
+          </div>
+          <div class="dialog-actions" style="margin-top:16px">
+            <button class="btn btn-text">Reset</button>
+            <button class="btn btn-filled">Save change</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-flush">
+        <div class="card-header"><span class="material-symbols-outlined">history</span><div class="card-title">History</div></div>
+        <ul class="list">
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Today, Nov 14</div><div class="secondary-text">Met · in progress</div></div>
+            <div class="trailing">1 of 1</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Fri, Nov 13</div><div class="secondary-text">Met</div></div>
+            <div class="trailing">1 of 1</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Thu, Nov 12</div><div class="secondary-text">Met</div></div>
+            <div class="trailing">1 of 1</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Wed, Nov 11</div><div class="secondary-text">Met</div></div>
+            <div class="trailing">1 of 1</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Tue, Nov 10</div><div class="secondary-text">Met</div></div>
+            <div class="trailing">1 of 1</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Mon, Nov 9</div><div class="secondary-text">Met</div></div>
+            <div class="trailing">1 of 1</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Sun, Nov 8</div><div class="secondary-text">Met</div></div>
+            <div class="trailing">1 of 1</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-missed"><span class="material-symbols-outlined">close</span></span>
+            <div class="grow"><div class="primary-text">Sat, Nov 7</div><div class="secondary-text">Missed</div></div>
+            <div class="trailing">0 of 1</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Fri, Nov 6</div><div class="secondary-text">Met</div></div>
+            <div class="trailing">1 of 1</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Thu, Nov 5</div><div class="secondary-text">Met</div></div>
+            <div class="trailing">1 of 1</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Wed, Nov 4</div><div class="secondary-text">Met</div></div>
+            <div class="trailing">1 of 1</div>
+          </li>
+          <li class="change-marker"><span class="material-symbols-outlined">swap_vert</span>Goal changed to once per day on Nov 4</li>
+          <li class="list-item">
+            <span class="result-icon interrupted"><span class="material-symbols-outlined">content_cut</span></span>
+            <div class="grow"><div class="primary-text">Nov 1 – Nov 3 <span class="muted small">(3 per week)</span></div><div class="secondary-text">Interrupted by change · neither met nor missed</div></div>
+            <div class="trailing">2 entries</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Week of Oct 25 <span class="muted small">(3 per week)</span></div><div class="secondary-text">Met</div></div>
+            <div class="trailing">3 of 3</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-met"><span class="material-symbols-outlined">check</span></span>
+            <div class="grow"><div class="primary-text">Week of Oct 18 <span class="muted small">(3 per week)</span></div><div class="secondary-text">Met</div></div>
+            <div class="trailing">3 of 3</div>
+          </li>
+          <li class="list-item">
+            <span class="result-icon result-missed"><span class="material-symbols-outlined">close</span></span>
+            <div class="grow"><div class="primary-text">Week of Oct 11 <span class="muted small">(3 per week)</span></div><div class="secondary-text">Missed</div></div>
+            <div class="trailing">2 of 3</div>
+          </li>
+        </ul>
+        <div style="padding:10px 20px;border-top:1px solid var(--outline-variant)"><button class="btn btn-text btn-sm">Show older periods</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bench press 185 lb by Nov 1 — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+</head>
+<body>
+
+<nav class="rail">
+  <img class="rail-logo" src="logo.svg" alt="Hypomnema">
+  <a class="rail-item active" href="dashboard.html"><span class="rail-indicator"><span class="material-symbols-outlined">space_dashboard</span></span>Dashboard</a>
+  <a class="rail-item" href="journal.html"><span class="rail-indicator"><span class="material-symbols-outlined">book_2</span></span>Journal</a>
+  <a class="rail-item" href="archive.html"><span class="rail-indicator"><span class="material-symbols-outlined">inventory_2</span></span>Archive</a>
+  <div class="rail-spacer"></div>
+  <div class="rail-divider"></div>
+  <a class="rail-item" href="dialog-sign-out.html"><span class="rail-indicator"><span class="material-symbols-outlined">logout</span></span>Sign Out</a>
+</nav>
+
+<div class="main">
+  <header class="page-header">
+    <a class="icon-btn" href="dashboard.html" title="Back to grid"><span class="material-symbols-outlined">grid_view</span></a>
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <div class="page-subtitle">Saturday, November 14 · Week of Nov 8–14</div>
+    </div>
+    <div class="spacer"></div>
+    <a class="btn btn-filled" href="goal-add.html"><span class="material-symbols-outlined">add</span>Add Goal</a>
+  </header>
+
+  <div class="split">
+    <aside class="list-pane">
+      <a class="goal-row" href="journal.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">edit_note</span><span class="goal-row-name">Journal once per day</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">1 of 1 today · mood <span class="mood mood-sm mood-4">4</span></div>
+      </a>
+      <div class="goal-row">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">event_repeat</span><span class="goal-row-name">Meditate daily</span></div>
+        <div class="goal-row-sub muted">0 of 1 today</div>
+        <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <a class="goal-row" href="goal-frequency.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">event_repeat</span><span class="goal-row-name">Exercise 4 times per week</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">3 of 4 this week</div>
+        <div class="progress-track"><div class="progress-fill" style="width:75%"></div></div>
+      </a>
+      <a class="goal-row" href="goal-accumulation.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">stacked_bar_chart</span><span class="goal-row-name">Read 300 pages per month</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">142 of 300 pages this month</div>
+        <div class="progress-track"><div class="progress-fill" style="width:47%"></div></div>
+      </a>
+      <a class="goal-row" href="goal-target-value.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">flag</span><span class="goal-row-name">Lose 20 pounds by Dec 31</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">188.4 lb → 180 lb · 58%</div>
+        <div class="progress-track"><div class="progress-fill" style="width:58%"></div></div>
+      </a>
+      <div class="goal-row">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No alcohol</span></div>
+        <div class="goal-row-sub muted">741 days · longest 741</div>
+      </div>
+      <div class="goal-row">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No social media for 30 days</span></div>
+        <div class="goal-row-sub muted">13 of 30 days</div>
+        <div class="progress-track"><div class="progress-fill" style="width:43%"></div></div>
+      </div>
+      <a class="goal-row" href="goal-avoidance.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No soda for 30 days</span><span class="chip chip-missed">Missed</span></div>
+        <div class="goal-row-sub muted">0 days · longest 12 · <span style="color:var(--warning)">Slipped today</span></div>
+      </a>
+      <a class="goal-row" href="goal-upcoming.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No desserts in December</span><span class="chip chip-upcoming">Upcoming</span></div>
+        <div class="goal-row-sub muted">Starts Dec 1</div>
+      </a>
+      <a class="goal-row" href="goal-closed.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">Sober October</span><span class="chip chip-achieved">Achieved</span></div>
+        <div class="goal-row-sub muted">31 of 31 days · closed</div>
+      </a>
+      <a class="goal-row selected" href="goal-closed-missed.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined">flag</span><span class="goal-row-name">Bench press 185 lb by Nov 1</span><span class="chip chip-missed">Missed</span></div>
+        <div class="goal-row-sub muted">172.5 lb · 64% · closed</div>
+      </a>
+    </aside>
+
+    <section class="detail-pane">
+      <div class="detail-header">
+        <div>
+          <h2 class="detail-title">Bench press 185 lb by Nov 1</h2>
+          <div class="detail-tags">
+            <span class="type-label"><span class="material-symbols-outlined">flag</span>Target Value · 150 → 185 lb by Nov 1, 2026</span>
+            <span class="chip chip-missed">Missed</span>
+            <span class="chip chip-closed"><span class="material-symbols-outlined">lock</span>Closed</span>
+          </div>
+          <p class="detail-desc">One-rep max with a spotter, tested every other Saturday.</p>
+        </div>
+        <div class="detail-actions">
+          <button class="btn btn-tonal btn-sm"><span class="material-symbols-outlined">archive</span>Archive</button>
+          <button class="btn btn-danger-text btn-sm"><span class="material-symbols-outlined">delete</span>Delete</button>
+        </div>
+      </div>
+
+      <div class="banner banner-neutral">
+        <span class="material-symbols-outlined">event_busy</span>
+        <span>Missed: Nov 1 passed before the target was reached. The goal is closed and accepts no new entries. To try again, create a new goal.</span>
+      </div>
+
+      <div class="card summary-card">
+        <div class="stat"><span class="stat-label">Latest value</span><span class="stat-value">172.5 lb</span></div>
+        <div class="stat"><span class="stat-label">Target</span><span class="stat-value">185 lb</span></div>
+        <div class="stat-sep"></div>
+        <div class="stat" style="min-width:180px"><span class="stat-label">Progress · 64%</span><div class="progress-track" style="margin-top:8px"><div class="progress-fill missed" style="width:64%"></div></div></div>
+        <div class="stat"><span class="stat-label">Ran</span><span class="stat-value">Aug 1 – Nov 1</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="material-symbols-outlined">show_chart</span><div class="card-title">History</div><span class="muted small">Increase · 22.5 of 35 lb gained</span></div>
+        <div id="chart"></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card card-flush">
+          <div class="card-header"><span class="material-symbols-outlined">list_alt</span><div class="card-title">Entries</div><span class="muted small">All edit windows have passed</span></div>
+          <table class="table">
+            <thead><tr><th>Date</th><th>Time</th><th>Value</th><th>Memo</th><th class="actions"></th></tr></thead>
+            <tbody>
+            <tr><td>Sat, Oct 31</td><td>10:15 AM</td><td class="num">172.5 lb</td><td>Last try before the deadline</td><td class="actions"></td></tr>
+            <tr><td>Sat, Oct 24</td><td>10:40 AM</td><td class="num">170 lb</td><td class="muted">—</td><td class="actions"></td></tr>
+            <tr><td>Sat, Oct 10</td><td>9:55 AM</td><td class="num">167.5 lb</td><td>Shoulder felt tight</td><td class="actions"></td></tr>
+            <tr><td>Sat, Sep 26</td><td>10:20 AM</td><td class="num">165 lb</td><td class="muted">—</td><td class="actions"></td></tr>
+            <tr><td>Sat, Sep 12</td><td>10:05 AM</td><td class="num">162.5 lb</td><td>New spotter, more confident</td><td class="actions"></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card card-flush">
+          <div class="card-header">
+            <span class="material-symbols-outlined">bookmarks</span><div class="card-title">Resources</div>
+            <a class="btn btn-text btn-sm" href="dialog-resource.html"><span class="material-symbols-outlined">add</span>Add</a>
+          </div>
+          <div class="resource">
+            <div class="resource-icon"><span class="material-symbols-outlined">link</span></div>
+            <div style="flex:1">
+              <div class="resource-subject">Bench press form check</div>
+              <div class="resource-url">startingstrength.com/article/the-bench-press</div>
+            </div>
+            <a class="icon-btn" href="dialog-resource.html" title="Edit"><span class="material-symbols-outlined">edit</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+hmChart(document.getElementById('chart'), {
+  label: 'Bench press over time', start: '2026-08-01', end: '2026-11-08', height: 240,
+  yMin: 145, yMax: 190, yTicks: [150, 160, 170, 180], yFormat: (v) => v + ' lb',
+  xTicks: [['2026-08-01', 'Aug'], ['2026-09-01', 'Sep'], ['2026-10-01', 'Oct'], ['2026-11-01', 'Nov']],
+  target: { value: 185, label: 'Target 185 lb' }, targetDate: { date: '2026-11-01', label: 'Nov 1' },
+  points: [['2026-08-01', 150], ['2026-08-15', 155], ['2026-08-29', 157.5], ['2026-09-12', 162.5], ['2026-09-26', 165], ['2026-10-10', 167.5], ['2026-10-24', 170], ['2026-10-31', 172.5]]
+});
+</script>
+</body>
+</html>

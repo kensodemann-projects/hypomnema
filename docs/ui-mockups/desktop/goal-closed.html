@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sober October — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+<style>
+  .streak-strip { display: flex; gap: 3px; flex-wrap: wrap; }
+  .streak-day { width: 22px; height: 22px; border-radius: 5px; font-size: 10px; display: flex; align-items: center; justify-content: center; background: var(--success-container); color: var(--success); font-weight: 600; }
+  .streak-day.slip { background: var(--error-container); color: var(--error); }
+  .streak-day.future { background: var(--surface-high); color: var(--on-surface-variant); font-weight: 400; }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--on-surface-variant); margin-top: 10px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+</style>
+</head>
+<body>
+
+<nav class="rail">
+  <img class="rail-logo" src="logo.svg" alt="Hypomnema">
+  <a class="rail-item active" href="dashboard.html"><span class="rail-indicator"><span class="material-symbols-outlined">space_dashboard</span></span>Dashboard</a>
+  <a class="rail-item" href="journal.html"><span class="rail-indicator"><span class="material-symbols-outlined">book_2</span></span>Journal</a>
+  <a class="rail-item" href="archive.html"><span class="rail-indicator"><span class="material-symbols-outlined">inventory_2</span></span>Archive</a>
+  <div class="rail-spacer"></div>
+  <div class="rail-divider"></div>
+  <a class="rail-item" href="dialog-sign-out.html"><span class="rail-indicator"><span class="material-symbols-outlined">logout</span></span>Sign Out</a>
+</nav>
+
+<div class="main">
+  <header class="page-header">
+    <a class="icon-btn" href="dashboard.html" title="Back to grid"><span class="material-symbols-outlined">grid_view</span></a>
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <div class="page-subtitle">Saturday, November 14 · Week of Nov 8–14</div>
+    </div>
+    <div class="spacer"></div>
+    <a class="btn btn-filled" href="goal-add.html"><span class="material-symbols-outlined">add</span>Add Goal</a>
+  </header>
+
+  <div class="split">
+    <aside class="list-pane">
+      <a class="goal-row" href="journal.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">edit_note</span><span class="goal-row-name">Journal once per day</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">1 of 1 today · mood <span class="mood mood-sm mood-4">4</span></div>
+      </a>
+      <div class="goal-row">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">event_repeat</span><span class="goal-row-name">Meditate daily</span></div>
+        <div class="goal-row-sub muted">0 of 1 today</div>
+        <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <a class="goal-row" href="goal-frequency.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">event_repeat</span><span class="goal-row-name">Exercise 4 times per week</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">3 of 4 this week</div>
+        <div class="progress-track"><div class="progress-fill" style="width:75%"></div></div>
+      </a>
+      <a class="goal-row" href="goal-accumulation.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">stacked_bar_chart</span><span class="goal-row-name">Read 300 pages per month</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">142 of 300 pages this month</div>
+        <div class="progress-track"><div class="progress-fill" style="width:47%"></div></div>
+      </a>
+      <a class="goal-row" href="goal-target-value.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">flag</span><span class="goal-row-name">Lose 20 pounds by Dec 31</span><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        <div class="goal-row-sub muted">188.4 lb → 180 lb · 58%</div>
+        <div class="progress-track"><div class="progress-fill" style="width:58%"></div></div>
+      </a>
+      <div class="goal-row">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No alcohol</span></div>
+        <div class="goal-row-sub muted">741 days · longest 741</div>
+      </div>
+      <div class="goal-row">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No social media for 30 days</span></div>
+        <div class="goal-row-sub muted">13 of 30 days</div>
+        <div class="progress-track"><div class="progress-fill" style="width:43%"></div></div>
+      </div>
+      <a class="goal-row" href="goal-avoidance.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No soda for 30 days</span><span class="chip chip-missed">Missed</span></div>
+        <div class="goal-row-sub muted">0 days · longest 12 · <span style="color:var(--warning)">Slipped today</span></div>
+      </a>
+      <a class="goal-row" href="goal-upcoming.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">block</span><span class="goal-row-name">No desserts in December</span><span class="chip chip-upcoming">Upcoming</span></div>
+        <div class="goal-row-sub muted">Starts Dec 1</div>
+      </a>
+      <a class="goal-row selected" href="goal-closed.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined">block</span><span class="goal-row-name">Sober October</span><span class="chip chip-achieved">Achieved</span></div>
+        <div class="goal-row-sub muted">31 of 31 days · closed</div>
+      </a>
+      <a class="goal-row" href="goal-closed-missed.html">
+        <div class="goal-row-top"><span class="material-symbols-outlined muted">flag</span><span class="goal-row-name">Bench press 185 lb by Nov 1</span><span class="chip chip-missed">Missed</span></div>
+        <div class="goal-row-sub muted">172.5 lb · 64% · closed</div>
+      </a>
+    </aside>
+
+    <section class="detail-pane">
+      <div class="detail-header">
+        <div>
+          <h2 class="detail-title">Sober October</h2>
+          <div class="detail-tags">
+            <span class="type-label"><span class="material-symbols-outlined">block</span>Avoidance · 31-day target</span>
+            <span class="chip chip-achieved"><span class="material-symbols-outlined">emoji_events</span>Achieved</span>
+            <span class="chip chip-closed"><span class="material-symbols-outlined">lock</span>Closed</span>
+          </div>
+          <p class="detail-desc">No cannabis for the month of October. Started as a challenge with Dan.</p>
+        </div>
+        <div class="detail-actions">
+          <button class="btn btn-tonal btn-sm"><span class="material-symbols-outlined">archive</span>Archive</button>
+          <button class="btn btn-danger-text btn-sm"><span class="material-symbols-outlined">delete</span>Delete</button>
+        </div>
+      </div>
+
+      <div class="banner banner-neutral">
+        <span class="material-symbols-outlined">emoji_events</span>
+        <span>Achieved at midnight after Oct 31, when the streak reached 31 days. The goal is closed, so no more slips can be recorded. Archive it when you're ready.</span>
+      </div>
+
+      <div class="card summary-card">
+        <div class="stat"><span class="stat-label">Streak</span><span class="stat-value">31 of 31 days</span></div>
+        <div class="stat"><span class="stat-label">Longest streak</span><span class="stat-value">31 days</span></div>
+        <div class="stat-sep"></div>
+        <div class="stat"><span class="stat-label">Ran</span><span class="stat-value">Oct 1 – Oct 31</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="material-symbols-outlined">calendar_month</span><div class="card-title">Oct 1 – Oct 31</div></div>
+        <div class="streak-strip"><div class="streak-day">1</div><div class="streak-day">2</div><div class="streak-day">3</div><div class="streak-day">4</div><div class="streak-day">5</div><div class="streak-day">6</div><div class="streak-day">7</div><div class="streak-day">8</div><div class="streak-day">9</div><div class="streak-day">10</div><div class="streak-day">11</div><div class="streak-day">12</div><div class="streak-day">13</div><div class="streak-day">14</div><div class="streak-day">15</div><div class="streak-day">16</div><div class="streak-day">17</div><div class="streak-day">18</div><div class="streak-day">19</div><div class="streak-day">20</div><div class="streak-day">21</div><div class="streak-day">22</div><div class="streak-day">23</div><div class="streak-day">24</div><div class="streak-day">25</div><div class="streak-day">26</div><div class="streak-day">27</div><div class="streak-day">28</div><div class="streak-day">29</div><div class="streak-day">30</div><div class="streak-day">31</div></div>
+        <div class="legend"><span><i style="background:var(--success-container)"></i>Completed without a slip</span></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card card-flush">
+          <div class="card-header"><span class="material-symbols-outlined">list_alt</span><div class="card-title">Slips</div></div>
+          <div class="empty"><span class="material-symbols-outlined" style="font-size:36px;opacity:.5">celebration</span><p>No slips recorded.</p></div>
+        </div>
+        <div class="card card-flush">
+          <div class="card-header">
+            <span class="material-symbols-outlined">bookmarks</span><div class="card-title">Resources</div>
+            <a class="btn btn-text btn-sm" href="dialog-resource.html"><span class="material-symbols-outlined">add</span>Add</a>
+          </div>
+          <div class="resource">
+            <div class="resource-icon"><span class="material-symbols-outlined">link</span></div>
+            <div style="flex:1">
+              <div class="resource-subject">What happens in a month off</div>
+              <div class="resource-url">health.harvard.edu/blog/taking-a-break</div>
+            </div>
+            <a class="icon-btn" href="dialog-resource.html" title="Edit"><span class="material-symbols-outlined">edit</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+</body>
+</html>

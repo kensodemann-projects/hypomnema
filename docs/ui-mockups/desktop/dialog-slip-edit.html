@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Edit slip — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+</head>
+<body>
+<iframe class="bg-frame" src="goal-avoidance.html" title="Background" tabindex="-1"></iframe>
+
+<div class="scrim">
+  <div class="dialog" role="dialog" aria-labelledby="dlg-title" style="width:460px">
+    <div>
+      <div class="type-label"><span class="material-symbols-outlined">block</span>No soda for 30 days</div>
+      <h2 class="dialog-title" id="dlg-title">Edit slip</h2>
+    </div>
+    <div class="kbd-note"><span class="material-symbols-outlined">schedule</span>Editable until 10:20 AM tomorrow, 24 hours after it was recorded</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" value="2026-11-14" min="2026-11-07" max="2026-11-14">
+        <span class="helper">Nov 7 – today</span>
+      </div>
+      <div class="field">
+        <label>Time</label>
+        <input type="time" value="10:20">
+        <span class="helper">Can't be later than now</span>
+      </div>
+      <div class="field focused span-2">
+        <label>Memo</label>
+        <input type="text" value="Lunch with the team" autofocus>
+      </div>
+    </div>
+    <div class="banner banner-info">
+      <span class="material-symbols-outlined">info</span>
+      <span>Deleting this slip restores the current streak to <strong>7 days</strong> (Nov 7–13). The goal stays Missed, because of the slip on Nov 6.</span>
+    </div>
+    <div class="dialog-actions">
+      <a class="btn btn-danger-text" href="goal-avoidance.html" style="margin-right:auto"><span class="material-symbols-outlined">delete</span>Delete slip</a>
+      <a class="btn btn-text" href="goal-avoidance.html">Cancel</a>
+      <a class="btn btn-filled" href="goal-avoidance.html">Save</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

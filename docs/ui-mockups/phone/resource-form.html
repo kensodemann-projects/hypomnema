@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resource form · Phone — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="../desktop/shared.css">
+<link rel="stylesheet" href="../desktop/journal.css">
+<link rel="stylesheet" href="phone.css">
+<script src="../desktop/shared.js"></script>
+<script src="phone.js"></script>
+</head>
+<body class="phone">
+<div class="stage">
+<div class="device">
+
+<div class="statusbar plain"><span>11:51</span><span class="sys"><span class="material-symbols-outlined">signal_cellular_alt</span><span class="material-symbols-outlined">wifi</span><span class="material-symbols-outlined">battery_full</span></span></div>
+<header class="topbar with-nav"><a class="icon-btn" href="goal-frequency.html" title="Close"><span class="material-symbols-outlined">close</span></a><div class="tb-text"><div class="tb-title sm">Edit resource</div></div><a class="btn btn-text" href="goal-frequency.html">Save</a></header>
+<div class="form-screen">
+  <div class="type-label"><span class="material-symbols-outlined">event_repeat</span>Exercise 4 times per week</div>
+  <div class="field"><label>Subject <span class="req">*</span></label><input type="text" value="Heavy / light alternating weeks"></div>
+  <div class="field"><label>URL</label><input type="url" value="https://strengthlog.com/heavy-light-training"><span class="helper">Optional</span></div>
+  <div class="field"><label>Description</label><textarea rows="7">Alternate a hard week with an easier one so joints recover. Light week = same exercises at ~60% effort.</textarea><span class="helper">Optional</span></div>
+  <button class="btn btn-danger-text" style="align-self:flex-start"><span class="material-symbols-outlined">delete</span>Delete resource</button>
+</div>
+<div class="gesture surface"></div>
+
+</div>
+<aside class="notes">
+  <a class="back" href="index.html"><span class="material-symbols-outlined">arrow_back</span>All phone screens</a>
+  <h1>Resource form</h1>
+  <p>Add and edit resource as a full-screen form. Delete appears only when editing.</p>
+  <div class="refs">Requirements: §5</div>
+  <div class="links"><a href="goal-frequency.html">Goal details</a></div>
+
+</aside>
+</div>
+</body>
+</html>

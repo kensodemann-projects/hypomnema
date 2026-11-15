@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Goal overflow menu · Phone — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="../desktop/shared.css">
+<link rel="stylesheet" href="../desktop/journal.css">
+<link rel="stylesheet" href="phone.css">
+<script src="../desktop/shared.js"></script>
+<script src="phone.js"></script>
+</head>
+<body class="phone">
+<div class="stage">
+<div class="device">
+<iframe class="device-bg" src="goal-avoidance.html" title="Background screen" tabindex="-1"></iframe>
+
+<div style="position:absolute;inset:0;z-index:10"></div>
+<div style="position:absolute;top:92px;right:12px;z-index:11;width:200px;background:var(--surface-container);border-radius:8px;box-shadow:var(--shadow);padding:8px 0">
+  <a style="display:flex;align-items:center;gap:12px;padding:12px 16px" href="#"><span class="material-symbols-outlined">edit</span>Edit goal</a>
+  <a style="display:flex;align-items:center;gap:12px;padding:12px 16px" href="dialog-archive.html"><span class="material-symbols-outlined">archive</span>Archive</a>
+  <a style="display:flex;align-items:center;gap:12px;padding:12px 16px;color:var(--error)" href="dialog-delete.html"><span class="material-symbols-outlined">delete</span>Delete</a>
+</div>
+</div>
+<aside class="notes">
+  <a class="back" href="index.html"><span class="material-symbols-outlined">arrow_back</span>All phone screens</a>
+  <h1>Goal overflow menu</h1>
+  <p>The overflow menu on goal details. Archive and Delete each ask for confirmation.</p>
+  <div class="refs">Requirements: §3.5, §7.2</div>
+  <div class="links"><a href="dialog-archive.html">Archive</a><a href="dialog-delete.html">Delete</a></div>
+
+</aside>
+</div>
+</body>
+</html>

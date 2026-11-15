@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+</head>
+<body>
+
+<nav class="rail">
+  <img class="rail-logo" src="logo.svg" alt="Hypomnema">
+  <a class="rail-item active" href="dashboard.html"><span class="rail-indicator"><span class="material-symbols-outlined">space_dashboard</span></span>Dashboard</a>
+  <a class="rail-item" href="journal.html"><span class="rail-indicator"><span class="material-symbols-outlined">book_2</span></span>Journal</a>
+  <a class="rail-item" href="archive.html"><span class="rail-indicator"><span class="material-symbols-outlined">inventory_2</span></span>Archive</a>
+  <div class="rail-spacer"></div>
+  <div class="rail-divider"></div>
+  <a class="rail-item" href="dialog-sign-out.html"><span class="rail-indicator"><span class="material-symbols-outlined">logout</span></span>Sign Out</a>
+</nav>
+
+<div class="main">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <div class="page-subtitle">Saturday, November 14 · Week of Nov 8–14</div>
+    </div>
+    <div class="spacer"></div>
+    <a class="btn btn-filled" href="goal-add.html"><span class="material-symbols-outlined">add</span>Add Goal</a>
+  </header>
+
+  <div class="page-body">
+    <div class="panel-grid">
+
+      <!-- Journaling goal: always first -->
+      <a class="panel journal clickable" href="journal.html">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">edit_note</span>Journaling</div>
+            <div class="panel-name">Journal once per day</div>
+          </div>
+          <div class="badges"><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        </div>
+        <div class="panel-progress"><span class="big-number">1 of 1</span><span class="big-unit">today</span></div>
+        <div class="progress-track"><div class="progress-fill met" style="width:100%"></div></div>
+        <div class="panel-meta" style="align-items:center">Latest mood <span class="mood mood-sm mood-4">4</span></div>
+        <div class="panel-actions">
+          <span class="btn btn-filled btn-sm" onclick="location.href='journal-editor.html';return false;"><span class="material-symbols-outlined">edit</span>Write</span>
+        </div>
+      </a>
+
+      <!-- Frequency, daily, not yet done today -->
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">event_repeat</span>Frequency</div>
+            <div class="panel-name">Meditate daily</div>
+          </div>
+        </div>
+        <div class="panel-progress"><span class="big-number">0 of 1</span><span class="big-unit">today</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
+        <div class="panel-meta">Streak: 16 days met</div>
+        <div class="panel-actions">
+          <button class="btn btn-filled btn-sm"><span class="material-symbols-outlined">check</span>Done</button>
+          <a class="btn btn-text btn-sm" href="dialog-entry-details.html">Add details</a>
+        </div>
+      </div>
+
+      <!-- Frequency, weekly, logged today -->
+      <a class="panel clickable" href="goal-frequency.html">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">event_repeat</span>Frequency</div>
+            <div class="panel-name">Exercise 4 times per week</div>
+          </div>
+          <div class="badges"><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        </div>
+        <div class="panel-progress"><span class="big-number">3 of 4</span><span class="big-unit">this week</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:75%"></div></div>
+        <div class="panel-meta">Streak: 4 weeks met</div>
+        <div class="panel-actions">
+          <span class="btn btn-filled btn-sm"><span class="material-symbols-outlined">check</span>Done</span>
+          <span class="btn btn-text btn-sm" onclick="location.href='dialog-entry-details.html';return false;">Add details</span>
+        </div>
+      </a>
+
+      <!-- Accumulation -->
+      <a class="panel clickable" href="goal-accumulation.html">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">stacked_bar_chart</span>Accumulation</div>
+            <div class="panel-name">Read 300 pages per month</div>
+          </div>
+          <div class="badges"><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        </div>
+        <div class="panel-progress"><span class="big-number">142 of 300</span><span class="big-unit">pages this month</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:47%"></div></div>
+        <div class="panel-meta">158 pages to go · 16 days left in November</div>
+        <div class="panel-actions">
+          <span class="btn btn-filled btn-sm" onclick="location.href='dialog-log-entry.html';return false;"><span class="material-symbols-outlined">add</span>Log pages</span>
+        </div>
+      </a>
+
+      <!-- Target value -->
+      <a class="panel clickable" href="goal-target-value.html">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">flag</span>Target Value</div>
+            <div class="panel-name">Lose 20 pounds by Dec 31</div>
+          </div>
+          <div class="badges"><span class="chip chip-today"><span class="material-symbols-outlined">check_circle</span>Today</span></div>
+        </div>
+        <div class="panel-progress"><span class="big-number">188.4</span><span class="big-unit">lb → 180 lb</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:58%"></div></div>
+        <div class="panel-meta"><span><strong>58%</strong> of the way from 200 lb</span><span>47 days left</span></div>
+        <div class="panel-actions">
+          <span class="btn btn-filled btn-sm"><span class="material-symbols-outlined">add</span>Log weight</span>
+        </div>
+      </a>
+
+      <!-- Avoidance, open-ended, started in the past -->
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">block</span>Avoidance</div>
+            <div class="panel-name">No alcohol</div>
+          </div>
+        </div>
+        <div class="panel-progress"><span class="big-number">741</span><span class="big-unit">days · longest 741</span></div>
+        <div class="panel-meta">Open-ended · since Nov 3, 2024</div>
+        <div class="panel-actions">
+          <span class="panel-question">Did you slip today?</span>
+          <button class="btn btn-outlined btn-sm">Yes</button>
+          <button class="btn btn-tonal btn-sm">No</button>
+        </div>
+      </div>
+
+      <!-- Avoidance with target, no outcome yet -->
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">block</span>Avoidance</div>
+            <div class="panel-name">No social media for 30 days</div>
+          </div>
+        </div>
+        <div class="panel-progress"><span class="big-number">13 of 30</span><span class="big-unit">days</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:43%"></div></div>
+        <div class="panel-meta">Achieved at midnight after Nov 30 with no slips</div>
+        <div class="panel-actions">
+          <span class="panel-question">Did you slip today?</span>
+          <a class="btn btn-outlined btn-sm" href="dialog-slip.html">Yes</a>
+          <button class="btn btn-tonal btn-sm">No</button>
+        </div>
+      </div>
+
+      <!-- Avoidance, missed by option 2, slipped today -->
+      <a class="panel clickable" href="goal-avoidance.html">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">block</span>Avoidance</div>
+            <div class="panel-name">No soda for 30 days</div>
+          </div>
+          <div class="badges">
+            <span class="chip chip-slipped"><span class="material-symbols-outlined">warning</span>Slipped today</span>
+            <span class="chip chip-missed">Missed</span>
+          </div>
+        </div>
+        <div class="panel-progress"><span class="big-number">0</span><span class="big-unit">days current · longest 12</span></div>
+        <div class="panel-meta">Keeps running until Nov 23</div>
+        <div class="panel-actions">
+          <span class="panel-question">Did you slip today?</span>
+          <span class="btn btn-outlined btn-sm">Yes</span>
+          <span class="btn btn-tonal btn-sm">No</span>
+        </div>
+      </a>
+
+      <!-- Upcoming -->
+      <a class="panel upcoming clickable" href="goal-upcoming.html">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">block</span>Avoidance</div>
+            <div class="panel-name">No desserts in December</div>
+          </div>
+          <div class="badges"><span class="chip chip-upcoming"><span class="material-symbols-outlined">schedule</span>Upcoming</span></div>
+        </div>
+        <div class="panel-progress"><span class="big-number">Starts Dec 1</span></div>
+        <div class="panel-meta">31-day goal · tracking begins in 17 days</div>
+      </a>
+
+      <!-- Closed, achieved, not yet archived -->
+      <a class="panel closed clickable" href="goal-closed.html">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">block</span>Avoidance</div>
+            <div class="panel-name">Sober October</div>
+          </div>
+          <div class="badges">
+            <span class="chip chip-achieved"><span class="material-symbols-outlined">emoji_events</span>Achieved</span>
+          </div>
+        </div>
+        <div class="panel-progress"><span class="big-number">31 of 31</span><span class="big-unit">days</span></div>
+        <div class="progress-track"><div class="progress-fill met" style="width:100%"></div></div>
+        <div class="panel-meta"><span class="chip chip-closed"><span class="material-symbols-outlined">lock</span>Closed</span> Archive it from goal details when you're ready</div>
+      </a>
+
+      <!-- Closed, missed target value, not yet archived -->
+      <a class="panel closed clickable" href="goal-closed-missed.html">
+        <div class="panel-head">
+          <div>
+            <div class="type-label"><span class="material-symbols-outlined">flag</span>Target Value</div>
+            <div class="panel-name">Bench press 185 lb by Nov 1</div>
+          </div>
+          <div class="badges"><span class="chip chip-missed">Missed</span></div>
+        </div>
+        <div class="panel-progress"><span class="big-number">172.5</span><span class="big-unit">lb → 185 lb</span></div>
+        <div class="progress-track"><div class="progress-fill missed" style="width:64%"></div></div>
+        <div class="panel-meta"><span class="chip chip-closed"><span class="material-symbols-outlined">lock</span>Closed</span> 64% · ended Nov 1</div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<div class="snackbar"><span class="material-symbols-outlined icon-filled">favorite</span>Nice work. 741 days without alcohol.</div>
+
+</body>
+</html>

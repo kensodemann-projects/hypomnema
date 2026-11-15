@@ -110,6 +110,8 @@ What can be changed depends on the goal's status (Section 3.5):
 - Once a goal is Active, changing its type, period, unit, or starting value would make its entries or past progress meaningless. To change any of them, the user creates a new goal. (The journaling goal is an exception; see Section 6.5.)
 - A target change on an Active goal applies to the current period and all later ones. Past periods keep the target that was in effect at the time, so the application must keep a history of each goal's targets.
 - The start date rules in Section 3.1 still apply when the start date is edited.
+- A closed goal (Section 3.5) cannot be edited. Its target no longer applies to any period, so the only goal actions left are Archive and Delete. Its entries still follow the 24-hour edit and delete window (Section 4.2).
+- An Archived goal cannot be changed, but it can still be deleted (Section 3.5).
 
 ### 3.5 Goal Lifecycle and Outcomes
 
@@ -138,7 +140,7 @@ A goal with an Achieved or Missed outcome stays on the dashboard with an outcome
 The user can take two actions on a goal:
 
 - **Archive** — Stops tracking the goal and keeps its history for viewing. Archiving is permanent. Before archiving, the application warns the user that it cannot be undone and gives them a chance to cancel. An archived goal, its tracking entries, and its resources are read-only. Archived goals cannot be unarchived.
-- **Delete** — Permanently removes the goal and all of its tracking entries and resources. The application asks the user to confirm before deleting.
+- **Delete** — Permanently removes the goal and all of its tracking entries and resources. The application asks the user to confirm before deleting. A goal can be deleted while it is Upcoming, Active, or Archived. Deleting is the only action available on an Archived goal.
 
 ---
 
@@ -165,7 +167,7 @@ Mistakes should be easy to correct, but only within limits:
   Only the combined date and time is limited by "now." A backdated entry can use any time of day, including on the seventh day back. For example, at 9 AM an entry dated yesterday can be at 11 PM, and so can an entry dated 7 days ago.
 - **Date decides placement** — The date alone decides which period an entry belongs to and which day it falls on for an avoidance streak. The time is used only for display and ordering, including choosing the latest value for a target value goal (Section 3.2).
 - **Editing** — An entry can be edited within 24 hours of when it was created. An edited date and time must still meet the date and time limits, checked at the time of the edit.
-- **Deleting** — An entry, including an avoidance slip, can be deleted within 24 hours of when it was created. A deleted entry no longer counts toward the goal. Deleting a mistaken slip restores the streak.
+- **Deleting** — An entry, including an avoidance slip, can be deleted within 24 hours of when it was created. A deleted entry no longer counts toward the goal. Deleting a mistaken slip restores the streak. The application asks the user to confirm before deleting an entry.
 
 ---
 
@@ -181,7 +183,7 @@ Each resource has:
 
 The application stores the date and time each resource was created and uses it to sort resources newest first. The timestamp is not displayed.
 
-While a goal is active, the user can create, view, edit, and delete its resources at any time. Once the goal is archived, its resources are read-only.
+While a goal is upcoming or active, including after it is closed, the user can create, view, edit, and delete its resources at any time. The application asks the user to confirm before deleting a resource. Once the goal is archived, its resources are read-only.
 
 ---
 
@@ -201,7 +203,17 @@ Journaling is a separate feature from goals. Each user has one journal and one j
 
 - Mood is a whole number from 1 to 5, shown as a number.
 - When entering a mood, only the ends are labeled: 1 is "Awful" and 5 is "Great." The values in between mean whatever the user wants them to mean.
-- Each mood value has a color on a gradient from red (1), through yellow (3), to green (5). Values 2 and 4 use the colors in between (orange and yellow-green). The exact colors will be chosen during the mock-up session.
+- Each mood value has a color on a gradient from red (1), through yellow (3), to green (5). Values 2 and 4 use the colors in between (orange and yellow-green). The colors are the same in light and dark themes:
+
+  | Mood | Color |
+  | --- | --- |
+  | 1 | `#E5534B` (red) |
+  | 2 | `#F28C38` (orange) |
+  | 3 | `#F5C842` (yellow) |
+  | 4 | `#A8CC4A` (yellow-green) |
+  | 5 | `#4CAF50` (green) |
+
+  The number is always drawn in near-black (`#111111`), which stays readable on all five colors.
 - The number must be easy to read against its color in both light and dark themes.
 - Color is never the only indicator of mood. The number is always shown, so moods stay readable for users with red-green color blindness.
 - Wherever a mood is displayed, it uses the same look as in the mood picker (e.g., a yellow square containing a 3), without the labels.
@@ -281,7 +293,7 @@ The dashboard also has an **Add Goal** action. Selecting a goal panel opens that
   - Avoidance: the current streak, the longest streak, and a list of slips.
 - **Entries** — All tracking entries, newest first, showing date, time, value, and memo. Edit and delete are offered only while the entry is within its 24-hour window.
 - **Resources** — The goal's resources, newest first, with add, edit, and delete. They are read-only once the goal is archived.
-- **Actions** — Edit goal (the fields allowed by the goal's status; see Section 3.4), Archive (with confirmation), and Delete (with confirmation).
+- **Actions** — Edit goal (the fields allowed by the goal's status; see Section 3.4), Archive (with confirmation), and Delete (with confirmation). An upcoming goal offers all three. A closed goal offers only Archive and Delete. An archived goal offers only Delete.
 
 ### 7.3 Journal
 
@@ -298,16 +310,26 @@ The dashboard also has an **Add Goal** action. Selecting a goal panel opens that
 
 ### 7.4 Archive
 
-A list of archived goals. Selecting one opens its goal details, which are read-only.
+A list of archived goals. Selecting one opens its goal details, which are read-only except for Delete (with confirmation; see Section 3.5).
 
 ### 7.5 Navigation and Layout
 
-Phone and desktop each have their own layout. A phone layout stretched to desktop width does not meet this requirement. The top-level areas are **Dashboard**, **Journal**, and **Archive**. A **Sign Out** action is part of the navigation in both layouts.
+Phone and desktop each have their own layout. A phone layout stretched to desktop width does not meet this requirement. The top-level areas are **Dashboard**, **Journal**, and **Archive**. A **Sign Out** action is part of the navigation in both layouts. Selecting Sign Out asks the user to confirm before signing out, so a stray tap does not end the session. Canceling leaves the user where they were.
 
-- **Phone** — A bottom navigation bar for the top-level areas. Goal details, the entry form, and the journal editor open as full-screen pages.
-- **Desktop** — A side navigation rail with list-and-detail layouts. For example, the dashboard shows panels in a grid and opens a goal's details beside them, and the journal shows the entry list beside the selected entry. Forms open in dialogs or side panels instead of full pages.
+- **Phone** — A bottom navigation bar for the top-level areas, with Sign Out as its last item.
+  - The dashboard is a single column of panels, with Add Goal as a floating button above the bottom bar.
+  - Goal details open as a full-screen page. The summary and logging controls are at the top, and History, Entries, and Resources are tabs below them.
+  - Forms (entry forms, Add Goal, Edit Goal, resources, and the journal editor) open as full-screen pages with Close and Save in the top bar, so Save stays visible above the keyboard.
+  - Dialogs are used only for short confirmations: recording a slip, archiving, deleting, and signing out.
+  - The Journal area has Entries, Mood, and Goal tabs, with Write as a floating button.
+  - The 30-day and one-year mood charts scroll sideways, with the mood axis pinned, so every point stays large enough to read its number.
+- **Desktop** — A side navigation rail with list-and-detail layouts, with Sign Out at the bottom of the rail.
+  - The dashboard shows panels in a grid. Selecting a goal shows the panels as a list beside the goal's details.
+  - The journal shows the entry list beside the selected entry, with Entries, Mood Trend, and Journaling Goal tabs.
+  - The archive shows the archived goal list beside the selected goal's read-only details.
+  - Add Goal and Edit Goal open as side sheets. Entry forms, resources, and confirmations open as dialogs.
 
-This layout is a concept. It will be refined in a separate mock-up session and may change.
+The mock-ups in `docs/ui-mockups/desktop` and `docs/ui-mockups/phone` show each screen in both layouts.
 
 ---
 
@@ -361,11 +383,3 @@ The following are out of scope for the first release:
 ## 11. Open Questions
 
 None at this time.
-
-### Deferred to Mock-ups
-
-These items are intentionally postponed to the mock-up session:
-
-- The final phone and desktop layouts (Section 7.5).
-- The exact colors for each mood value (Section 6.2).
-- Where Sign Out sits in each layout's navigation (Section 7.5).

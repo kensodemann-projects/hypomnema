@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add Goal · Avoidance — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+<style>
+  .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .type-card { border: 1px solid var(--outline-variant); border-radius: 12px; padding: 10px 12px; cursor: pointer; display: flex; gap: 10px; align-items: flex-start; color: inherit; text-decoration: none; }
+  .type-card .material-symbols-outlined { color: var(--primary); margin-top: 1px; }
+  .type-card .t { font-weight: 600; font-size: 13px; }
+  .type-card .d { font-size: 12px; color: var(--on-surface-variant); line-height: 1.35; }
+  .type-card.selected { border: 2px solid var(--primary); padding: 9px 11px; background: var(--primary-container); }
+  .type-card.selected .t, .type-card.selected .d, .type-card.selected .material-symbols-outlined { color: var(--on-primary-container); }
+  .derived { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 10px 12px; border-radius: 10px; background: var(--surface-container); }
+  .derived .material-symbols-outlined { color: var(--primary); }
+</style>
+</head>
+<body>
+<iframe class="bg-frame" src="dashboard.html" title="Background" tabindex="-1"></iframe>
+
+<div class="scrim sheet-scrim">
+  <aside class="sheet" role="dialog" aria-labelledby="sheet-title">
+    <div class="sheet-header">
+      <h2 class="sheet-title" id="sheet-title">Add Goal</h2>
+      <a class="icon-btn" href="dashboard.html" title="Close"><span class="material-symbols-outlined">close</span></a>
+    </div>
+    <div class="sheet-body">
+      <div class="field">
+        <label>Name <span class="req">*</span></label>
+        <input type="text" value="No smoking">
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea rows="3" placeholder="Optional. Your own rules for this goal.">Includes vaping. Nicotine gum is fine.</textarea>
+      </div>
+
+      <div class="form-section-title">Type</div>
+      <div class="type-grid">
+        <a class="type-card" href="goal-add-frequency.html"><span class="material-symbols-outlined">event_repeat</span><div><div class="t">Frequency</div><div class="d">Do something a number of times per day, week, or month</div></div></a>
+        <a class="type-card" href="goal-add-accumulation.html"><span class="material-symbols-outlined">stacked_bar_chart</span><div><div class="t">Accumulation</div><div class="d">Reach a total amount per day, week, or month</div></div></a>
+        <a class="type-card" href="goal-add.html"><span class="material-symbols-outlined">flag</span><div><div class="t">Target Value</div><div class="d">Reach a value by a date</div></div></a>
+        <a class="type-card selected" href="goal-add-avoidance.html"><span class="material-symbols-outlined">block</span><div><div class="t">Avoidance</div><div class="d">Stop doing something and build a streak</div></div></a>
+      </div>
+
+      <div class="form-section-title">Target</div>
+      <div class="field">
+        <label>Streak target</label>
+        <div class="segmented" style="align-self:flex-start"><button class="active">Open-ended</button><button>Number of days</button></div>
+        <span class="helper">Open-ended keeps going for good. Choose Number of days for a goal like Dry January (31 days).</span>
+      </div>
+
+      <div class="form-section-title">Schedule</div>
+      <div class="field focused">
+        <label>Start date <span class="req">*</span></label>
+        <input type="date" value="2026-03-02">
+        <span class="helper">Avoidance goals can start in the past, so an existing streak counts.</span>
+      </div>
+      <div class="derived"><span class="material-symbols-outlined">local_fire_department</span><span>Your streak starts at <strong>257 days</strong> (Mar 2 – Nov 13). Today counts at midnight.</span></div>
+      <div class="kbd-note"><span class="material-symbols-outlined">info</span>You'll record only slips. The streak counts up on its own.</div>
+    </div>
+    <div class="sheet-footer">
+      <a class="btn btn-text" href="dashboard.html">Cancel</a>
+      <a class="btn btn-filled" href="dashboard.html"><span class="material-symbols-outlined">add</span>Add Goal</a>
+    </div>
+  </aside>
+</div>
+</body>
+</html>

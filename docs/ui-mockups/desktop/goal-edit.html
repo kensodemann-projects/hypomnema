@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Edit Goal — Hypomnema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+<link rel="stylesheet" href="shared.css">
+<script src="shared.js"></script>
+</head>
+<body>
+<iframe class="bg-frame" src="goal-frequency.html" title="Goal details" tabindex="-1"></iframe>
+
+<div class="scrim sheet-scrim">
+  <aside class="sheet" role="dialog" aria-labelledby="sheet-title">
+    <div class="sheet-header">
+      <h2 class="sheet-title" id="sheet-title">Edit Goal</h2>
+      <a class="icon-btn" href="goal-frequency.html" title="Close"><span class="material-symbols-outlined">close</span></a>
+    </div>
+    <div class="sheet-body">
+      <div class="field">
+        <label>Name <span class="req">*</span></label>
+        <input type="text" value="Exercise 5 times per week">
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea rows="3">Only count sessions of 30 minutes or more. Walks count if they're brisk enough to get my heart rate up.</textarea>
+      </div>
+
+      <div class="form-section-title">Target</div>
+      <div class="form-grid">
+        <div class="field focused">
+          <label>Times <span class="req">*</span></label>
+          <input type="number" value="5" min="1">
+          <span class="helper">Was 4</span>
+        </div>
+        <div class="field">
+          <label>Per</label>
+          <select disabled><option>Week</option></select>
+          <span class="helper lock"><span class="material-symbols-outlined">lock</span>Fixed</span>
+        </div>
+      </div>
+      <div class="banner banner-info">
+        <span class="material-symbols-outlined">event_upcoming</span>
+        <span>The new target applies to <strong>this week (Nov 8–14)</strong> and later. Past weeks keep the target that was in effect.</span>
+      </div>
+
+      <div class="form-section-title">Fixed while active</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Type</label>
+          <select disabled><option>Frequency</option></select>
+        </div>
+        <div class="field">
+          <label>Start date</label>
+          <input type="text" value="Sep 30, 2026" disabled>
+        </div>
+      </div>
+      <div class="kbd-note"><span class="material-symbols-outlined">lock</span>Type, period, and start date can't change once a goal is active. To change them, create a new goal.</div>
+    </div>
+    <div class="sheet-footer">
+      <a class="btn btn-text" href="goal-frequency.html">Cancel</a>
+      <a class="btn btn-filled" href="goal-frequency.html">Save</a>
+    </div>
+  </aside>
+</div>
+</body>
+</html>
