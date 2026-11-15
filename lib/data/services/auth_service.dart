@@ -18,8 +18,7 @@ abstract interface class AuthService {
 }
 
 class FirebaseAuthService implements AuthService {
-  FirebaseAuthService({FirebaseAuth? firebaseAuth})
-    : _firebaseAuth = firebaseAuth; // ignore: prefer_initializing_formals
+  FirebaseAuthService({this._firebaseAuth});
 
   final FirebaseAuth? _firebaseAuth;
 

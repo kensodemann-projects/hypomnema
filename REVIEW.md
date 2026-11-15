@@ -1,6 +1,6 @@
 ## Summary
 
-Reviewed the resulting diff for [PR #16](https://github.com/kensodemann-projects/hypomnema/pull/16) (`4-gate-the-shell-behind-sign-in-and-add-sign-out` → `main`), which implements issue #4: gate the shell behind `AuthService.signedIn`, show a loading state then login or shell, and add phone/desktop sign-out. The auth gate, service API, and widget tests are solid and match the stated acceptance criteria. **Request changes** before merge: the PR title/body describe the opposite of the change, and `PLAN.md` still lists STEP-003 as unfinished while that work is already in the tree. SEC-001 is **won't fix**: the committed email is already public, and the emulator password is not used anywhere else. CLN-001 is **done**: `main` creates one `FirebaseAuthService` and passes it into `MainApp`. CLN-002 is **done**: `make emulators` imports `seed-data`.
+Reviewed the resulting diff for [PR #16](https://github.com/kensodemann-projects/hypomnema/pull/16) (`4-gate-the-shell-behind-sign-in-and-add-sign-out` → `main`), which implements issue #4: gate the shell behind `AuthService.signedIn`, show a loading state then login or shell, and add phone/desktop sign-out. The auth gate, service API, and widget tests are solid and match the stated acceptance criteria. **Request changes** before merge: the PR title/body describe the opposite of the change, and `PLAN.md` still lists STEP-003 as unfinished while that work is already in the tree. SEC-001 is **won't fix**: the committed email is already public, and the emulator password is not used anywhere else. CLN-001 is **done**: `main` creates one `FirebaseAuthService` and passes it into `MainApp`. CLN-002 is **done**: `make emulators` imports `seed-data`. CLN-003 is **done**: `FirebaseAuthService` uses `{this._firebaseAuth}`, so callers pass `firebaseAuth:` and the field stays private.
 
 ## Finding counts
 
@@ -54,6 +54,8 @@ final authService = this.authService ?? FirebaseAuthService();
 **Why:** Unrelated Makefile noise makes the auth change harder to review and leaves seed data that looks supported but is never loaded.
 
 [CLN-003]
+
+**Status:** Done. `FirebaseAuthService({this._firebaseAuth})` initializes the private field. Call sites still pass `firebaseAuth:`, and the `prefer_initializing_formals` ignore is gone.
 
 **Issue:** `FirebaseAuthService` uses `// ignore: prefer_initializing_formals` for the `firebaseAuth` → `_firebaseAuth` assignment.
 
