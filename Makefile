@@ -1,4 +1,4 @@
-.PHONY: get format format-check analyze test check devices run emulators preview
+.PHONY: get format format-check analyze test check devices run emulators preview seed-data web
 
 get:
 	flutter pub get
@@ -24,7 +24,13 @@ run:
 	flutter run$(if $(DEVICE), -d $(DEVICE))
 
 emulators:
-	firebase emulators:start --only auth,firestore
+	firebase emulators:start --only auth,firestore --import seed-data
 
 preview:
 	flutter widget-preview start
+
+seed-data:
+	firebase emulators:export ./seed-data --force
+
+web:
+	flutter build web

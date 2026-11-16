@@ -46,6 +46,12 @@ class _RecordingAuthService implements AuthService {
       throw error;
     }
   }
+
+  @override
+  Future<void> signOut() async {}
+
+  @override
+  Stream<bool> get signedIn => const Stream<bool>.empty();
 }
 
 Future<void> pumpLoginScreen(
