@@ -1,13 +1,13 @@
 # PR #24 — add the firestore section to the firebase.json
 
 **Branch:** `22-apply-firestore-rules-in-the-firebase-console` → `main`  
-**Scope:** New `PLAN.md` (PLAN-22) and `firebase.json` Firestore configuration.
+**Scope:** Resulting diff only (`PLAN.md`, `REVIEW.md`, `firebase.json`).
 
 ## Summary
 
-This PR documents issue #22 and adds a top-level `firestore` block to `firebase.json`, aligned with a console-first rules workflow. The security model described in `PLAN.md` (per-user `users/{uid}/**`, read-only authenticated `prompts`, default deny) is sound for the stated product boundaries.
+This PR adds PLAN-22 and a top-level `firestore` block in `firebase.json` for database `(default)`. The rules text in the plan is a sound default-deny model: owner-only `users/{userId}` and nested documents, authenticated read-only `prompts`, and no other client paths. The repository change does not match that plan. `firebase.json` is valid JSON, and it also sets `location`, `rules`, and `indexes`. The rules and indexes paths name files that are not in the tree, so a Firestore deploy fails while reading them, and STEP-001 is marked complete against a contract it does not satisfy.
 
-**Recommendation: request changes.** The committed `firebase.json` is not valid JSON and does not match the plan’s contract: it references `firestore.rules` and `firestore.indexes.json` that are not in the repository, while `PLAN.md` explicitly keeps `rules` and `indexes` unset. Either alignment error will block reliable `firebase` / `make emulators` use and fails the documented acceptance criteria for STEP-001.
+**Recommendation: request changes.**
 
 ## Finding counts
 
@@ -18,28 +18,17 @@ This PR documents issue #22 and adds a top-level `firestore` block to `firebase.
 | 🧹 Code cleanup and maintainability        |     1 |
 | 📚 Documentation gaps                      |     1 |
 | ✅ Positive feedback                       |     1 |
-| 🚨 Critical blockers                       |     2 |
+| 🚨 Critical blockers                       |     1 |
 | 💭 Questions for discussion                |     1 |
-| **Total**                                  |     6 |
+| **Total**                                  |     5 |
 
 ## Findings
 
 ### [BLK-001]
 
-**Issue:** `firebase.json` is invalid JSON. After `"database": "(default)"` there is no comma before `"location"`.
+**Issue:** `firebase.json` does not implement the PLAN-22 contract, and STEP-001 is marked complete anyway. The contract (and the step’s **Change** section) add only `database: "(default)"` and leave `rules` and `indexes` unset, with no rules file in the repo. The diff adds `location`, `"rules": "firestore.rules"`, and `"indexes": "firestore.indexes.json"`. Neither `firestore.rules` nor `firestore.indexes.json` exists.
 
-**Suggestion:** Fix syntax and re-validate, for example:
-
-```json
-"firestore": {
-  "database": "(default)",
-  "location": "nam5",
-  "rules": "firestore.rules",
-  "indexes": "firestore.indexes.json"
-}
-```
-
-Or, if following the plan contract (preferred for this PR):
+**Suggestion:** Make the block match the contract, and leave the step incomplete until that file and the console publish both match the acceptance criteria:
 
 ```json
 "firestore": {
@@ -47,50 +36,38 @@ Or, if following the plan contract (preferred for this PR):
 }
 ```
 
-**Why:** Invalid JSON prevents the Firebase CLI from reading project config; local validation (`python3 -m json.tool firebase.json`) currently fails.
+If repo-managed rules are now the intent, add those two files, put the contract rules in `firestore.rules`, and update PLAN-22 so `rules` and `indexes` are in scope. Do not mark STEP-001 complete while the file still disagrees with the contract.
 
-### [BLK-002]
-
-**Issue:** `firebase.json` sets `"rules": "firestore.rules"` and `"indexes": "firestore.indexes.json"`, but those files are absent from the PR (and from the repo on this branch).
-
-**Suggestion:** Remove the `rules` and `indexes` keys to match `PLAN.md`, **or** add the files and update `PLAN.md` / issue scope if repo-managed rules are now intended. For the documented console-only workflow, unset paths are correct:
-
-```json
-"firestore": {
-  "database": "(default)"
-}
-```
-
-**Why:** Pointing at missing rule/index files commonly causes emulator start or `firebase deploy` failures, contradicting the plan’s goal of keeping the emulator permissive until rules live only in the console.
+**Why:** `firebase deploy` prepares Firestore by reading both paths. A missing indexes file fails with `File … does not exist`; a missing rules file fails with `Error reading rules file firestore.rules`. That prepare step runs before any rules release, so this config cannot deploy Firestore. `make emulators` still starts: the CLI warns that the rules file does not exist and falls back to allowing every read and write. That permissive emulator result happens to match the plan, but only alongside a missing-file warning the contract avoids by leaving `rules` unset. The acceptance criteria require the contract section in `firebase.json`. This diff does not meet them.
 
 ### [CLN-001]
 
-**Issue:** The implementation diverges from the explicit contract in `PLAN.md` (lines 12–13, 25–28, 78–79): only `database: "(default)"` should be added; `rules` and `indexes` stay unset; rules files are out of scope.
+**Issue:** The diff adds `REVIEW.md`, a prior review of this same PR. That write-up says `firebase.json` is invalid JSON because a comma is missing after `"(default)"`. The file on the branch parses (`python3 -m json.tool firebase.json` succeeds); the comma is present.
 
-**Suggestion:** Make `firebase.json` match the contract snippet in `PLAN.md`, or amend the plan and issue acceptance criteria if `location`, `rules`, and `indexes` are deliberate scope changes.
+**Suggestion:** Drop `REVIEW.md` from the branch before merge. Review notes stay outside the product tree.
 
-**Why:** Split brain between plan and config makes review and future steps unreliable; STEP-001 is marked **complete** while the file edit does not meet the stated acceptance criteria.
+**Why:** A squash merge would put an incorrect review on `main` next to the config it misdescribes. Later readers will treat “invalid JSON” as the defect and miss the real mismatch (extra keys and missing files).
 
 ### [DOC-001]
 
-**Issue:** Acceptance criteria require console rules on project `kws-hypomnema` to be published and behaviorally verified (signed-out deny, per-user `users`, read-only `prompts`). That work is not verifiable from the Git diff, and STEP-001 is already marked complete.
+**Issue:** STEP-001’s acceptance criteria require the `(default)` database in project `kws-hypomnema` to have the contract rules published, and they require a signed-out deny plus the signed-in `users` and `prompts` behavior. The Git diff cannot show that console publish or those checks. The plan’s opening still says `firebase.json` has no top-level `firestore` section, which is no longer true on this branch, and the step status is already **complete**.
 
-**Suggestion:** In the PR description or a follow-up comment to reviewers (not required in-repo), note that console rules were published and briefly how they were spot-checked; alternatively leave STEP-001 status as incomplete until validation is done.
+**Suggestion:** Keep the problem statement in the past tense or as the pre-change state, and leave STEP-001 incomplete until both the `firebase.json` contract and the console publish are done. In the PR description, record that the rules were published on `(default)` and how the signed-out and signed-in cases were checked.
 
-**Why:** Repository changes alone do not enforce production Firestore rules; human/console steps are part of “done” for this issue.
+**Why:** The issue’s product outcome is the live ruleset, not the JSON key. Marking the step complete from the file edit alone hides the console half of “done.”
 
 ### [POS-001]
 
 **Issue:** N/A (positive).
 
-**Suggestion:** `PLAN.md` clearly separates emulator vs production, documents default-deny with narrow allows, and uses `match /users/{userId}/{document=**}` appropriately for nested user data. Console bypass for prompt curation is called out explicitly.
+**Suggestion:** The rules in the plan are the right shape for the stated boundaries. `rules_version = '2'` with `match /users/{userId}/{document=**}` covers the user document and nested documents, and the `request.auth.uid == userId` check keeps that tree private. `prompts/{promptId}` is read-only for any signed-in client, with an explicit `allow write: if false`, and every other path stays denied because no allow rule grants it. The plan also says the console can still edit prompts because the console bypasses rules, and it keeps edit windows in the app.
 
-**Why:** Future contributors can implement client reads/writes against a stable security story without guessing path semantics.
+**Why:** Client work for `users` and `prompts` can follow this model without guessing which paths are private, shared, or closed.
 
 ### [QST-001]
 
-**Issue:** `"location": "nam5"` appears in `firebase.json` but is not mentioned in the plan contract or decisions.
+**Issue:** `"location": "nam5"` is not in the plan’s decisions or contract. The Firebase CLI uses `location` only when a deploy creates a database that does not already exist; if the field is omitted, that create path defaults to `nam5`.
 
-**Suggestion:** Confirm whether this was added for deploy/CLI requirements or copy-paste from `firebase init`. If it is not required for emulator-only workflow, omit it to minimize config surface; if required, document it in `PLAN.md` under **Decisions**.
+**Suggestion:** Confirm that database `(default)` in `kws-hypomnema` is actually in `nam5`. If the database already exists, omit `location` so the file stays on the contract. If the field should stay, add one decision line in `PLAN.md` naming the region and why it is recorded.
 
-**Why:** Region/location in `firebase.json` affects provisioning expectations; unexplained fields tend to drift from team intent.
+**Why:** A wrong `location` does not move an existing database, but it documents a region the rest of the plan never agreed to, and a later create of a missing `(default)` database would use it.
