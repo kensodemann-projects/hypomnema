@@ -39,6 +39,26 @@ Phone and desktop are both required form factors. Run on a phone (a device or si
 
 Import UI widgets from `package:material_ui/material_ui.dart`.
 
+## Firestore rules
+
+`firestore.rules` is the source of truth for the `(default)` database in project `kws-hypomnema`. `firebase.json` points the emulator and deploy at that file. `make emulators` loads it, so a local debug run enforces the same rules as production.
+
+Edit `firestore.rules` in the repository. Do not edit the rules in the Firebase console. The next publish overwrites the console copy.
+
+Publish from the repository root after `firebase login`, with an account that can deploy rules to `kws-hypomnema`. This uses the same Firebase CLI as `make emulators`:
+
+```sh
+make publish-rules
+```
+
+`make publish-rules` runs `firebase deploy --only firestore:rules --project kws-hypomnema`.
+
+The rules allow this and nothing else:
+
+- A signed-in person can read and write `users/{their uid}` and every document under it.
+- Any signed-in person can read `prompts/{promptId}`. Clients cannot write prompts.
+- A signed-out person cannot read or write. Any other path is denied.
+
 ## Firebase on other platforms
 
 Firebase Auth and Firestore are connected for Android, macOS, and web. A Windows, Linux, or iOS build starts without calling Firebase. Adding Firebase on one of those targets takes the registration and app changes below.
