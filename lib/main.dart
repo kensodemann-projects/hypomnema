@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kDebugMode, kIsWeb;
 import 'package:hypomnema/data/services/auth_service.dart';
+import 'package:hypomnema/ui/app_theme.dart';
 import 'package:hypomnema/ui/auth/login_screen.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -38,8 +39,8 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
       home: _AuthGate(authService: authService),
     );
