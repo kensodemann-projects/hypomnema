@@ -49,7 +49,7 @@ service cloud.firestore {
 
 | Order | Step       | Status | Files          |
 | ----- | ---------- | ------ | -------------- |
-| 1     | [STEP-001] |        | `firebase.json` |
+| 1     | [STEP-001] | complete | `firebase.json` |
 
 **Commit gate**
 
@@ -64,7 +64,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Add the Firestore section and publish the console rules
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** `firebase.json` has the contract's top-level `firestore` section for database `(default)`. The `(default)` database in project `kws-hypomnema` has the contract's rules published. A signed-out person cannot read or write. A signed-in person can read and write only `users/{their uid}` and the documents under it, can read every `prompts/{promptId}` document, and cannot write prompts.
 
