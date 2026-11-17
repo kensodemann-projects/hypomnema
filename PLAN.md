@@ -50,7 +50,7 @@ Issue: [#19](https://github.com/kensodemann-projects/hypomnema/issues/19) (OPEN)
 
 | Order | Step | Status | Files |
 | ----- | ---- | ------ | ----- |
-| 1 | [STEP-001] | | `lib/ui/app_theme.dart`, then `lib/main.dart`, then `test/main_test.dart` |
+| 1 | [STEP-001] | complete | `lib/ui/app_theme.dart`, then `lib/main.dart`, then `test/main_test.dart` |
 
 ## Commit gate
 
@@ -65,7 +65,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Apply the indigo light and dark themes
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** `MainApp` uses the contract colors for light and dark, and platform brightness still selects which one is shown.
 
