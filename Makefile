@@ -1,4 +1,4 @@
-.PHONY: get format format-check analyze test check devices run emulators preview seed-data web
+.PHONY: get format format-check analyze test check devices run emulators preview seed-data web publish-rules
 
 get:
 	flutter pub get
@@ -25,6 +25,9 @@ run:
 
 emulators:
 	firebase emulators:start --only auth,firestore --import seed-data
+
+publish-rules:
+	firebase deploy --only firestore:rules --project kws-hypomnema
 
 preview:
 	flutter widget-preview start
