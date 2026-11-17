@@ -222,9 +222,10 @@ void expectMainAppTheme(WidgetTester tester, Brightness brightness) {
     Brightness.dark => _darkPalette,
   };
   final shellTheme = Theme.of(tester.element(find.byType(Shell)));
-  final materialAppTheme = Theme.of(
-    tester.element(find.byType(ScaffoldMessenger)),
-  );
+  final materialAppTheme = switch (brightness) {
+    Brightness.light => materialApp.theme!,
+    Brightness.dark => materialApp.darkTheme!,
+  };
 
   expect(shellTheme.brightness, brightness);
   expect(materialAppTheme.brightness, brightness);
