@@ -30,7 +30,7 @@
   },
   "firestore": {
     "database": "(default)",
-    "rules": "firestore.rules",
+    "rules": "firestore.rules"
   },
   "emulators": {
     "auth": {
