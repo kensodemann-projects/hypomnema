@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:flutter/widget_previews.dart';
 import 'package:hypomnema/data/services/auth_service.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -297,31 +296,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-class _PreviewAuthService implements AuthService {
-  const _PreviewAuthService();
-
-  @override
-  Future<void> signInWithEmailAndPassword({
-    required String email,
-    required String password,
-  }) async {}
-
-  @override
-  Future<void> sendPasswordResetEmail({required String email}) async {}
-
-  @override
-  Future<void> signOut() async {}
-
-  @override
-  Stream<bool> get signedIn => const Stream<bool>.empty();
-}
-
-@Preview(name: 'Login Screen - Phone', size: Size(400, 800))
-@Preview(name: 'Login Screen - Desktop', size: Size(1000, 700))
-Widget previewLoginScreen() => MaterialApp(
-  theme: ThemeData.light(),
-  darkTheme: ThemeData.dark(),
-  themeMode: ThemeMode.system,
-  home: const LoginScreen(authService: _PreviewAuthService()),
-);
