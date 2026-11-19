@@ -210,6 +210,7 @@ class _ConfirmationDialogPreviewState
       style: style,
       warning: warning,
     );
+    if (!mounted) return;
     setState(() {
       _result = confirmed ? 'Confirmed.' : 'Canceled.';
     });
