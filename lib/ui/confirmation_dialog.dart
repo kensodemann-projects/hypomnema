@@ -32,7 +32,7 @@ Future<bool> showConfirmationDialog({
   ).then((confirmed) => confirmed ?? false);
 }
 
-class ConfirmationDialog extends StatelessWidget {
+class ConfirmationDialog extends StatefulWidget {
   const ConfirmationDialog({
     required this.title,
     required this.message,
@@ -49,6 +49,19 @@ class ConfirmationDialog extends StatelessWidget {
   final String? warning;
 
   @override
+  State<ConfirmationDialog> createState() => _ConfirmationDialogState();
+}
+
+class _ConfirmationDialogState extends State<ConfirmationDialog> {
+  var _closed = false;
+
+  void _close(bool confirmed) {
+    if (_closed) return;
+    _closed = true;
+    Navigator.of(context).pop(confirmed);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -57,7 +70,7 @@ class ConfirmationDialog extends StatelessWidget {
         final titleSize = desktop ? 22.0 : 20.0;
         final gap = desktop ? 16.0 : 14.0;
         final colorScheme = Theme.of(context).colorScheme;
-        final warningText = warning;
+        final warningText = widget.warning;
 
         return AlertDialog(
           key: const Key('confirmation-dialog'),
@@ -67,7 +80,7 @@ class ConfirmationDialog extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(28)),
           ),
           title: Text(
-            title,
+            widget.title,
             key: const Key('confirmation-title'),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.w400),
@@ -77,7 +90,7 @@ class ConfirmationDialog extends StatelessWidget {
             spacing: gap,
             children: [
               Text(
-                message,
+                widget.message,
                 key: const Key('confirmation-message'),
                 style: TextStyle(
                   fontSize: 14,
@@ -92,14 +105,14 @@ class ConfirmationDialog extends StatelessWidget {
           actions: [
             TextButton(
               key: const Key('confirmation-cancel'),
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: () => _close(false),
               child: const Text('Cancel'),
             ),
             FilledButton(
               key: const Key('confirmation-confirm'),
               style: _confirmStyle(colorScheme),
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(confirmLabel),
+              onPressed: () => _close(true),
+              child: Text(widget.confirmLabel),
             ),
           ],
         );
@@ -108,7 +121,7 @@ class ConfirmationDialog extends StatelessWidget {
   }
 
   ButtonStyle _confirmStyle(ColorScheme colorScheme) {
-    return switch (style) {
+    return switch (widget.style) {
       ConfirmationStyle.normal => FilledButton.styleFrom(
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
