@@ -1,4 +1,4 @@
-.PHONY: get format format-check analyze test check devices run emulators preview seed-data web publish-rules
+.PHONY: get format format-check analyze test check devices dev emulators preview seed-data web publish-rules
 
 get:
 	flutter pub get
@@ -20,7 +20,7 @@ check: format-check analyze test
 devices:
 	flutter devices
 
-run:
+dev:
 	flutter run$(if $(DEVICE), -d $(DEVICE))
 
 emulators:
