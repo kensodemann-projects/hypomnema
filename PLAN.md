@@ -33,7 +33,7 @@ There is no shared confirmation dialog. `Shell.build` and `LoginScreen.build` bo
 
 | Order | Step       | Status | Files                                                                      |
 | ----- | ---------- | ------ | -------------------------------------------------------------------------- |
-| 1     | [STEP-001] |        | `lib/ui/confirmation_dialog.dart`, then `test/ui/confirmation_dialog_test.dart` |
+| 1     | [STEP-001] | complete | `lib/ui/confirmation_dialog.dart`, then `test/ui/confirmation_dialog_test.dart` |
 
 **Commit gate** — the human commits. A spot-check does not replace the gate. `make check` already runs `test`.
 
@@ -46,7 +46,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Add the shared confirmation dialog
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** The dialog shows a title, a message, Cancel, and a confirm action, plus a warning only when one is provided. Cancel closes it with `false`. The confirm action closes it with `true` in either the normal style or the danger style. Phone and desktop each use the contract layout.
 
