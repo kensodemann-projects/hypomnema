@@ -4,7 +4,7 @@ PR: https://github.com/kensodemann-projects/hypomnema/pull/25
 
 ## Summary
 
-This review covers the resulting diff of [PR #25](https://github.com/kensodemann-projects/hypomnema/pull/25): the shared confirmation dialog, its widget tests, the login-screen preview removal, and `PLAN.md`. Recommendation: request changes. The dialog follows the phone and desktop contract, and the tests lock copy, width, warning colors, and both confirm styles. CLN-001 is complete: `799b8b4` closes the dialog only once via `_close`. `PLAN.md` still says this change does not touch `LoginScreen`. The removed login previews and the nearest-navigator choice are open questions for how later actions will call this dialog.
+This review covers the resulting diff of [PR #25](https://github.com/kensodemann-projects/hypomnema/pull/25): the shared confirmation dialog, its widget tests, the login-screen preview removal, and `PLAN.md`. Recommendation: request changes. The dialog follows the phone and desktop contract, and the tests lock copy, width, warning colors, and both confirm styles. CLN-001 is complete: `799b8b4` closes the dialog only once via `_close`. CLN-002 is complete: `1652744` sets `scrollable: true` on `AlertDialog`. `PLAN.md` still says this change does not touch `LoginScreen`. The removed login previews and the nearest-navigator choice are open questions for how later actions will call this dialog.
 
 ## Finding counts
 
@@ -12,13 +12,13 @@ This review covers the resulting diff of [PR #25](https://github.com/kensodemann
 | ------------------------------------------ | ----: |
 | 🔒 Security concerns (immediate attention) |     0 |
 | ⚡ Performance issues/optimizations        |     0 |
-| 🧹 Code cleanup and maintainability        |     2 |
+| 🧹 Code cleanup and maintainability        |     1 |
 | 📚 Documentation gaps                      |     1 |
 | ✅ Positive feedback                       |     1 |
-| ✅ Resolved                                |     1 |
+| ✅ Resolved                                |     2 |
 | 🚨 Critical blockers                       |     0 |
 | 💭 Questions for discussion                |     2 |
-| **Total**                                  |     6 |
+| **Total**                                  |     5 |
 
 ## Findings
 
@@ -34,23 +34,17 @@ This review covers the resulting diff of [PR #25](https://github.com/kensodemann
 
 **Why:** This dialog is the shared gate for sign-out, delete, and archive. A second tap should leave the underlying page in place. The future should still complete once, with the first choice.
 
-### 🧹 Code cleanup and maintainability (open)
-
 [CLN-002]
 
-**Issue:** `AlertDialog` keeps the default `scrollable: false`. Title, message, warning, and actions share one column. A long message, a large text scale, or a short window overflows that column. The phone mock-up (`.p-dialog`) and the desktop mock-up (`.dialog`) both cap height and set `overflow-y: auto`.
+**Status:** Complete — verified in `1652744`. `AlertDialog` sets `scrollable: true` so title and content scroll while actions stay fixed, matching the review suggestion with no further CLN-002 work.
 
-**Suggestion:** Scroll the title and content, and keep the actions on screen:
+**Issue:** `AlertDialog` used the default `scrollable: false`, so a long message, large text scale, or short window could overflow the column.
 
-```dart
-return AlertDialog(
-  scrollable: true,
-  key: const Key('confirmation-dialog'),
-  // existing inset, shape, title, content, and actions
-);
-```
+**Suggestion:** Set `scrollable: true` on `AlertDialog`.
 
-**Why:** Callers pass arbitrary title, message, and warning strings. `scrollable: true` matches the mock-ups: the body moves, and Cancel and the confirm action stay reachable. The actions stay outside the scroll view in Flutter's `AlertDialog`.
+**Why:** Callers pass arbitrary title, message, and warning strings. Scrolling the body keeps Cancel and the confirm action reachable, consistent with the mock-ups.
+
+### 🧹 Code cleanup and maintainability (open)
 
 [CLN-003]
 
