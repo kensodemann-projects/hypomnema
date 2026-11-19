@@ -4,7 +4,7 @@ PR: https://github.com/kensodemann-projects/hypomnema/pull/25
 
 ## Summary
 
-This review covers the resulting diff of [PR #25](https://github.com/kensodemann-projects/hypomnema/pull/25): the shared confirmation dialog, its widget tests, the login-screen preview removal, and `PLAN.md`. Recommendation: request changes. The dialog follows the phone and desktop contract, and the tests lock copy, width, warning colors, and both confirm styles. The dismissal path can pop the route under the dialog on a second tap while the exit animation is still on screen, and `PLAN.md` still says this change does not touch `LoginScreen`. The removed login previews and the nearest-navigator choice are open questions for how later actions will call this dialog.
+This review covers the resulting diff of [PR #25](https://github.com/kensodemann-projects/hypomnema/pull/25): the shared confirmation dialog, its widget tests, the login-screen preview removal, and `PLAN.md`. Recommendation: request changes. The dialog follows the phone and desktop contract, and the tests lock copy, width, warning colors, and both confirm styles. CLN-001 is complete: `799b8b4` closes the dialog only once via `_close`. `PLAN.md` still says this change does not touch `LoginScreen`. The removed login previews and the nearest-navigator choice are open questions for how later actions will call this dialog.
 
 ## Finding counts
 
@@ -12,58 +12,29 @@ This review covers the resulting diff of [PR #25](https://github.com/kensodemann
 | ------------------------------------------ | ----: |
 | 🔒 Security concerns (immediate attention) |     0 |
 | ⚡ Performance issues/optimizations        |     0 |
-| 🧹 Code cleanup and maintainability        |     3 |
+| 🧹 Code cleanup and maintainability        |     2 |
 | 📚 Documentation gaps                      |     1 |
 | ✅ Positive feedback                       |     1 |
+| ✅ Resolved                                |     1 |
 | 🚨 Critical blockers                       |     0 |
 | 💭 Questions for discussion                |     2 |
-| **Total**                                  |     7 |
+| **Total**                                  |     6 |
 
 ## Findings
 
-### 🧹 Code cleanup and maintainability
+### ✅ Resolved
 
 [CLN-001]
 
-**Issue:** Cancel and confirm call `Navigator.pop` with no guard. After the first pop, Flutter moves that route to the `popping` lifecycle. The route stays visible for the exit animation, and it is no longer a present route. A second tap during that animation calls `Navigator.pop` again, and the navigator pops the route underneath. `showConfirmationDialog` has already completed with the first result, so the caller can proceed while the page below disappears.
+**Status:** Complete — verified in `799b8b4`. `ConfirmationDialog` is a `StatefulWidget` with `_closed` and `_close`; Cancel and confirm call `_close` instead of `Navigator.pop` directly.
 
-**Suggestion:** Close the dialog once. A `State` flag is enough:
+**Issue:** Cancel and confirm called `Navigator.pop` with no guard. After the first pop, Flutter moves that route to the `popping` lifecycle. The route stays visible for the exit animation, and it is no longer a present route. A second tap during that animation could call `Navigator.pop` again and pop the route underneath while `showConfirmationDialog` had already completed.
 
-```dart
-class ConfirmationDialog extends StatefulWidget {
-  const ConfirmationDialog({
-    required this.title,
-    required this.message,
-    required this.confirmLabel,
-    required this.style,
-    this.warning,
-    super.key,
-  });
-
-  final String title;
-  final String message;
-  final String confirmLabel;
-  final ConfirmationStyle style;
-  final String? warning;
-
-  @override
-  State<ConfirmationDialog> createState() => _ConfirmationDialogState();
-}
-
-class _ConfirmationDialogState extends State<ConfirmationDialog> {
-  var _closed = false;
-
-  void _close(bool confirmed) {
-    if (_closed) return;
-    _closed = true;
-    Navigator.of(context).pop(confirmed);
-  }
-
-  // Pass _close(false) to Cancel and _close(true) to confirm.
-}
-```
+**Suggestion:** Close the dialog once with a `State` flag and wire Cancel and confirm through `_close`.
 
 **Why:** This dialog is the shared gate for sign-out, delete, and archive. A second tap should leave the underlying page in place. The future should still complete once, with the first choice.
+
+### 🧹 Code cleanup and maintainability (open)
 
 [CLN-002]
 
