@@ -18,18 +18,18 @@ From the repository root:
 make get
 ```
 
-## Run
+## Dev
 
 List devices, then run on one of them:
 
 ```sh
 make devices
-make run DEVICE=<device>
+make dev DEVICE=<device>
 ```
 
-`make run` with no `DEVICE` is `flutter run`.
+`make dev` with no `DEVICE` is `flutter run`.
 
-Local debug runs on Android, macOS, and Chrome use the Firebase Auth and Firestore emulators. Start them from the repository root before `make run`:
+Local debug runs on Android, macOS, and Chrome use the Firebase Auth and Firestore emulators. Start them from the repository root before `make dev`:
 
 ```sh
 make emulators
