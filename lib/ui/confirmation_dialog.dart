@@ -19,6 +19,7 @@ Future<bool> showConfirmationDialog({
 }) {
   return showDialog<bool>(
     context: context,
+    useRootNavigator: false,
     builder: (context) {
       return ConfirmationDialog(
         title: title,

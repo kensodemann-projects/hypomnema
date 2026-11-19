@@ -216,6 +216,61 @@ void main() {
   );
 
   testWidgets(
+    'Given a MaterialApp nested under another navigator, when the dialog opens, then the dialog is shown',
+    (tester) async {
+      setLogicalViewportSize(tester, const Size(400, 800));
+      late Future<bool> result;
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Navigator(
+            onGenerateRoute: (settings) {
+              return MaterialPageRoute<void>(
+                settings: settings,
+                builder: (context) {
+                  return MaterialApp(
+                    theme: AppTheme.light,
+                    home: Builder(
+                      builder: (context) {
+                        return Scaffold(
+                          body: TextButton(
+                            onPressed: () {
+                              result = showConfirmationDialog(
+                                context: context,
+                                title: _title,
+                                message: _message,
+                                confirmLabel: _confirmLabel,
+                                style: ConfirmationStyle.normal,
+                              );
+                            },
+                            child: const Text('Open'),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(_title), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('confirmation-cancel')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('confirmation-dialog')), findsNothing);
+      expect(await result, isFalse);
+    },
+  );
+
+  testWidgets(
     'Given the danger style, when confirm is tapped, then the dialog closes with true and the error colors',
     (tester) async {
       final result = await openDialog(
