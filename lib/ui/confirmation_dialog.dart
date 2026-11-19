@@ -73,6 +73,7 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
         final warningText = widget.warning;
 
         return AlertDialog(
+          scrollable: true,
           key: const Key('confirmation-dialog'),
           insetPadding: const EdgeInsets.all(24),
           constraints: BoxConstraints.tightFor(width: width),
