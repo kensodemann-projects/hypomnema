@@ -1,5 +1,35 @@
 import 'package:material_ui/material_ui.dart';
 
+class AppColors extends ThemeExtension<AppColors> {
+  const AppColors({required this.warning, required this.warningContainer});
+
+  final Color warning;
+  final Color warningContainer;
+
+  @override
+  AppColors copyWith({Color? warning, Color? warningContainer}) {
+    return AppColors(
+      warning: warning ?? this.warning,
+      warningContainer: warningContainer ?? this.warningContainer,
+    );
+  }
+
+  @override
+  AppColors lerp(ThemeExtension<AppColors>? other, double t) {
+    if (other is! AppColors) {
+      return this;
+    }
+    return AppColors(
+      warning: Color.lerp(warning, other.warning, t)!,
+      warningContainer: Color.lerp(
+        warningContainer,
+        other.warningContainer,
+        t,
+      )!,
+    );
+  }
+}
+
 class AppTheme {
   static ThemeData get light {
     const primary = Color(0xFF4A55C8);
@@ -30,6 +60,12 @@ class AppTheme {
         scrim: Color(0x61000000),
       ),
       scaffoldBackgroundColor: const Color(0xFFF4F4FA),
+      extensions: const [
+        AppColors(
+          warning: Color(0xFF8A5000),
+          warningContainer: Color(0xFFFFDDB3),
+        ),
+      ],
     );
   }
 
@@ -62,6 +98,12 @@ class AppTheme {
         scrim: Color(0x99000000),
       ),
       scaffoldBackgroundColor: const Color(0xFF131318),
+      extensions: const [
+        AppColors(
+          warning: Color(0xFFFFB86B),
+          warningContainer: Color(0xFF6A3C00),
+        ),
+      ],
     );
   }
 }

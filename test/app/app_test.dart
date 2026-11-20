@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/app/app.dart';
 import 'package:hypomnema/app/shell.dart';
+import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -107,6 +108,8 @@ class _ContractPalette {
     required this.onErrorContainer,
     required this.scrim,
     required this.scaffoldBackgroundColor,
+    required this.warning,
+    required this.warningContainer,
   });
 
   final Color primary;
@@ -131,6 +134,8 @@ class _ContractPalette {
   final Color onErrorContainer;
   final Color scrim;
   final Color scaffoldBackgroundColor;
+  final Color warning;
+  final Color warningContainer;
 }
 
 const _lightPalette = _ContractPalette(
@@ -156,6 +161,8 @@ const _lightPalette = _ContractPalette(
   onErrorContainer: Color(0xFF410002),
   scrim: Color(0x61000000),
   scaffoldBackgroundColor: Color(0xFFF4F4FA),
+  warning: Color(0xFF8A5000),
+  warningContainer: Color(0xFFFFDDB3),
 );
 
 const _darkPalette = _ContractPalette(
@@ -181,6 +188,8 @@ const _darkPalette = _ContractPalette(
   onErrorContainer: Color(0xFFFFDAD6),
   scrim: Color(0x99000000),
   scaffoldBackgroundColor: Color(0xFF131318),
+  warning: Color(0xFFFFB86B),
+  warningContainer: Color(0xFF6A3C00),
 );
 
 void _expectContractColors(ThemeData theme, _ContractPalette palette) {
@@ -207,6 +216,9 @@ void _expectContractColors(ThemeData theme, _ContractPalette palette) {
   expect(scheme.onErrorContainer, palette.onErrorContainer);
   expect(scheme.scrim, palette.scrim);
   expect(theme.scaffoldBackgroundColor, palette.scaffoldBackgroundColor);
+  final colors = theme.extension<AppColors>()!;
+  expect(colors.warning, palette.warning);
+  expect(colors.warningContainer, palette.warningContainer);
 }
 
 void expectMainAppTheme(WidgetTester tester, Brightness brightness) {

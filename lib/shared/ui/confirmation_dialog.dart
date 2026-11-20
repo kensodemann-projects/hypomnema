@@ -4,11 +4,6 @@ import 'package:material_ui/material_ui.dart';
 
 enum ConfirmationStyle { normal, danger }
 
-const _lightWarning = Color(0xFF8A5000);
-const _lightWarningContainer = Color(0xFFFFDDB3);
-const _darkWarning = Color(0xFFFFB86B);
-const _darkWarningContainer = Color(0xFF6A3C00);
-
 Future<bool> showConfirmationDialog({
   required BuildContext context,
   required String title,
@@ -142,10 +137,9 @@ class _WarningBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (foreground, background) = switch (Theme.of(context).brightness) {
-      Brightness.light => (_lightWarning, _lightWarningContainer),
-      Brightness.dark => (_darkWarning, _darkWarningContainer),
-    };
+    final colors = Theme.of(context).extension<AppColors>()!;
+    final foreground = colors.warning;
+    final background = colors.warningContainer;
 
     return DecoratedBox(
       key: const Key('confirmation-warning'),

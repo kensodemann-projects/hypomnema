@@ -134,10 +134,11 @@ void main() {
       );
 
       expect(find.text(_warning), findsOneWidget);
+      final colors = AppTheme.light.extension<AppColors>()!;
       expectBannerColors(
         tester,
-        background: const Color(0xFFFFDDB3),
-        foreground: const Color(0xFF8A5000),
+        background: colors.warningContainer,
+        foreground: colors.warning,
       );
     },
   );
@@ -153,10 +154,11 @@ void main() {
       );
 
       expect(find.text(_warning), findsOneWidget);
+      final colors = AppTheme.dark.extension<AppColors>()!;
       expectBannerColors(
         tester,
-        background: const Color(0xFF6A3C00),
-        foreground: const Color(0xFFFFB86B),
+        background: colors.warningContainer,
+        foreground: colors.warning,
       );
     },
   );
