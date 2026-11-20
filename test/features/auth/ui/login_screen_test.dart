@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:hypomnema/features/auth/ui/login_screen.dart';
 import 'package:material_ui/material_ui.dart';
@@ -49,14 +50,29 @@ class _RecordingAuthService implements AuthService {
   Stream<bool> get signedIn => const Stream<bool>.empty();
 }
 
+const _desktopQuote =
+    'A note kept so it can be found again: a reminder, a memorandum, '
+    'a short record of something worth remembering.';
+
+const _phoneQuote = 'A note kept so it can be found again.';
+
+const _accountLine = 'Use the account you were given.';
+
+const _noSignUpLine = 'Accounts are created for you. There is no sign-up.';
+
 Future<void> pumpLoginScreen(
   WidgetTester tester, {
   required AuthService authService,
   required Size size,
+  ThemeData? theme,
 }) async {
   setLogicalViewportSize(tester, size);
   await tester.pumpWidget(
-    MaterialApp(home: LoginScreen(authService: authService)),
+    MaterialApp(
+      theme: theme ?? AppTheme.light,
+      themeAnimationStyle: AnimationStyle.noAnimation,
+      home: LoginScreen(authService: authService),
+    ),
   );
 }
 
@@ -82,44 +98,107 @@ Color textColor(WidgetTester tester, String text) {
 
 void main() {
   testWidgets(
-    'Given a phone width, when the login screen builds, then the column has no card',
+    'Given a phone width, when the login screen builds, then the brand stacks above the form',
     (tester) async {
       for (final width in [400.0, 600.0]) {
-        // Given, when
-        await pumpLoginScreen(
-          tester,
-          authService: _RecordingAuthService(),
-          size: Size(width, 800),
-        );
+        for (final theme in [AppTheme.light, AppTheme.dark]) {
+          // Given, when
+          await pumpLoginScreen(
+            tester,
+            authService: _RecordingAuthService(),
+            size: Size(width, 800),
+            theme: theme,
+          );
 
-        // Then
-        expect(find.byKey(const Key('login-form-card')), findsNothing);
+          // Then
+          expect(find.byKey(const Key('login-brand')), findsNothing);
+          expect(find.byKey(const Key('login-heading')), findsNothing);
+          expect(find.text(_desktopQuote), findsNothing);
+          expect(find.text(_accountLine), findsNothing);
+          expect(find.text('Hypomnema'), findsOneWidget);
+          expect(
+            tester.widget<Text>(find.text('Hypomnema')).style?.fontSize,
+            28,
+          );
+          expect(find.text(_phoneQuote), findsOneWidget);
+          final quote = tester.widget<Text>(find.text(_phoneQuote));
+          expect(quote.style?.fontSize, 15);
+          expect(quote.style?.fontStyle, FontStyle.italic);
+          expect(quote.style?.color, theme.colorScheme.onSurfaceVariant);
+          expect(find.text(_noSignUpLine), findsOneWidget);
+          expect(
+            tester.getSize(find.byKey(const Key('login-logo'))),
+            const Size(72, 72),
+          );
+          expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
+        }
       }
     },
   );
 
   testWidgets(
-    'Given a desktop width, when the login screen builds, then the form sits in a card',
+    'Given a desktop width, when the login screen builds, then the brand panel sits beside the form',
     (tester) async {
       for (final width in [601.0, 1200.0]) {
-        // Given, when
-        await pumpLoginScreen(
-          tester,
-          authService: _RecordingAuthService(),
-          size: Size(width, 800),
-        );
+        for (final theme in [AppTheme.light, AppTheme.dark]) {
+          // Given, when
+          await pumpLoginScreen(
+            tester,
+            authService: _RecordingAuthService(),
+            size: Size(width, 800),
+            theme: theme,
+          );
 
-        // Then
-        expect(find.byKey(const Key('login-form-card')), findsOneWidget);
-        final box = tester.widget<ConstrainedBox>(
-          find
-              .ancestor(
-                of: find.byKey(const Key('login-form-card')),
-                matching: find.byType(ConstrainedBox),
-              )
-              .first,
-        );
-        expect(box.constraints.maxWidth, 400);
+          // Then
+          expect(find.text(_phoneQuote), findsNothing);
+          expect(find.text(_noSignUpLine), findsNothing);
+          expect(find.text(_desktopQuote), findsOneWidget);
+          final quote = tester.widget<Text>(find.text(_desktopQuote));
+          expect(quote.style?.fontSize, 18);
+          expect(quote.style?.fontStyle, FontStyle.italic);
+          expect(
+            quote.style?.color,
+            const Color(0xFFFFFFFF).withValues(alpha: 0.85),
+          );
+          final name = tester.widget<Text>(find.text('Hypomnema'));
+          expect(name.style?.fontSize, 40);
+          expect(name.style?.color, const Color(0xFFFFFFFF));
+          expect(find.text(_accountLine), findsOneWidget);
+          final heading = tester.widget<Text>(
+            find.byKey(const Key('login-heading')),
+          );
+          expect(heading.data, 'Sign in');
+          expect(heading.style?.fontSize, 26);
+          expect(
+            tester.getSize(find.byKey(const Key('login-logo'))),
+            const Size(72, 72),
+          );
+          expect(
+            tester.getSize(find.byKey(const Key('login-form-side'))).width,
+            520,
+          );
+          expect(
+            tester
+                .widget<ConstrainedBox>(
+                  find.byKey(const Key('login-form-column')),
+                )
+                .constraints
+                .maxWidth,
+            360,
+          );
+          final brand = tester.widget<DecoratedBox>(
+            find.byKey(const Key('login-brand')),
+          );
+          final gradient =
+              (brand.decoration as BoxDecoration).gradient! as LinearGradient;
+          expect(
+            gradient.colors,
+            theme.brightness == Brightness.light
+                ? const [Color(0xFF4A55C8), Color(0xFF2E3694)]
+                : const [Color(0xFF2B3290), Color(0xFF151A55)],
+          );
+          expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
+        }
       }
     },
   );
