@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:hypomnema/data/services/auth_service.dart';
+import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:material_ui/material_ui.dart';
 
 final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');

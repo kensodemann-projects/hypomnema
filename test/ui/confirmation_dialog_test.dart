@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hypomnema/ui/app_theme.dart';
-import 'package:hypomnema/ui/confirmation_dialog.dart';
+import 'package:hypomnema/core/theme/app_theme.dart';
+import 'package:hypomnema/shared/ui/confirmation_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 
 const _title = 'Delete this goal?';

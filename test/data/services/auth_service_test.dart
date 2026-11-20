@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hypomnema/data/services/auth_service.dart';
+import 'package:hypomnema/features/auth/data/auth_service.dart';
 
 class _FakeUserCredential implements UserCredential {
   @override
