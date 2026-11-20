@@ -56,6 +56,10 @@ const _desktopQuote =
 
 const _phoneQuote = 'A note kept so it can be found again.';
 
+const _resetSentMessage = 'Check your email for a password reset link.';
+
+const _resetFailedMessage = 'A reset link could not be sent. Try again.';
+
 Future<void> pumpLoginScreen(
   WidgetTester tester, {
   required AuthService authService,
@@ -65,6 +69,7 @@ Future<void> pumpLoginScreen(
   setLogicalViewportSize(tester, size);
   await tester.pumpWidget(
     MaterialApp(
+      key: ValueKey(theme?.brightness),
       theme: theme ?? AppTheme.light,
       themeAnimationStyle: AnimationStyle.noAnimation,
       home: LoginScreen(authService: authService),
@@ -74,6 +79,42 @@ Future<void> pumpLoginScreen(
 
 FilledButton signInButton(WidgetTester tester) {
   return tester.widget<FilledButton>(find.byKey(const Key('login-sign-in')));
+}
+
+TextButton forgotPasswordButton(WidgetTester tester) {
+  return tester.widget<TextButton>(
+    find.byKey(const Key('login-forgot-password')),
+  );
+}
+
+SnackBar snackBarOf(WidgetTester tester) {
+  return tester.widget<SnackBar>(find.byType(SnackBar));
+}
+
+void expectErrorSnackBar(WidgetTester tester, String message) {
+  final scheme = Theme.of(tester.element(find.byType(LoginScreen))).colorScheme;
+  expect(find.text(message), findsOneWidget);
+  expect(snackBarOf(tester).backgroundColor, scheme.errorContainer);
+  expect(tester.widget<Text>(find.text(message)).style?.color, scheme.error);
+}
+
+void expectInfoSnackBar(
+  WidgetTester tester, {
+  required Color background,
+  required Color foreground,
+}) {
+  expect(find.text(_resetSentMessage), findsOneWidget);
+  expect(snackBarOf(tester).backgroundColor, background);
+  expect(
+    tester.widget<Text>(find.text(_resetSentMessage)).style?.color,
+    foreground,
+  );
+}
+
+Future<void> dismissSnackBar(WidgetTester tester) async {
+  await tester.pumpAndSettle();
+  await tester.pump(const Duration(seconds: 4));
+  await tester.pumpAndSettle();
 }
 
 TextField textField(WidgetTester tester, String key) {
@@ -335,7 +376,7 @@ void main() {
         (email: 'person@example.com', password: ' secret '),
         (email: 'second@example.com', password: 'other-password'),
       ]);
-      expect(find.byKey(const Key('login-error')), findsNothing);
+      expect(find.byType(SnackBar), findsNothing);
       expect(
         find.text('Check your email for a password reset link.'),
         findsNothing,
@@ -433,8 +474,11 @@ void main() {
       await tester.pump();
 
       // Then
-      expect(find.byKey(const Key('login-error')), findsOneWidget);
-      expect(find.text('Authentication failed.'), findsOneWidget);
+      expectErrorSnackBar(tester, 'Authentication failed.');
+
+      await dismissSnackBar(tester);
+      expect(find.text('Authentication failed.'), findsNothing);
+      expect(find.byType(SnackBar), findsNothing);
     },
   );
 
@@ -476,197 +520,108 @@ void main() {
   );
 
   testWidgets(
-    'Given the sign-in form, when the user enters an empty, invalid, or valid email, then Forgot password is enabled only for a valid email',
+    'Given the sign-in screen, when it first builds, then no reset message is shown',
     (tester) async {
-      // Given
+      // Given, when
       await pumpLoginScreen(
         tester,
         authService: _RecordingAuthService(),
+        size: const Size(400, 800),
+      );
+
+      // Then
+      expect(find.byType(SnackBar), findsNothing);
+      expect(find.text(_resetSentMessage), findsNothing);
+      expect(find.byKey(const Key('login-password')), findsOneWidget);
+      expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
+      expect(find.byKey(const Key('login-forgot-password')), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'Given an empty or malformed email, when Forgot password is tapped, then the email helper is shown and no reset is sent',
+    (tester) async {
+      // Given
+      final auth = _RecordingAuthService();
+      await pumpLoginScreen(
+        tester,
+        authService: auth,
         size: const Size(400, 800),
       );
       final forgot = find.byKey(const Key('login-forgot-password'));
-
-      // Then
-      expect(tester.widget<TextButton>(forgot).onPressed, isNull);
-
-      // When
-      await tester.enterText(find.byKey(const Key('login-email')), 'person');
-      await tester.pump();
-
-      // Then
-      expect(tester.widget<TextButton>(forgot).onPressed, isNull);
-
-      // When
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        'person@example.com',
-      );
-      await tester.pump();
-
-      // Then
       expect(tester.widget<TextButton>(forgot).onPressed, isNotNull);
-    },
-  );
-
-  testWidgets(
-    'Given a valid email, when Forgot password is tapped, then the reset form keeps that email',
-    (tester) async {
-      // Given
-      await pumpLoginScreen(
-        tester,
-        authService: _RecordingAuthService(),
-        size: const Size(400, 800),
-      );
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        'person@example.com',
-      );
-      await tester.pump();
 
       // When
-      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.tap(forgot);
       await tester.pump();
 
       // Then
-      expect(find.byKey(const Key('login-password')), findsNothing);
-      expect(find.byKey(const Key('login-sign-in')), findsNothing);
       expect(
-        tester
-            .widget<TextField>(find.byKey(const Key('login-email')))
-            .controller
-            ?.text,
-        'person@example.com',
+        textField(tester, 'login-email').decoration?.errorText,
+        'Email is required.',
       );
-      expect(find.byKey(const Key('login-send-reset')), findsOneWidget);
-      expect(find.byKey(const Key('login-back-to-sign-in')), findsOneWidget);
-    },
-  );
-
-  testWidgets(
-    'Given the reset form, when the user clears the email or enters an invalid email, then Send reset email stays disabled, and when the user enters a valid email, then Send reset email is enabled',
-    (tester) async {
-      // Given
-      final auth = _RecordingAuthService();
-      await pumpLoginScreen(
-        tester,
-        authService: auth,
-        size: const Size(400, 800),
-      );
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        'person@example.com',
-      );
-      await tester.pump();
-      await tester.tap(find.byKey(const Key('login-forgot-password')));
-      await tester.pump();
-      final send = find.byKey(const Key('login-send-reset'));
-      expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
-
-      // When
-      await tester.enterText(find.byKey(const Key('login-email')), '');
-      await tester.pump();
-
-      // Then
-      expect(tester.widget<FilledButton>(send).onPressed, isNull);
+      expect(find.byType(SnackBar), findsNothing);
+      expect(auth.resetCalls, isEmpty);
 
       // When
       await tester.enterText(find.byKey(const Key('login-email')), 'person');
       await tester.pump();
-
-      // Then
-      expect(tester.widget<FilledButton>(send).onPressed, isNull);
-      expect(auth.resetCalls, isEmpty);
-
-      // When
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        'person@example.com',
-      );
+      expect(tester.widget<TextButton>(forgot).onPressed, isNotNull);
+      await tester.tap(forgot);
       await tester.pump();
 
       // Then
-      expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
-    },
-  );
-
-  testWidgets(
-    'Given the reset form, when the user presses Enter on an invalid email, then no reset email is sent, and when the user presses Enter on a valid email, then the trimmed address is sent',
-    (tester) async {
-      // Given
-      final auth = _RecordingAuthService();
-      await pumpLoginScreen(
-        tester,
-        authService: auth,
-        size: const Size(400, 800),
-      );
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        'person@example.com',
-      );
-      await tester.pump();
-      await tester.tap(find.byKey(const Key('login-forgot-password')));
-      await tester.pump();
       expect(
-        textField(tester, 'login-email').textInputAction,
-        TextInputAction.done,
+        textField(tester, 'login-email').decoration?.errorText,
+        'Enter a valid email address.',
       );
-
-      // When
-      await tester.enterText(find.byKey(const Key('login-email')), 'person');
-      await tester.testTextInput.receiveAction(TextInputAction.done);
-      await tester.pump();
-
-      // Then
+      expect(find.byType(SnackBar), findsNothing);
       expect(auth.resetCalls, isEmpty);
-
-      // When
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        ' person@example.com ',
-      );
-      await tester.testTextInput.receiveAction(TextInputAction.done);
-      await tester.pump();
-
-      // Then
-      expect(auth.resetCalls, ['person@example.com']);
     },
   );
 
   testWidgets(
-    'Given an email with surrounding spaces on the reset form, when the user taps Send reset email, then the trimmed email is forwarded and the confirmation is shown',
+    'Given a valid email with surrounding spaces, when Forgot password is tapped, then the trimmed email is sent and the info snackbar is shown',
     (tester) async {
-      // Given
-      final auth = _RecordingAuthService();
-      await pumpLoginScreen(
-        tester,
-        authService: auth,
-        size: const Size(400, 800),
-      );
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        ' person@example.com ',
-      );
-      await tester.pump();
-      await tester.tap(find.byKey(const Key('login-forgot-password')));
-      await tester.pump();
+      for (final theme in [AppTheme.light, AppTheme.dark]) {
+        // Given
+        final auth = _RecordingAuthService();
+        await pumpLoginScreen(
+          tester,
+          authService: auth,
+          size: const Size(400, 800),
+          theme: theme,
+        );
+        await tester.enterText(
+          find.byKey(const Key('login-email')),
+          ' person@example.com ',
+        );
+        await tester.pump();
 
-      // When
-      await tester.tap(find.byKey(const Key('login-send-reset')));
-      await tester.pump();
+        // When
+        await tester.tap(find.byKey(const Key('login-forgot-password')));
+        await tester.pump();
 
-      // Then
-      expect(auth.resetCalls, ['person@example.com']);
-      expect(find.byKey(const Key('login-reset-confirmation')), findsOneWidget);
-      expect(
-        find.text('Check your email for a password reset link.'),
-        findsOneWidget,
-      );
-      expect(find.byKey(const Key('login-error')), findsNothing);
+        // Then
+        expect(auth.resetCalls, ['person@example.com']);
+        expect(find.byKey(const Key('login-password')), findsOneWidget);
+        expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
+        expect(find.byKey(const Key('login-forgot-password')), findsOneWidget);
+        expectInfoSnackBar(
+          tester,
+          background: theme.brightness == Brightness.light
+              ? const Color(0xFFD4E3FF)
+              : const Color(0xFF00468A),
+          foreground: theme.brightness == Brightness.light
+              ? const Color(0xFF0C5DA8)
+              : const Color(0xFFA5C8FF),
+        );
+      }
     },
   );
 
   testWidgets(
-    'Given the auth service throws an AuthException, when the user taps Send reset email, then an error message is shown and the confirmation is hidden',
+    'Given the auth service throws an AuthException, when Forgot password is tapped, then the reset failure snackbar is shown and then dismissed',
     (tester) async {
       // Given
       final auth = _RecordingAuthService()..error = const AuthException();
@@ -680,21 +635,25 @@ void main() {
         'person@example.com',
       );
       await tester.pump();
+
+      // When
       await tester.tap(find.byKey(const Key('login-forgot-password')));
       await tester.pump();
 
-      // When
-      await tester.tap(find.byKey(const Key('login-send-reset')));
-      await tester.pump();
-
       // Then
-      expect(find.text('Failed to send password reset email.'), findsOneWidget);
-      expect(find.byKey(const Key('login-reset-confirmation')), findsNothing);
+      expectErrorSnackBar(tester, _resetFailedMessage);
+      expect(find.text(_resetSentMessage), findsNothing);
+      expect(find.byKey(const Key('login-password')), findsOneWidget);
+      expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
+
+      await dismissSnackBar(tester);
+      expect(find.text(_resetFailedMessage), findsNothing);
+      expect(find.byType(SnackBar), findsNothing);
     },
   );
 
   testWidgets(
-    'Given the auth service has not completed the password reset, when the user taps Send reset email, then Back to sign in is disabled, and when the call completes, then Back to sign in is enabled',
+    'Given the reset call has not completed, when Forgot password is tapped, then Sign in and Forgot password stay disabled until it finishes',
     (tester) async {
       // Given
       final auth = _RecordingAuthService()..pending = Completer<void>();
@@ -707,63 +666,23 @@ void main() {
         find.byKey(const Key('login-email')),
         'person@example.com',
       );
-      await tester.pump();
-      await tester.tap(find.byKey(const Key('login-forgot-password')));
+      await tester.enterText(find.byKey(const Key('login-password')), 'secret');
       await tester.pump();
 
       // When
-      await tester.tap(find.byKey(const Key('login-send-reset')));
+      await tester.tap(find.byKey(const Key('login-forgot-password')));
       await tester.pump();
 
       // Then
-      expect(
-        tester
-            .widget<TextButton>(find.byKey(const Key('login-back-to-sign-in')))
-            .onPressed,
-        isNull,
-      );
-
-      await tester.tap(find.byKey(const Key('login-back-to-sign-in')));
-      await tester.pump();
+      expect(signInButton(tester).onPressed, isNull);
+      expect(forgotPasswordButton(tester).onPressed, isNull);
+      expect(auth.resetCalls, ['person@example.com']);
+      expect(find.byType(SnackBar), findsNothing);
 
       auth.pending!.complete();
       await tester.pump();
-      expect(
-        tester
-            .widget<TextButton>(find.byKey(const Key('login-back-to-sign-in')))
-            .onPressed,
-        isNotNull,
-      );
-    },
-  );
-
-  testWidgets(
-    'Given the reset form, when Back to sign in is tapped, then the password field returns without an error',
-    (tester) async {
-      // Given
-      await pumpLoginScreen(
-        tester,
-        authService: _RecordingAuthService(),
-        size: const Size(400, 800),
-      );
-      await tester.enterText(
-        find.byKey(const Key('login-email')),
-        'person@example.com',
-      );
-      await tester.pump();
-      await tester.tap(find.byKey(const Key('login-forgot-password')));
-      await tester.pump();
-
-      // When
-      await tester.tap(find.byKey(const Key('login-back-to-sign-in')));
-      await tester.pump();
-
-      // Then
-      expect(textField(tester, 'login-password').decoration?.errorText, isNull);
-      expect(signInButton(tester).onPressed, isNull);
-      await tester.enterText(find.byKey(const Key('login-password')), 'secret');
-      await tester.pump();
       expect(signInButton(tester).onPressed, isNotNull);
+      expect(forgotPasswordButton(tester).onPressed, isNotNull);
     },
   );
 }

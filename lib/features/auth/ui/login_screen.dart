@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:hypomnema/features/auth/ui/hypomnema_logo.dart';
@@ -49,6 +47,15 @@ const _darkBrandGradient = LinearGradient(
   colors: [Color(0xFF2B3290), Color(0xFF151A55)],
 );
 
+const _resetSentMessage = 'Check your email for a password reset link.';
+const _resetFailedMessage = 'A reset link could not be sent. Try again.';
+const _signInFailedMessage = 'Authentication failed.';
+
+const _lightInfo = Color(0xFF0C5DA8);
+const _lightInfoContainer = Color(0xFFD4E3FF);
+const _darkInfo = Color(0xFFA5C8FF);
+const _darkInfoContainer = Color(0xFF00468A);
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({required this.authService, super.key});
 
@@ -66,10 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String? _emailError;
   String? _passwordError;
-  String? _authError;
-  String? _confirmation;
   var _submitting = false;
-  var _resettingPassword = false;
 
   bool get _emailIsValid =>
       _emailValidationError(_emailController.text) == null;
@@ -78,8 +82,6 @@ class _LoginScreenState extends State<LoginScreen> {
       !_submitting &&
       _emailIsValid &&
       _passwordValidationError(_passwordController.text) == null;
-
-  bool get _canResetPassword => !_submitting && _emailIsValid;
 
   @override
   void initState() {
@@ -116,10 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signIn() async {
-    setState(() {
-      _submitting = true;
-      _authError = null;
-    });
+    setState(() => _submitting = true);
     try {
       await widget.authService.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -130,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) {
         return;
       }
-      setState(() => _authError = 'Authentication failed.');
+      _showErrorSnackBar(_signInFailedMessage);
     } finally {
       if (mounted) {
         setState(() => _submitting = false);
@@ -138,31 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _showResetForm() {
-    setState(() {
-      _resettingPassword = true;
-      _authError = null;
-      _confirmation = null;
-      _passwordError = null;
-    });
-  }
-
-  void _showSignInForm() {
-    setState(() {
-      _resettingPassword = false;
-      _authError = null;
-      _confirmation = null;
-      _passwordError = null;
-    });
-  }
-
   void _submitEmailField(String _) {
-    if (_resettingPassword) {
-      if (_canResetPassword) {
-        _sendResetEmail();
-      }
-      return;
-    }
     _passwordFocus.requestFocus();
   }
 
@@ -172,12 +147,13 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _sendResetEmail() async {
-    setState(() {
-      _submitting = true;
-      _authError = null;
-      _confirmation = null;
-    });
+  Future<void> _forgotPassword() async {
+    final emailError = _emailValidationError(_emailController.text);
+    if (emailError != null) {
+      setState(() => _emailError = emailError);
+      return;
+    }
+    setState(() => _submitting = true);
     try {
       await widget.authService.sendPasswordResetEmail(
         email: _emailController.text.trim(),
@@ -185,19 +161,48 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) {
         return;
       }
-      setState(
-        () => _confirmation = 'Check your email for a password reset link.',
-      );
+      _showInfoSnackBar(_resetSentMessage);
     } on AuthException {
       if (!mounted) {
         return;
       }
-      setState(() => _authError = 'Failed to send password reset email.');
+      _showErrorSnackBar(_resetFailedMessage);
     } finally {
       if (mounted) {
         setState(() => _submitting = false);
       }
     }
+  }
+
+  void _showInfoSnackBar(String message) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    _showSnackBar(
+      message: message,
+      background: dark ? _darkInfoContainer : _lightInfoContainer,
+      foreground: dark ? _darkInfo : _lightInfo,
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    final scheme = Theme.of(context).colorScheme;
+    _showSnackBar(
+      message: message,
+      background: scheme.errorContainer,
+      foreground: scheme.error,
+    );
+  }
+
+  void _showSnackBar({
+    required String message,
+    required Color background,
+    required Color foreground,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: background,
+        content: Text(message, style: TextStyle(color: foreground)),
+      ),
+    );
   }
 
   Widget _emailField() {
@@ -206,31 +211,12 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: _emailController,
       focusNode: _emailFocus,
       keyboardType: TextInputType.emailAddress,
-      textInputAction: _resettingPassword
-          ? TextInputAction.done
-          : TextInputAction.next,
+      textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.email],
       decoration: InputDecoration(labelText: 'Email', errorText: _emailError),
       onChanged: (_) => setState(() => _emailError = null),
       onSubmitted: _submitEmailField,
     );
-  }
-
-  List<Widget> _feedback() {
-    return [
-      if (_authError != null) ...[
-        const SizedBox(height: 16),
-        Text(
-          _authError!,
-          key: const Key('login-error'),
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
-        ),
-      ],
-      if (_confirmation != null) ...[
-        const SizedBox(height: 16),
-        Text(_confirmation!, key: const Key('login-reset-confirmation')),
-      ],
-    ];
   }
 
   Widget _form() {
@@ -240,50 +226,33 @@ class _LoginScreenState extends State<LoginScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _emailField(),
-          if (_resettingPassword) ...[
-            ..._feedback(),
-            const SizedBox(height: 24),
-            FilledButton(
-              key: const Key('login-send-reset'),
-              onPressed: _canResetPassword ? _sendResetEmail : null,
-              child: const Text('Send reset email'),
+          const SizedBox(height: 16),
+          TextField(
+            key: const Key('login-password'),
+            controller: _passwordController,
+            focusNode: _passwordFocus,
+            obscureText: true,
+            textInputAction: TextInputAction.done,
+            autofillHints: const [AutofillHints.password],
+            decoration: InputDecoration(
+              labelText: 'Password',
+              errorText: _passwordError,
             ),
-            const SizedBox(height: 8),
-            TextButton(
-              key: const Key('login-back-to-sign-in'),
-              onPressed: _submitting ? null : _showSignInForm,
-              child: const Text('Back to sign in'),
-            ),
-          ] else ...[
-            const SizedBox(height: 16),
-            TextField(
-              key: const Key('login-password'),
-              controller: _passwordController,
-              focusNode: _passwordFocus,
-              obscureText: true,
-              textInputAction: TextInputAction.done,
-              autofillHints: const [AutofillHints.password],
-              decoration: InputDecoration(
-                labelText: 'Password',
-                errorText: _passwordError,
-              ),
-              onChanged: (_) => setState(() => _passwordError = null),
-              onSubmitted: _submitPasswordField,
-            ),
-            ..._feedback(),
-            const SizedBox(height: 24),
-            FilledButton(
-              key: const Key('login-sign-in'),
-              onPressed: _canSignIn ? _signIn : null,
-              child: const Text('Sign in'),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              key: const Key('login-forgot-password'),
-              onPressed: _canResetPassword ? _showResetForm : null,
-              child: const Text('Forgot password'),
-            ),
-          ],
+            onChanged: (_) => setState(() => _passwordError = null),
+            onSubmitted: _submitPasswordField,
+          ),
+          const SizedBox(height: 24),
+          FilledButton(
+            key: const Key('login-sign-in'),
+            onPressed: _canSignIn ? _signIn : null,
+            child: const Text('Sign in'),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            key: const Key('login-forgot-password'),
+            onPressed: _submitting ? null : _forgotPassword,
+            child: const Text('Forgot password'),
+          ),
         ],
       ),
     );
