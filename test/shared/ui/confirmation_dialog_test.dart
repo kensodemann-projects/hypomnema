@@ -3,17 +3,12 @@ import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/shared/ui/confirmation_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../helpers/viewport.dart';
+
 const _title = 'Delete this goal?';
 const _message = 'This permanently removes the goal.';
 const _confirmLabel = 'Delete';
 const _warning = "This can't be undone.";
-
-void setLogicalViewportSize(WidgetTester tester, Size size) {
-  addTearDown(tester.view.resetPhysicalSize);
-  addTearDown(tester.view.resetDevicePixelRatio);
-  tester.view.devicePixelRatio = 1;
-  tester.view.physicalSize = size;
-}
 
 Future<Future<bool>> openDialog(
   WidgetTester tester, {
