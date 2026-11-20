@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:hypomnema/features/auth/ui/hypomnema_logo.dart';
 import 'package:material_ui/material_ui.dart';
@@ -50,11 +51,6 @@ const _darkBrandGradient = LinearGradient(
 const _resetSentMessage = 'Check your email for a password reset link.';
 const _resetFailedMessage = 'A reset link could not be sent. Try again.';
 const _signInFailedMessage = 'Authentication failed.';
-
-const _lightInfo = Color(0xFF0C5DA8);
-const _lightInfoContainer = Color(0xFFD4E3FF);
-const _darkInfo = Color(0xFFA5C8FF);
-const _darkInfoContainer = Color(0xFF00468A);
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({required this.authService, super.key});
@@ -175,11 +171,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _showInfoSnackBar(String message) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
+    final colors = Theme.of(context).extension<AppColors>()!;
     _showSnackBar(
       message: message,
-      background: dark ? _darkInfoContainer : _lightInfoContainer,
-      foreground: dark ? _darkInfo : _lightInfo,
+      background: colors.infoContainer,
+      foreground: colors.info,
     );
   }
 

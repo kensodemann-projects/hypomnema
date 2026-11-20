@@ -98,16 +98,14 @@ void expectErrorSnackBar(WidgetTester tester, String message) {
   expect(tester.widget<Text>(find.text(message)).style?.color, scheme.error);
 }
 
-void expectInfoSnackBar(
-  WidgetTester tester, {
-  required Color background,
-  required Color foreground,
-}) {
+void expectInfoSnackBar(WidgetTester tester) {
+  final colors = Theme.of(tester.element(find.byType(LoginScreen)))
+      .extension<AppColors>()!;
   expect(find.text(_resetSentMessage), findsOneWidget);
-  expect(snackBarOf(tester).backgroundColor, background);
+  expect(snackBarOf(tester).backgroundColor, colors.infoContainer);
   expect(
     tester.widget<Text>(find.text(_resetSentMessage)).style?.color,
-    foreground,
+    colors.info,
   );
 }
 
@@ -607,15 +605,7 @@ void main() {
         expect(find.byKey(const Key('login-password')), findsOneWidget);
         expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
         expect(find.byKey(const Key('login-forgot-password')), findsOneWidget);
-        expectInfoSnackBar(
-          tester,
-          background: theme.brightness == Brightness.light
-              ? const Color(0xFFD4E3FF)
-              : const Color(0xFF00468A),
-          foreground: theme.brightness == Brightness.light
-              ? const Color(0xFF0C5DA8)
-              : const Color(0xFFA5C8FF),
-        );
+        expectInfoSnackBar(tester);
       }
     },
   );

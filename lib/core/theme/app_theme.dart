@@ -2,26 +2,43 @@ import 'package:material_ui/material_ui.dart';
 
 @immutable
 class AppColors extends ThemeExtension<AppColors> {
-  const AppColors({required this.warning, required this.warningContainer});
+  const AppColors({
+    required this.warning,
+    required this.warningContainer,
+    required this.info,
+    required this.infoContainer,
+  });
 
   final Color warning;
   final Color warningContainer;
+  final Color info;
+  final Color infoContainer;
 
   @override
   bool operator ==(Object other) {
     return other is AppColors &&
         other.warning == warning &&
-        other.warningContainer == warningContainer;
+        other.warningContainer == warningContainer &&
+        other.info == info &&
+        other.infoContainer == infoContainer;
   }
 
   @override
-  int get hashCode => Object.hash(warning, warningContainer);
+  int get hashCode =>
+      Object.hash(warning, warningContainer, info, infoContainer);
 
   @override
-  AppColors copyWith({Color? warning, Color? warningContainer}) {
+  AppColors copyWith({
+    Color? warning,
+    Color? warningContainer,
+    Color? info,
+    Color? infoContainer,
+  }) {
     return AppColors(
       warning: warning ?? this.warning,
       warningContainer: warningContainer ?? this.warningContainer,
+      info: info ?? this.info,
+      infoContainer: infoContainer ?? this.infoContainer,
     );
   }
 
@@ -37,6 +54,8 @@ class AppColors extends ThemeExtension<AppColors> {
         other.warningContainer,
         t,
       )!,
+      info: Color.lerp(info, other.info, t)!,
+      infoContainer: Color.lerp(infoContainer, other.infoContainer, t)!,
     );
   }
 }
@@ -75,6 +94,8 @@ class AppTheme {
         AppColors(
           warning: Color(0xFF8A5000),
           warningContainer: Color(0xFFFFDDB3),
+          info: Color(0xFF0C5DA8),
+          infoContainer: Color(0xFFD4E3FF),
         ),
       ],
     );
@@ -113,6 +134,8 @@ class AppTheme {
         AppColors(
           warning: Color(0xFFFFB86B),
           warningContainer: Color(0xFF6A3C00),
+          info: Color(0xFFA5C8FF),
+          infoContainer: Color(0xFF00468A),
         ),
       ],
     );
