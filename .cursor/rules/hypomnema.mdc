@@ -18,9 +18,9 @@ Keep these constraints unless the user changes them.
 lib/
 ├── main.dart                  # App entry point and initialization
 ├── firebase_options.dart      # Generated. Do not move.
-├── app/                       # Routing, root widget, global providers
+├── app/                       # Root widget, shell, global providers
 │   ├── app.dart
-│   └── router.dart
+│   └── shell.dart             # Signed-in shell and its scaffolds
 ├── core/                      # App-wide essentials and shared utilities
 │   ├── constants/
 │   ├── errors/

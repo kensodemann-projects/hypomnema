@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/app/app.dart';
-import 'package:hypomnema/app/router.dart';
+import 'package:hypomnema/app/shell.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:material_ui/material_ui.dart';
 
