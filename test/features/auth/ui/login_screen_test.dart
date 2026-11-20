@@ -176,6 +176,11 @@ Future<void> unfocus(WidgetTester tester) async {
   await tester.pump();
 }
 
+TextStyle effectiveStyle(WidgetTester tester, Finder finder) {
+  final widget = tester.widget<Text>(finder);
+  return DefaultTextStyle.of(tester.element(finder)).style.merge(widget.style);
+}
+
 Color textColor(WidgetTester tester, String text) {
   final finder = find.text(text);
   final widget = tester.widget<Text>(finder);
@@ -247,6 +252,24 @@ void main() {
           final name = tester.widget<Text>(find.text('Hypomnema'));
           expect(name.style?.fontSize, 40);
           expect(name.style?.color, const Color(0xFFFFFFFF));
+          final nameStyle = effectiveStyle(tester, find.text('Hypomnema'));
+          final quoteStyle = effectiveStyle(tester, find.text(_desktopQuote));
+          expect(
+            nameStyle.decoration ?? TextDecoration.none,
+            TextDecoration.none,
+          );
+          expect(nameStyle.fontWeight, FontWeight.w400);
+          expect(
+            quoteStyle.decoration ?? TextDecoration.none,
+            TextDecoration.none,
+          );
+          expect(
+            quoteStyle.fontWeight,
+            Theme.of(tester.element(find.text(_desktopQuote)))
+                .textTheme
+                .bodyMedium
+                ?.fontWeight,
+          );
           final heading = tester.widget<Text>(
             find.byKey(const Key('login-heading')),
           );

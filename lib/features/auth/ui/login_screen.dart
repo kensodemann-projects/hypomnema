@@ -330,26 +330,32 @@ class _LoginScreenState extends State<LoginScreen> {
     return DecoratedBox(
       key: const Key('login-brand'),
       decoration: BoxDecoration(gradient: gradient),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final narrow = constraints.maxWidth < _brandPadding * 2 + 72;
-          if (narrow) {
-            return ClipRect(
-              child: OverflowBox(
-                alignment: Alignment.centerLeft,
-                minWidth: 0,
-                maxWidth: double.infinity,
-                maxHeight: constraints.maxHeight,
-                child: _brandContent(),
-              ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final narrow = constraints.maxWidth < _brandPadding * 2 + 72;
+            if (narrow) {
+              return ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.centerLeft,
+                  minWidth: 0,
+                  maxWidth: double.infinity,
+                  maxHeight: constraints.maxHeight,
+                  child: _brandContent(),
+                ),
+              );
+            }
+            return CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _brandContent(),
+                ),
+              ],
             );
-          }
-          return CustomScrollView(
-            slivers: [
-              SliverFillRemaining(hasScrollBody: false, child: _brandContent()),
-            ],
-          );
-        },
+          },
+        ),
       ),
     );
   }
