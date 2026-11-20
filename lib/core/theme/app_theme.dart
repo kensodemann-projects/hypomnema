@@ -1,10 +1,21 @@
 import 'package:material_ui/material_ui.dart';
 
+@immutable
 class AppColors extends ThemeExtension<AppColors> {
   const AppColors({required this.warning, required this.warningContainer});
 
   final Color warning;
   final Color warningContainer;
+
+  @override
+  bool operator ==(Object other) {
+    return other is AppColors &&
+        other.warning == warning &&
+        other.warningContainer == warningContainer;
+  }
+
+  @override
+  int get hashCode => Object.hash(warning, warningContainer);
 
   @override
   AppColors copyWith({Color? warning, Color? warningContainer}) {
