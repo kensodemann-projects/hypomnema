@@ -1,16 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hypomnema/data/services/auth_service.dart';
-import 'package:hypomnema/ui/auth/login_screen.dart';
+import 'package:hypomnema/features/auth/data/auth_service.dart';
+import 'package:hypomnema/features/auth/ui/login_screen.dart';
 import 'package:material_ui/material_ui.dart';
 
-void setLogicalViewportSize(WidgetTester tester, Size size) {
-  addTearDown(tester.view.resetPhysicalSize);
-  addTearDown(tester.view.resetDevicePixelRatio);
-  tester.view.devicePixelRatio = 1;
-  tester.view.physicalSize = size;
-}
+import '../../../helpers/viewport.dart';
 
 class _RecordingAuthService implements AuthService {
   Object? error;

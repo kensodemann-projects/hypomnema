@@ -1,16 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hypomnema/data/services/auth_service.dart';
-import 'package:hypomnema/main.dart';
+import 'package:hypomnema/app/app.dart';
+import 'package:hypomnema/app/shell.dart';
+import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:material_ui/material_ui.dart';
 
-void setLogicalViewportSize(WidgetTester tester, Size size) {
-  addTearDown(tester.view.resetPhysicalSize);
-  addTearDown(tester.view.resetDevicePixelRatio);
-  tester.view.devicePixelRatio = 1;
-  tester.view.physicalSize = size;
-}
+import '../helpers/viewport.dart';
 
 void expectPhoneShellExists() {
   expect(find.byType(Shell), findsOneWidget);

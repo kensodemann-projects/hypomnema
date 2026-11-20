@@ -1,5 +1,5 @@
 import 'package:flutter/widget_previews.dart';
-import 'package:hypomnema/ui/app_theme.dart';
+import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart';
 
 enum ConfirmationStyle { normal, danger }
