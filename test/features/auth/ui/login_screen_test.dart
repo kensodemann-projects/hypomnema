@@ -87,26 +87,78 @@ TextButton forgotPasswordButton(WidgetTester tester) {
   );
 }
 
-SnackBar snackBarOf(WidgetTester tester) {
-  return tester.widget<SnackBar>(find.byType(SnackBar));
+const _snackBarKey = Key('login-snackbar');
+
+Finder snackBarFinder() => find.byKey(_snackBarKey);
+
+double standardLineHeight(WidgetTester tester) {
+  final context = tester.element(find.byType(LoginScreen));
+  final painter = TextPainter(
+    text: TextSpan(text: 'Hg', style: Theme.of(context).textTheme.bodyMedium),
+    textDirection: Directionality.of(context),
+    maxLines: 1,
+  )..layout();
+  final height = painter.height;
+  painter.dispose();
+  return height;
 }
 
-void expectErrorSnackBar(WidgetTester tester, String message) {
+void expectSnackBarPlacement(WidgetTester tester) {
+  final snackBar = snackBarFinder();
+  final button = find.byKey(const Key('login-forgot-password'));
+  final scaffold = find.ancestor(of: snackBar, matching: find.byType(Scaffold));
+  final snackTop = tester.getTopLeft(snackBar).dy;
+  final buttonBottom = tester.getBottomLeft(button).dy;
+  expect(snackTop, closeTo(buttonBottom + standardLineHeight(tester), 1));
+
+  final snackSize = tester.getSize(snackBar);
+  final snackLeft = tester.getTopLeft(snackBar).dx;
+  final scaffoldLeft = tester.getTopLeft(scaffold).dx;
+  final scaffoldWidth = tester.getSize(scaffold).width;
+  final leftInset = snackLeft - scaffoldLeft;
+  final rightInset =
+      scaffoldLeft + scaffoldWidth - (snackLeft + snackSize.width);
+  expect(leftInset, closeTo(rightInset, 1));
+  expect(scaffoldWidth - snackSize.width, greaterThanOrEqualTo(31));
+
+  final textWidth = tester
+      .getSize(find.descendant(of: snackBar, matching: find.byType(Text)))
+      .width;
+  final iconWidth = tester
+      .getSize(find.descendant(of: snackBar, matching: find.byType(Icon)))
+      .width;
+  expect(snackSize.width, closeTo(16 * 2 + iconWidth + 12 + textWidth, 1));
+}
+
+Future<void> expectErrorSnackBar(WidgetTester tester, String message) async {
+  await tester.pumpAndSettle();
   final scheme = Theme.of(tester.element(find.byType(LoginScreen))).colorScheme;
+  final snackBar = snackBarFinder();
   expect(find.text(message), findsOneWidget);
-  expect(snackBarOf(tester).backgroundColor, scheme.errorContainer);
+  expect(tester.widget<Material>(snackBar).color, scheme.errorContainer);
   expect(tester.widget<Text>(find.text(message)).style?.color, scheme.error);
+  expect(
+    find.descendant(of: snackBar, matching: find.byIcon(Icons.error_outline)),
+    findsOneWidget,
+  );
+  expectSnackBarPlacement(tester);
 }
 
 void expectInfoSnackBar(WidgetTester tester) {
   final colors = Theme.of(tester.element(find.byType(LoginScreen)))
       .extension<AppColors>()!;
+  final snackBar = snackBarFinder();
   expect(find.text(_resetSentMessage), findsOneWidget);
-  expect(snackBarOf(tester).backgroundColor, colors.infoContainer);
+  expect(tester.widget<Material>(snackBar).color, colors.infoContainer);
   expect(
     tester.widget<Text>(find.text(_resetSentMessage)).style?.color,
     colors.info,
   );
+  expect(
+    find.descendant(of: snackBar, matching: find.byIcon(Icons.info_outline)),
+    findsOneWidget,
+  );
+  expectSnackBarPlacement(tester);
 }
 
 Future<void> dismissSnackBar(WidgetTester tester) async {
@@ -374,7 +426,7 @@ void main() {
         (email: 'person@example.com', password: ' secret '),
         (email: 'second@example.com', password: 'other-password'),
       ]);
-      expect(find.byType(SnackBar), findsNothing);
+      expect(find.byKey(const Key('login-snackbar')), findsNothing);
       expect(
         find.text('Check your email for a password reset link.'),
         findsNothing,
@@ -472,11 +524,11 @@ void main() {
       await tester.pump();
 
       // Then
-      expectErrorSnackBar(tester, 'Authentication failed.');
+      await expectErrorSnackBar(tester, 'Authentication failed.');
 
       await dismissSnackBar(tester);
       expect(find.text('Authentication failed.'), findsNothing);
-      expect(find.byType(SnackBar), findsNothing);
+      expect(find.byKey(const Key('login-snackbar')), findsNothing);
     },
   );
 
@@ -528,7 +580,7 @@ void main() {
       );
 
       // Then
-      expect(find.byType(SnackBar), findsNothing);
+      expect(find.byKey(const Key('login-snackbar')), findsNothing);
       expect(find.text(_resetSentMessage), findsNothing);
       expect(find.byKey(const Key('login-password')), findsOneWidget);
       expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
@@ -558,7 +610,7 @@ void main() {
         textField(tester, 'login-email').decoration?.errorText,
         'Email is required.',
       );
-      expect(find.byType(SnackBar), findsNothing);
+      expect(find.byKey(const Key('login-snackbar')), findsNothing);
       expect(auth.resetCalls, isEmpty);
 
       // When
@@ -573,7 +625,7 @@ void main() {
         textField(tester, 'login-email').decoration?.errorText,
         'Enter a valid email address.',
       );
-      expect(find.byType(SnackBar), findsNothing);
+      expect(find.byKey(const Key('login-snackbar')), findsNothing);
       expect(auth.resetCalls, isEmpty);
     },
   );
@@ -581,31 +633,43 @@ void main() {
   testWidgets(
     'Given a valid email with surrounding spaces, when Forgot password is tapped, then the trimmed email is sent and the info snackbar is shown',
     (tester) async {
-      for (final theme in [AppTheme.light, AppTheme.dark]) {
-        // Given
-        final auth = _RecordingAuthService();
-        await pumpLoginScreen(
-          tester,
-          authService: auth,
-          size: const Size(400, 800),
-          theme: theme,
-        );
-        await tester.enterText(
-          find.byKey(const Key('login-email')),
-          ' person@example.com ',
-        );
-        await tester.pump();
+      for (final size in const [Size(400, 800), Size(1200, 800)]) {
+        for (final theme in [AppTheme.light, AppTheme.dark]) {
+          // Given
+          final auth = _RecordingAuthService();
+          await pumpLoginScreen(
+            tester,
+            authService: auth,
+            size: size,
+            theme: theme,
+          );
+          await tester.enterText(
+            find.byKey(const Key('login-email')),
+            ' person@example.com ',
+          );
+          await tester.pump();
 
-        // When
-        await tester.tap(find.byKey(const Key('login-forgot-password')));
-        await tester.pump();
+          // When
+          await tester.tap(find.byKey(const Key('login-forgot-password')));
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 80));
+          final movingTop = tester.getTopLeft(snackBarFinder()).dy;
+          await tester.pumpAndSettle();
 
-        // Then
-        expect(auth.resetCalls, ['person@example.com']);
-        expect(find.byKey(const Key('login-password')), findsOneWidget);
-        expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
-        expect(find.byKey(const Key('login-forgot-password')), findsOneWidget);
-        expectInfoSnackBar(tester);
+          // Then
+          expect(
+            movingTop,
+            greaterThan(tester.getTopLeft(snackBarFinder()).dy),
+          );
+          expect(auth.resetCalls, ['person@example.com']);
+          expect(find.byKey(const Key('login-password')), findsOneWidget);
+          expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
+          expect(
+            find.byKey(const Key('login-forgot-password')),
+            findsOneWidget,
+          );
+          expectInfoSnackBar(tester);
+        }
       }
     },
   );
@@ -631,14 +695,14 @@ void main() {
       await tester.pump();
 
       // Then
-      expectErrorSnackBar(tester, _resetFailedMessage);
+      await expectErrorSnackBar(tester, _resetFailedMessage);
       expect(find.text(_resetSentMessage), findsNothing);
       expect(find.byKey(const Key('login-password')), findsOneWidget);
       expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
 
       await dismissSnackBar(tester);
       expect(find.text(_resetFailedMessage), findsNothing);
-      expect(find.byType(SnackBar), findsNothing);
+      expect(find.byKey(const Key('login-snackbar')), findsNothing);
     },
   );
 
@@ -667,7 +731,7 @@ void main() {
       expect(signInButton(tester).onPressed, isNull);
       expect(forgotPasswordButton(tester).onPressed, isNull);
       expect(auth.resetCalls, ['person@example.com']);
-      expect(find.byType(SnackBar), findsNothing);
+      expect(find.byKey(const Key('login-snackbar')), findsNothing);
 
       auth.pending!.complete();
       await tester.pump();
