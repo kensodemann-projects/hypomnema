@@ -36,7 +36,7 @@ Related to [#17](https://github.com/kensodemann-projects/hypomnema/issues/17).
 
 | Order | Step       | Status | Files                                                                                                      |
 | ----- | ---------- | ------ | ---------------------------------------------------------------------------------------------------------- |
-| 1     | [STEP-001] |        | `lib/features/auth/ui/hypomnema_logo.dart`, then `lib/features/auth/ui/login_screen.dart`, then `test/features/auth/ui/login_screen_test.dart` |
+| 1     | [STEP-001] | complete | `lib/features/auth/ui/hypomnema_logo.dart`, then `lib/features/auth/ui/login_screen.dart`, then `test/features/auth/ui/login_screen_test.dart` |
 | 2     | [STEP-002] |        | `lib/features/auth/ui/login_screen.dart`, then `test/features/auth/ui/login_screen_test.dart`              |
 
 **Commit gate** — the human commits. A spot-check does not replace the gate.
@@ -50,7 +50,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Match the phone and desktop sign-in layouts
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** A signed-out person sees the redesigned sign-in screen on phone and on desktop, in light and in dark, with the logo, the Hypomnema name, and that layout's quote. Desktop places the brand panel beside the form. Phone stacks the brand above the form.
 
