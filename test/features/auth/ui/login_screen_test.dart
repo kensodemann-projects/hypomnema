@@ -56,10 +56,6 @@ const _desktopQuote =
 
 const _phoneQuote = 'A note kept so it can be found again.';
 
-const _accountLine = 'Use the account you were given.';
-
-const _noSignUpLine = 'Accounts are created for you. There is no sign-up.';
-
 Future<void> pumpLoginScreen(
   WidgetTester tester, {
   required AuthService authService,
@@ -114,7 +110,6 @@ void main() {
           expect(find.byKey(const Key('login-brand')), findsNothing);
           expect(find.byKey(const Key('login-heading')), findsNothing);
           expect(find.text(_desktopQuote), findsNothing);
-          expect(find.text(_accountLine), findsNothing);
           expect(find.text('Hypomnema'), findsOneWidget);
           expect(
             tester.widget<Text>(find.text('Hypomnema')).style?.fontSize,
@@ -125,7 +120,6 @@ void main() {
           expect(quote.style?.fontSize, 15);
           expect(quote.style?.fontStyle, FontStyle.italic);
           expect(quote.style?.color, theme.colorScheme.onSurfaceVariant);
-          expect(find.text(_noSignUpLine), findsOneWidget);
           expect(
             tester.getSize(find.byKey(const Key('login-logo'))),
             const Size(72, 72),
@@ -151,7 +145,6 @@ void main() {
 
           // Then
           expect(find.text(_phoneQuote), findsNothing);
-          expect(find.text(_noSignUpLine), findsNothing);
           expect(find.text(_desktopQuote), findsOneWidget);
           final quote = tester.widget<Text>(find.text(_desktopQuote));
           expect(quote.style?.fontSize, 18);
@@ -163,7 +156,6 @@ void main() {
           final name = tester.widget<Text>(find.text('Hypomnema'));
           expect(name.style?.fontSize, 40);
           expect(name.style?.color, const Color(0xFFFFFFFF));
-          expect(find.text(_accountLine), findsOneWidget);
           final heading = tester.widget<Text>(
             find.byKey(const Key('login-heading')),
           );

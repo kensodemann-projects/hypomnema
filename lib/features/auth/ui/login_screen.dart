@@ -354,7 +354,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _desktopLayout() {
-    final onSurfaceVariant = Theme.of(context).colorScheme.onSurfaceVariant;
     return Scaffold(
       body: Row(
         children: [
@@ -380,14 +379,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Use the account you were given.',
-                            style: TextStyle(
-                              color: onSurfaceVariant,
-                              fontSize: 12,
                             ),
                           ),
                           const SizedBox(height: 18),
@@ -445,12 +436,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 18),
                     _form(),
-                    const SizedBox(height: 18),
-                    Text(
-                      'Accounts are created for you. There is no sign-up.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: onSurfaceVariant, fontSize: 12),
-                    ),
                   ],
                 ),
               ),

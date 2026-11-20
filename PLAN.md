@@ -4,7 +4,7 @@ Issue: [#20](https://github.com/kensodemann-projects/hypomnema/issues/20) (OPEN)
 
 Related to [#17](https://github.com/kensodemann-projects/hypomnema/issues/17).
 
-`LoginScreen` in `lib/features/auth/ui/login_screen.dart` shows Email, Password, Sign in, and Forgot password, then replaces that form with a reset form when Forgot password is pressed. Field helpers already show `Email is required.`, `Enter a valid email address.`, and `Password is required.`, and Sign in is enabled only for a valid email and password. Sign-in failure, reset success, and reset failure are inline text, not snackbars. At a width of 600 and below the form is a padded column; above that it sits in a card 400 wide. The screen has no logo, Hypomnema name, quote, or the phone and desktop supporting lines. `FirebaseAuthService.sendPasswordResetEmail` in `lib/features/auth/data/auth_service.dart` already forwards the address to Firebase and throws `AuthException` on `FirebaseAuthException`. The issue names `lib/ui/auth/` and `lib/data/services/`; those files are not in the tree.
+`LoginScreen` in `lib/features/auth/ui/login_screen.dart` shows Email, Password, Sign in, and Forgot password, then replaces that form with a reset form when Forgot password is pressed. Field helpers already show `Email is required.`, `Enter a valid email address.`, and `Password is required.`, and Sign in is enabled only for a valid email and password. Sign-in failure, reset success, and reset failure are inline text, not snackbars. At a width of 600 and below the form is a padded column; above that it sits in a card 400 wide. The screen has no logo, Hypomnema name, or quote. `FirebaseAuthService.sendPasswordResetEmail` in `lib/features/auth/data/auth_service.dart` already forwards the address to Firebase and throws `AuthException` on `FirebaseAuthException`. The issue names `lib/ui/auth/` and `lib/data/services/`; those files are not in the tree.
 
 **Decisions**
 
@@ -14,6 +14,7 @@ Related to [#17](https://github.com/kensodemann-projects/hypomnema/issues/17).
 - Those info colors stay on the sign-in screen. This task does not add them to `AppColors`.
 - The logo is a widget painted to match `docs/ui-mockups/desktop/logo.svg`. No new package or asset.
 - Desktop layout remains `constraints.maxWidth > 600`.
+- The screen omits `Use the account you were given.` and `Accounts are created for you. There is no sign-up.` Those lines stay in the mock-ups only.
 
 **Out of scope**
 
@@ -24,10 +25,9 @@ Related to [#17](https://github.com/kensodemann-projects/hypomnema/issues/17).
 
 **Contract**
 
-- Desktop heading `Sign in` and supporting line `Use the account you were given.`
+- Desktop heading `Sign in`.
 - Desktop quote `A note kept so it can be found again: a reminder, a memorandum, a short record of something worth remembering.`
 - Phone quote `A note kept so it can be found again.`
-- Phone line `Accounts are created for you. There is no sign-up.`
 - Name `Hypomnema`. Buttons stay `Sign in` and `Forgot password`.
 - Light brand gradient `#4A55C8` to `#2E3694`. Dark brand gradient `#2B3290` to `#151A55`. Brand text is white.
 - Logo is 72 by 72. The desktop form side is 520 wide, and the form column is at most 360 wide.
@@ -64,9 +64,9 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 Add `HypomnemaLogo`, keyed `login-logo`, and give it a 72 by 72 box. Reproduce the SVG: a rounded square from `#6E78F0` to `#3A44B8`, a white document with a folded corner, three rules, and the bookmark.
 
-Keep `maxWidth > 600` as desktop. On desktop, use a row. The brand panel, keyed `login-brand`, fills the remaining width, pads 64, and uses a 150° gradient with the contract stops for the active brightness. White text shows the logo, `Hypomnema` at 40, and the desktop quote in italic at 18 with opacity 0.85. The form side is 520 wide and centers a column at most 360 wide. That column shows `Sign in` at 26, `Use the account you were given.`, then the existing form. The phone line is absent.
+Keep `maxWidth > 600` as desktop. On desktop, use a row. The brand panel, keyed `login-brand`, fills the remaining width, pads 64, and uses a 150° gradient with the contract stops for the active brightness. White text shows the logo, `Hypomnema` at 40, and the desktop quote in italic at 18 with opacity 0.85. The form side is 520 wide and centers a column at most 360 wide. That column shows `Sign in` at 26, then the existing form. `Use the account you were given.` is absent.
 
-On phone, use a `SafeArea`, padding of 24 by 28, and a scrollable centered column. Stack the logo, `Hypomnema` at 28, and the phone quote in italic at 15 in `onSurfaceVariant`. Then show the existing form, then `Accounts are created for you. There is no sign-up.`, centered. The brand panel, desktop heading, desktop quote, and desktop supporting line are absent.
+On phone, use a `SafeArea`, padding of 24 by 28, and a scrollable centered column. Stack the logo, `Hypomnema` at 28, and the phone quote in italic at 15 in `onSurfaceVariant`. Then show the existing form. `Accounts are created for you. There is no sign-up.` is absent. The brand panel, desktop heading, and desktop quote are absent.
 
 Leave Email, Password, Sign in, Forgot password, validation, and the reset form behavior as they are. Keep their keys.
 
