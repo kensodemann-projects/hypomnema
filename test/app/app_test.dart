@@ -13,13 +13,17 @@ void expectPhoneShellExists() {
   expect(find.byType(Shell), findsOneWidget);
   expect(find.byType(PhoneScaffold), findsOneWidget);
   expect(find.byType(DesktopScaffold), findsNothing);
-  expect(find.byType(AppBar), findsOneWidget);
-  expect(find.byKey(const Key('shell-side-panel')), findsNothing);
+  expect(find.byType(NavigationBar), findsOneWidget);
+  expect(find.byType(NavigationRail), findsNothing);
+  expect(find.byType(AppBar), findsNothing);
+  expect(find.text('Phone'), findsNothing);
+  expect(find.text('Desktop'), findsNothing);
 }
 
 void expectPhoneShellNotExists() {
   expect(find.byType(Shell), findsNothing);
   expect(find.byType(PhoneScaffold), findsNothing);
+  expect(find.byType(NavigationBar), findsNothing);
   expect(find.byType(AppBar), findsNothing);
 }
 
@@ -27,14 +31,35 @@ void expectDesktopShellExists() {
   expect(find.byType(Shell), findsOneWidget);
   expect(find.byType(DesktopScaffold), findsOneWidget);
   expect(find.byType(PhoneScaffold), findsNothing);
+  expect(find.byType(NavigationRail), findsOneWidget);
+  expect(find.byType(NavigationBar), findsNothing);
   expect(find.byType(AppBar), findsNothing);
-  expect(find.byKey(const Key('shell-side-panel')), findsOneWidget);
+  expect(find.text('Desktop'), findsNothing);
+  expect(find.text('Phone'), findsNothing);
 }
 
 void expectDesktopShellNotExists() {
   expect(find.byType(Shell), findsNothing);
   expect(find.byType(DesktopScaffold), findsNothing);
-  expect(find.byKey(const Key('shell-side-panel')), findsNothing);
+  expect(find.byType(NavigationRail), findsNothing);
+}
+
+void expectContent(WidgetTester tester, String label) {
+  expect(
+    tester.widget<Text>(find.byKey(const Key('shell-content'))).data,
+    label,
+  );
+}
+
+void expectDestinationIcons() {
+  expect(find.byIcon(Icons.space_dashboard), findsOneWidget);
+  expect(find.byIcon(Icons.menu_book), findsOneWidget);
+  expect(find.byIcon(Icons.inventory_2), findsOneWidget);
+  expect(find.byIcon(Icons.logout), findsOneWidget);
+}
+
+Finder chromeLabel(Key chromeKey, String label) {
+  return find.descendant(of: find.byKey(chromeKey), matching: find.text(label));
 }
 
 void expectLoginFormExists() {
@@ -349,6 +374,218 @@ void main() {
   );
 
   testWidgets(
+    'Given a width of 400, when the shell builds, then Dashboard is selected',
+    (tester) async {
+      // Given
+      setLogicalViewportSize(tester, const Size(400, 800));
+
+      // When
+      await tester.pumpWidget(MainApp(authService: _authEmitting(true)));
+      await tester.pumpAndSettle();
+
+      // Then
+      expectPhoneShellExists();
+      expectContent(tester, 'Dashboard');
+      final bar = tester.widget<NavigationBar>(
+        find.byKey(const Key('shell-navigation-bar')),
+      );
+      expect(bar.selectedIndex, 0);
+      expect(bar.destinations, hasLength(4));
+      expect(
+        (bar.destinations.last as NavigationDestination).label,
+        'Sign out',
+      );
+      expect(
+        chromeLabel(const Key('shell-navigation-bar'), 'Dashboard'),
+        findsOneWidget,
+      );
+      expect(
+        chromeLabel(const Key('shell-navigation-bar'), 'Journal'),
+        findsOneWidget,
+      );
+      expect(
+        chromeLabel(const Key('shell-navigation-bar'), 'Archive'),
+        findsOneWidget,
+      );
+      expect(
+        chromeLabel(const Key('shell-navigation-bar'), 'Sign out'),
+        findsOneWidget,
+      );
+      expectDestinationIcons();
+    },
+  );
+
+  testWidgets(
+    'Given a width of 601, when the shell builds, then Dashboard is selected',
+    (tester) async {
+      // Given
+      setLogicalViewportSize(tester, const Size(601, 800));
+
+      // When
+      await tester.pumpWidget(MainApp(authService: _authEmitting(true)));
+      await tester.pumpAndSettle();
+
+      // Then
+      expectDesktopShellExists();
+      expectContent(tester, 'Dashboard');
+      final rail = tester.widget<NavigationRail>(
+        find.byKey(const Key('shell-navigation-rail')),
+      );
+      expect(rail.selectedIndex, 0);
+      expect(rail.destinations, hasLength(3));
+      expect(rail.trailingAtBottom, isTrue);
+      expect(
+        chromeLabel(const Key('shell-navigation-rail'), 'Dashboard'),
+        findsOneWidget,
+      );
+      expect(
+        chromeLabel(const Key('shell-navigation-rail'), 'Journal'),
+        findsOneWidget,
+      );
+      expect(
+        chromeLabel(const Key('shell-navigation-rail'), 'Archive'),
+        findsOneWidget,
+      );
+      expect(
+        chromeLabel(const Key('shell-navigation-rail'), 'Sign out'),
+        findsOneWidget,
+      );
+      expect(
+        tester.getTopLeft(find.byKey(const Key('shell-sign-out'))).dy,
+        greaterThan(
+          tester
+              .getTopLeft(
+                chromeLabel(const Key('shell-navigation-rail'), 'Archive'),
+              )
+              .dy,
+        ),
+      );
+      expectDestinationIcons();
+    },
+  );
+
+  testWidgets(
+    'Given the phone shell, when Journal and Archive are tapped, then each destination is selected',
+    (tester) async {
+      // Given
+      setLogicalViewportSize(tester, const Size(400, 800));
+      await tester.pumpWidget(MainApp(authService: _authEmitting(true)));
+      await tester.pumpAndSettle();
+      expectContent(tester, 'Dashboard');
+
+      // When
+      await tester.tap(
+        chromeLabel(const Key('shell-navigation-bar'), 'Journal'),
+      );
+      await tester.pumpAndSettle();
+
+      // Then
+      expectContent(tester, 'Journal');
+      expect(
+        tester
+            .widget<NavigationBar>(
+              find.byKey(const Key('shell-navigation-bar')),
+            )
+            .selectedIndex,
+        1,
+      );
+
+      // When
+      await tester.tap(
+        chromeLabel(const Key('shell-navigation-bar'), 'Archive'),
+      );
+      await tester.pumpAndSettle();
+
+      // Then
+      expectContent(tester, 'Archive');
+      expect(
+        tester
+            .widget<NavigationBar>(
+              find.byKey(const Key('shell-navigation-bar')),
+            )
+            .selectedIndex,
+        2,
+      );
+    },
+  );
+
+  testWidgets(
+    'Given the desktop shell, when Journal and Archive are tapped, then each destination is selected',
+    (tester) async {
+      // Given
+      setLogicalViewportSize(tester, const Size(601, 800));
+      await tester.pumpWidget(MainApp(authService: _authEmitting(true)));
+      await tester.pumpAndSettle();
+      expectContent(tester, 'Dashboard');
+
+      // When
+      await tester.tap(
+        chromeLabel(const Key('shell-navigation-rail'), 'Journal'),
+      );
+      await tester.pumpAndSettle();
+
+      // Then
+      expectContent(tester, 'Journal');
+      expect(
+        tester
+            .widget<NavigationRail>(
+              find.byKey(const Key('shell-navigation-rail')),
+            )
+            .selectedIndex,
+        1,
+      );
+
+      // When
+      await tester.tap(
+        chromeLabel(const Key('shell-navigation-rail'), 'Archive'),
+      );
+      await tester.pumpAndSettle();
+
+      // Then
+      expectContent(tester, 'Archive');
+      expect(
+        tester
+            .widget<NavigationRail>(
+              find.byKey(const Key('shell-navigation-rail')),
+            )
+            .selectedIndex,
+        2,
+      );
+    },
+  );
+
+  testWidgets(
+    'Given Journal is selected on the phone shell, when the width becomes 601, then Journal stays selected',
+    (tester) async {
+      // Given
+      setLogicalViewportSize(tester, const Size(400, 800));
+      await tester.pumpWidget(MainApp(authService: _authEmitting(true)));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        chromeLabel(const Key('shell-navigation-bar'), 'Journal'),
+      );
+      await tester.pumpAndSettle();
+      expectContent(tester, 'Journal');
+
+      // When
+      tester.view.physicalSize = const Size(601, 800);
+      await tester.pumpAndSettle();
+
+      // Then
+      expectDesktopShellExists();
+      expectContent(tester, 'Journal');
+      expect(
+        tester
+            .widget<NavigationRail>(
+              find.byKey(const Key('shell-navigation-rail')),
+            )
+            .selectedIndex,
+        1,
+      );
+    },
+  );
+
+  testWidgets(
     'Given the phone shell is showing, when MainApp rebuilds with the same auth service, then the shell stays',
     (tester) async {
       // Given
@@ -449,7 +686,7 @@ void main() {
       expect(find.byKey(const Key('shell-sign-out')), findsOneWidget);
       expect(
         find.descendant(
-          of: find.byType(AppBar),
+          of: find.byKey(const Key('shell-navigation-bar')),
           matching: find.byKey(const Key('shell-sign-out')),
         ),
         findsOneWidget,
@@ -478,7 +715,7 @@ void main() {
       expect(find.byKey(const Key('shell-sign-out')), findsOneWidget);
       expect(
         find.descendant(
-          of: find.byKey(const Key('shell-side-panel')),
+          of: find.byKey(const Key('shell-navigation-rail')),
           matching: find.byKey(const Key('shell-sign-out')),
         ),
         findsOneWidget,
