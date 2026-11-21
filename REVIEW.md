@@ -105,10 +105,8 @@ Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_scree
 
 **Resolution:** `PLAN.md` is transient and will be deleted just prior to the PR being merged. It will not remain on `main`.
 
-[QST-002]
+#### [QST-002] - answered
 
 **Issue:** The custom anchored snackbar is substantially more complex than `ScaffoldMessenger.showSnackBar` with margin/padding.
 
-**Suggestion:** Confirm whether the custom `RenderShiftedBox` approach is a long-term pattern for the app or a one-off for login; if one-off, the extraction in [CLN-001] is enough; if long-term, consider promoting to `shared/ui`.
-
-**Why:** Sets expectations for the next screen that needs “mock-accurate” notices.
+**Resolution:** Any abstraction such as this should wait until there is another use-case so we can determine the most useful abstraction shared layer.
