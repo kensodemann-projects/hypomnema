@@ -1,6 +1,6 @@
 ## Summary
 
-Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_screen.dart`, new `hypomnema_logo.dart`, `AppColors` info tokens, expanded widget tests, and new root `PLAN.md`. CI (`format_analyze_test`) is green. The layout contract, single-screen reset flow, themed snackbars, and test coverage (phone/desktop × light/dark, placement, dismissal) match the issue and PR description well. **Recommendation: approve.** `PLAN.md` will be deleted just prior to merge. The remaining discussion is whether the custom snackbar stays a sign-in one-off.
+Second pass on PR #29 (*Redesign the sign-in screen*) on `20-redesign-the-sign-in-screen` (`main...HEAD`: eight files, +1210/−369). This re-review covers the full resulting diff after follow-ups for the first `REVIEW.md` (fixed snackbar gap, `login_snackbar.dart` extraction, and documented answers for remaining nits). Layout, reset-on-one-screen, theme info colors, tests, format, analyze, and `make check` (46 tests) all pass locally. **Recommendation: approve.** Before merge, drop transient root files (`PLAN.md`, `REVIEW.md`) so they do not land on `main`, per your stated intent for `PLAN.md` and the local-only review workflow in `CONTRIBUTING.md`.
 
 ## Finding counts
 
@@ -8,12 +8,12 @@ Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_scree
 | ------------------------------------------ | ----: |
 | 🔒 Security concerns (immediate attention) |     0 |
 | ⚡ Performance issues/optimizations        |     0 |
-| 🧹 Code cleanup and maintainability        |     0 |
+| 🧹 Code cleanup and maintainability        |     1 |
 | 📚 Documentation gaps                      |     0 |
-| ✅ Positive feedback                       |     3 |
+| ✅ Positive feedback                       |     4 |
 | 🚨 Critical blockers                       |     0 |
-| 💭 Questions for discussion                |     1 |
-| **Total**                                  |     4 |
+| 💭 Questions for discussion                |     0 |
+| **Total**                                  |     5 |
 
 ## Findings
 
@@ -23,47 +23,21 @@ Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_scree
 
 ### ⚡ Performance issues/optimizations
 
-*(none — [PERF-001] resolved in `39d756d`.)*
-
-#### [PERF-001] — complete
-
-**Issue:** `_standardLineHeight` built a `TextPainter` on every rebuild while a notice was visible.
-
-**Resolution:** Removed text measurement; snackbars anchor with a fixed `_snackBarGap` (16px) under Forgot password. Tests assert `buttonBottom + 16`. No per-frame layout in the notice path.
+*(none)*
 
 ### 🧹 Code cleanup and maintainability
 
-#### [CLN-001] — complete
+[CLN-001]
 
-**Issue:** `login_screen.dart` mixed layout, auth, and three layers of custom snackbar UI.
+**Issue:** The branch still adds root `PLAN.md` and `REVIEW.md`. Both are workflow artifacts, not product code.
 
-**Resolution:** Uncommitted work moves `LoginNotice`, `LoginSnackBar`, and the anchored `RenderObject` stack into `lib/features/auth/ui/login_snackbar.dart`. `login_screen.dart` is ~474 lines and only composes `LoginSnackBar` with notice state and theme colors. Same feature-scoped split the review suggested.
+**Suggestion:** Remove or omit them from the squash-merge commit (same moment you already plan to drop `PLAN.md`). Keep review notes outside `main` unless you deliberately want them versioned.
 
-#### [CLN-002] — won't do
-
-**Issue:** `_measureAnchor` runs only once via a single `addPostFrameCallback`. If the anchor or overlay slot is not laid out on that frame, the method returns without rescheduling, so `_controller.forward()` never runs.
-
-**Resolution:** Won't do. A retry complicates the code in order to fix an unrealistic error scenario. The bar is created only after Forgot password is already laid out, and the callback runs after the frame that lays out the new bar.
-
-#### [CLN-003] — won't do
-
-**Issue:** User-facing strings and quotes (`_desktopQuote`, `_phoneQuote`, reset/sign-in messages) are duplicated in `login_screen_test.dart`.
-
-**Resolution:** Won't do. The duplicated strings are how the tests check that the copy is correct. A shared constant would carry a typo in the implementation into the expectation, so the test would still pass. In this case the repetition is a benefit.
-
-#### [CLN-004] — won't do
-
-**Issue:** Snackbar anchor position is fixed at show time and does not update if the form moves (e.g. software keyboard, window resize, or scroll).
-
-**Resolution:** Won't do. The bar is measured against the layout that exists when the result arrives, and it is gone after four seconds. Showing the keyboard, resizing, or scrolling comes from the user acting on that result, so they have already acknowledged the message. Re-measuring later would complicate the code for a position that no longer matters.
+**Why:** Avoids clutter and stale plans on `main`; matches `CONTRIBUTING.md` (review output stays local, not on the PR).
 
 ### 📚 Documentation gaps
 
-#### [DOC-001] — answered
-
-**Issue:** New `PLAN.md` still describes the pre-change screen (reset form, inline errors) in the opening paragraph, lists STEP-002 as incomplete, and under **Decisions** says info colors stay on the sign-in screen and `AppTheme` is out of scope—while this PR adds `AppColors.info` / `infoContainer` and implements STEP-002 behavior.
-
-**Resolution:** `PLAN.md` is transient and will be deleted just prior to the PR being merged, so it does not need to be refreshed to match the tree.
+*(none)*
 
 ### ✅ Positive feedback
 
@@ -71,27 +45,33 @@ Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_scree
 
 **Issue:** *(n/a — positive)*
 
-**Suggestion:** Widget tests go well beyond smoke checks: layout contract across 400/600/601/1200 widths, both themes, snackbar colors, horizontal centering, width-to-content, placement one line below Forgot password, enter animation, and timed dismissal.
+**Suggestion:** First-review items are closed: `39d756d` replaces per-rebuild `TextPainter` measurement with a fixed 16px gap; `5c6025e` splits anchored notices into `login_snackbar.dart`, leaving `login_screen.dart` at layout and auth.
 
-**Why:** This gives strong regression protection for a UI-heavy change.
+**Why:** Shows the feedback loop worked without changing the user-visible contract enforced by tests.
 
 [POS-002]
 
 **Issue:** *(n/a — positive)*
 
-**Suggestion:** Promoting info banner colors to `AppColors` on `AppTheme` matches the PR intent and mirrors existing warning extension fields, with `app_test.dart` palette assertions updated accordingly.
+**Suggestion:** Widget tests remain the safety net: phone/desktop × light/dark layout contract, snackbar colors, centered width-to-content, placement at Forgot password + 16px, enter animation, 4s dismissal, and auth/reset flows.
 
-**Why:** Keeps semantic colors centralized for later screens.
+**Why:** Appropriate depth for a UI-heavy feature tied to #20.
 
 [POS-003]
 
 **Issue:** *(n/a — positive)*
 
-**Suggestion:** Custom notices use `Semantics(liveRegion: true)` on the snackbar material, which helps screen readers pick up auth and reset feedback without relying on `ScaffoldMessenger`.
+**Suggestion:** `HypomnemaLogo` via `CustomPaint`, responsive brand panel, `AppColors.info` / `infoContainer`, and `Semantics(liveRegion: true)` on notices form a coherent implementation aligned with the PR description.
 
-**Why:** Aligns with accessible status messaging practices.
+**Why:** Theme extension and a11y choices scale beyond this screen.
 
-**Documentation:** https://www.w3.org/WAI/ARIA/apg/
+[POS-004]
+
+**Issue:** *(n/a — positive)*
+
+**Suggestion:** Declined follow-ups (anchor remeasure retry, shared string module, keyboard tracking) are documented with explicit product reasoning in commit history and the prior review thread—reasonable scope control for a sign-in-only custom bar.
+
+**Why:** Defers abstraction until a second use case (answered in `a827ed6`) without leaving ambiguity for the reviewer.
 
 ### 🚨 Critical blockers
 
@@ -99,14 +79,16 @@ Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_scree
 
 ### 💭 Questions for discussion
 
-#### [QST-001] — answered
+*(none)*
 
-**Issue:** Should `PLAN.md` remain on `main` after the feature merges, or is it branch-only working notes that should be dropped or archived when #20 closes?
+## Prior review disposition (for the record)
 
-**Resolution:** `PLAN.md` is transient and will be deleted just prior to the PR being merged. It will not remain on `main`.
-
-#### [QST-002] - answered
-
-**Issue:** The custom anchored snackbar is substantially more complex than `ScaffoldMessenger.showSnackBar` with margin/padding.
-
-**Resolution:** Any abstraction such as this should wait until there is another use-case so we can determine the most useful abstraction shared layer.
+| Tag | Outcome |
+| --- | ------- |
+| PERF-001 | Fixed in `39d756d` (fixed gap, no `TextPainter` on rebuild). |
+| CLN-001 (extraction) | Fixed in `5c6025e` (`login_snackbar.dart`). |
+| CLN-002 | Won't fix (single post-frame measure; anchor exists when notice shows). |
+| CLN-003 | Won't fix (duplicate strings intentional for contract tests). |
+| CLN-004 | Won't fix (static layout while message visible). |
+| DOC-001 / QST-001 | `PLAN.md` transient; delete before merge. |
+| QST-002 | Defer shared abstraction until another anchored notice exists. |
