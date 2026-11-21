@@ -62,6 +62,85 @@ Finder chromeLabel(Key chromeKey, String label) {
   return find.descendant(of: find.byKey(chromeKey), matching: find.text(label));
 }
 
+const _signOutTitle = 'Sign out?';
+const _signOutMessage = "You'll need your email and password to sign back in.";
+const _signOutFailure = 'Failed to sign out.';
+const _phoneChrome = Key('shell-navigation-bar');
+const _desktopChrome = Key('shell-navigation-rail');
+
+int shellSelectedIndex(WidgetTester tester) {
+  final bar = find.byKey(_phoneChrome);
+  if (bar.evaluate().isNotEmpty) {
+    return tester.widget<NavigationBar>(bar).selectedIndex;
+  }
+  return tester
+      .widget<NavigationRail>(find.byKey(_desktopChrome))
+      .selectedIndex!;
+}
+
+Future<_FakeAuthService> _openSignOutDialog(
+  WidgetTester tester, {
+  required Size size,
+  required Key chromeKey,
+  required String destination,
+  bool throwOnSignOut = false,
+}) async {
+  final auth = _authEmitting(true)..throwOnSignOut = throwOnSignOut;
+  setLogicalViewportSize(tester, size);
+  await tester.pumpWidget(MainApp(authService: auth));
+  await tester.pumpAndSettle();
+  await tester.tap(chromeLabel(chromeKey, destination));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key('shell-sign-out')));
+  await tester.pumpAndSettle();
+  return auth;
+}
+
+void expectSignOutDialog(WidgetTester tester) {
+  expect(
+    tester.widget<Text>(find.byKey(const Key('confirmation-title'))).data,
+    _signOutTitle,
+  );
+  expect(
+    tester.widget<Text>(find.byKey(const Key('confirmation-message'))).data,
+    _signOutMessage,
+  );
+  expect(find.text('Cancel'), findsOneWidget);
+  expect(
+    find.descendant(
+      of: find.byKey(const Key('confirmation-confirm')),
+      matching: find.text('Sign out'),
+    ),
+    findsOneWidget,
+  );
+  expect(find.byKey(const Key('confirmation-warning')), findsNothing);
+  final button = tester.widget<FilledButton>(
+    find.byKey(const Key('confirmation-confirm')),
+  );
+  final scheme = Theme.of(
+    tester.element(find.byKey(const Key('confirmation-confirm'))),
+  ).colorScheme;
+  expect(
+    button.style?.backgroundColor?.resolve(<WidgetState>{}),
+    scheme.primary,
+  );
+  expect(
+    button.style?.foregroundColor?.resolve(<WidgetState>{}),
+    scheme.onPrimary,
+  );
+}
+
+void expectSignOutFailureSnackBar(WidgetTester tester) {
+  final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+  final scheme = Theme.of(tester.element(find.byType(SnackBar))).colorScheme;
+  expect(snackBar.behavior, SnackBarBehavior.floating);
+  expect(snackBar.backgroundColor, scheme.errorContainer);
+  expect(
+    tester.widget<Text>(find.text(_signOutFailure)).style?.color,
+    scheme.error,
+  );
+}
+
 void expectLoginFormExists() {
   expect(find.byKey(const Key('login-email')), findsOneWidget);
   expect(find.byKey(const Key('login-sign-in')), findsOneWidget);
@@ -675,88 +754,202 @@ void main() {
   );
 
   testWidgets(
-    'Given the phone shell, when Sign out is tapped, then the login screen replaces the shell',
+    'Given Journal is selected on the phone shell, when Sign out is tapped, then the confirmation dialog opens',
     (tester) async {
       // Given
-      final auth = _authEmitting(true);
-      setLogicalViewportSize(tester, const Size(400, 800));
-      await tester.pumpWidget(MainApp(authService: auth));
-      await tester.pumpAndSettle();
-      expectPhoneShellExists();
-      expect(find.byKey(const Key('shell-sign-out')), findsOneWidget);
-      expect(
-        find.descendant(
-          of: find.byKey(const Key('shell-navigation-bar')),
-          matching: find.byKey(const Key('shell-sign-out')),
-        ),
-        findsOneWidget,
+      final auth = await _openSignOutDialog(
+        tester,
+        size: const Size(400, 800),
+        chromeKey: _phoneChrome,
+        destination: 'Journal',
       );
 
-      // When
-      await tester.tap(find.byKey(const Key('shell-sign-out')));
-      await tester.pump();
-
       // Then
-      expect(auth.signOutCalls, 1);
-      expectLoginFormExists();
-      expectPhoneShellNotExists();
+      expectPhoneShellExists();
+      expectSignOutDialog(tester);
+      expect(auth.signOutCalls, 0);
+      expect(shellSelectedIndex(tester), 1);
+      expectContent(tester, 'Journal');
     },
   );
 
   testWidgets(
-    'Given the desktop shell, when Sign out is tapped, then the login screen replaces the shell',
+    'Given Journal is selected on the desktop shell, when Sign out is tapped, then the confirmation dialog opens',
     (tester) async {
       // Given
-      final auth = _authEmitting(true);
-      setLogicalViewportSize(tester, const Size(601, 800));
-      await tester.pumpWidget(MainApp(authService: auth));
-      await tester.pumpAndSettle();
+      final auth = await _openSignOutDialog(
+        tester,
+        size: const Size(601, 800),
+        chromeKey: _desktopChrome,
+        destination: 'Journal',
+      );
+
+      // Then
       expectDesktopShellExists();
-      expect(find.byKey(const Key('shell-sign-out')), findsOneWidget);
-      expect(
-        find.descendant(
-          of: find.byKey(const Key('shell-navigation-rail')),
-          matching: find.byKey(const Key('shell-sign-out')),
-        ),
-        findsOneWidget,
-      );
-
-      // When
-      await tester.tap(find.byKey(const Key('shell-sign-out')));
-      await tester.pump();
-
-      // Then
-      expect(auth.signOutCalls, 1);
-      expectLoginFormExists();
-      expectDesktopShellNotExists();
+      expectSignOutDialog(tester);
+      expect(auth.signOutCalls, 0);
+      expect(shellSelectedIndex(tester), 1);
+      expectContent(tester, 'Journal');
     },
   );
 
   testWidgets(
-    'Given sign-out throws AuthException, when Sign out is tapped, then the phone shell stays',
+    'Given the phone sign-out dialog, when Cancel is tapped, then Journal stays selected',
     (tester) async {
       // Given
-      final auth = _authEmitting(true)..throwOnSignOut = true;
-      setLogicalViewportSize(tester, const Size(400, 800));
-      await tester.pumpWidget(MainApp(authService: auth));
-      await tester.pumpAndSettle();
-      final textBefore = tester
-          .widgetList<Text>(find.byType(Text))
-          .map((text) => text.data)
-          .toList();
+      final auth = await _openSignOutDialog(
+        tester,
+        size: const Size(400, 800),
+        chromeKey: _phoneChrome,
+        destination: 'Journal',
+      );
 
       // When
-      await tester.tap(find.byKey(const Key('shell-sign-out')));
-      await tester.pump();
+      await tester.tap(find.byKey(const Key('confirmation-cancel')));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(find.byKey(const Key('confirmation-dialog')), findsNothing);
+      expect(auth.signOutCalls, 0);
+      expectContent(tester, 'Journal');
+      expect(shellSelectedIndex(tester), 1);
+      expectPhoneShellExists();
+    },
+  );
+
+  testWidgets(
+    'Given the desktop sign-out dialog, when Cancel is tapped, then Journal stays selected',
+    (tester) async {
+      // Given
+      final auth = await _openSignOutDialog(
+        tester,
+        size: const Size(601, 800),
+        chromeKey: _desktopChrome,
+        destination: 'Journal',
+      );
+
+      // When
+      await tester.tap(find.byKey(const Key('confirmation-cancel')));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(find.byKey(const Key('confirmation-dialog')), findsNothing);
+      expect(auth.signOutCalls, 0);
+      expectContent(tester, 'Journal');
+      expect(shellSelectedIndex(tester), 1);
+      expectDesktopShellExists();
+    },
+  );
+
+  testWidgets(
+    'Given the phone sign-out dialog, when Sign out is confirmed, then the login screen is shown',
+    (tester) async {
+      // Given
+      final auth = await _openSignOutDialog(
+        tester,
+        size: const Size(400, 800),
+        chromeKey: _phoneChrome,
+        destination: 'Journal',
+      );
+
+      // When
+      await tester.tap(find.byKey(const Key('confirmation-confirm')));
+      await tester.pumpAndSettle();
 
       // Then
       expect(auth.signOutCalls, 1);
-      expectPhoneShellExists();
-      expectLoginFormNotExists();
-      expect(
-        tester.widgetList<Text>(find.byType(Text)).map((text) => text.data),
-        textBefore,
+      expect(find.byType(Shell), findsNothing);
+      expectLoginFormExists();
+    },
+  );
+
+  testWidgets(
+    'Given the desktop sign-out dialog, when Sign out is confirmed, then the login screen is shown',
+    (tester) async {
+      // Given
+      final auth = await _openSignOutDialog(
+        tester,
+        size: const Size(601, 800),
+        chromeKey: _desktopChrome,
+        destination: 'Journal',
       );
+
+      // When
+      await tester.tap(find.byKey(const Key('confirmation-confirm')));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(auth.signOutCalls, 1);
+      expect(find.byType(Shell), findsNothing);
+      expectLoginFormExists();
+    },
+  );
+
+  testWidgets(
+    'Given Archive is selected on the phone shell, when sign-out fails, then the error snackbar is shown and then dismissed',
+    (tester) async {
+      // Given
+      final auth = await _openSignOutDialog(
+        tester,
+        size: const Size(400, 800),
+        chromeKey: _phoneChrome,
+        destination: 'Archive',
+        throwOnSignOut: true,
+      );
+
+      // When
+      await tester.tap(find.byKey(const Key('confirmation-confirm')));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(find.byKey(const Key('confirmation-dialog')), findsNothing);
+      expect(auth.signOutCalls, 1);
+      expectPhoneShellExists();
+      expectContent(tester, 'Archive');
+      expect(shellSelectedIndex(tester), 2);
+      expectSignOutFailureSnackBar(tester);
+
+      final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+      await tester.pump(snackBar.duration);
+      await tester.pumpAndSettle();
+
+      expect(find.text(_signOutFailure), findsNothing);
+      expectPhoneShellExists();
+      expectContent(tester, 'Archive');
+    },
+  );
+
+  testWidgets(
+    'Given Archive is selected on the desktop shell, when sign-out fails, then the error snackbar is shown and then dismissed',
+    (tester) async {
+      // Given
+      final auth = await _openSignOutDialog(
+        tester,
+        size: const Size(601, 800),
+        chromeKey: _desktopChrome,
+        destination: 'Archive',
+        throwOnSignOut: true,
+      );
+
+      // When
+      await tester.tap(find.byKey(const Key('confirmation-confirm')));
+      await tester.pumpAndSettle();
+
+      // Then
+      expect(find.byKey(const Key('confirmation-dialog')), findsNothing);
+      expect(auth.signOutCalls, 1);
+      expectDesktopShellExists();
+      expectContent(tester, 'Archive');
+      expect(shellSelectedIndex(tester), 2);
+      expectSignOutFailureSnackBar(tester);
+
+      final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+      await tester.pump(snackBar.duration);
+      await tester.pumpAndSettle();
+
+      expect(find.text(_signOutFailure), findsNothing);
+      expectDesktopShellExists();
+      expectContent(tester, 'Archive');
     },
   );
 }

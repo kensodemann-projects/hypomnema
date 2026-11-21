@@ -32,7 +32,7 @@ Related to [#17](https://github.com/kensodemann-projects/hypomnema/issues/17).
 | Order | Step       | Status | Files                                              |
 | ----- | ---------- | ------ | -------------------------------------------------- |
 | 1     | [STEP-001] | complete | `lib/app/shell.dart`, then `test/app/app_test.dart` |
-| 2     | [STEP-002] |        | `lib/app/shell.dart`, then `test/app/app_test.dart` |
+| 2     | [STEP-002] | complete | `lib/app/shell.dart`, then `test/app/app_test.dart` |
 
 **Commit gate**
 
@@ -88,7 +88,7 @@ Add tests that assert:
 
 ## [STEP-002] Confirm sign-out and report failure
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** Sign out opens the confirmation dialog and leaves the selected destination unchanged. The dialog title is "Sign out?", the message is "You'll need your email and password to sign back in.", and the actions are Cancel and Sign out. The dialog has no warning, and the confirm action uses the primary color. Cancel closes the dialog and stays on the current destination. Confirming signs the person out and shows the sign-in screen. A failed sign-out closes the dialog, shows a snackbar that says "Failed to sign out.", and leaves the person signed in on the current destination. The snackbar goes away on its own.
 

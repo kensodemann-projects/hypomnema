@@ -1,4 +1,5 @@
 import 'package:hypomnema/features/auth/data/auth_service.dart';
+import 'package:hypomnema/shared/ui/confirmation_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 
 class _NavDestination {
@@ -27,10 +28,33 @@ class _ShellState extends State<Shell> {
   var _selectedIndex = 0;
 
   Future<void> _signOut() async {
+    final confirmed = await showConfirmationDialog(
+      context: context,
+      title: 'Sign out?',
+      message: "You'll need your email and password to sign back in.",
+      confirmLabel: 'Sign out',
+      style: ConfirmationStyle.normal,
+    );
+    if (!confirmed || !mounted) {
+      return;
+    }
     try {
       await widget.authService.signOut();
     } on AuthException {
-      // Stay on the current destination. signedIn does not emit false.
+      if (!mounted) {
+        return;
+      }
+      final scheme = Theme.of(context).colorScheme;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: scheme.errorContainer,
+          content: Text(
+            'Failed to sign out.',
+            style: TextStyle(color: scheme.error),
+          ),
+        ),
+      );
     }
   }
 
