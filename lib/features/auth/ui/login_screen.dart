@@ -1,7 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/services.dart';
+import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
+import 'package:hypomnema/features/auth/ui/hypomnema_logo.dart';
+import 'package:hypomnema/features/auth/ui/login_snackbar.dart';
 import 'package:material_ui/material_ui.dart';
 
 final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
@@ -24,6 +25,34 @@ String? _passwordValidationError(String text) {
   return null;
 }
 
+const _desktopQuote =
+    'A note kept so it can be found again: a reminder, a memorandum, '
+    'a short record of something worth remembering.';
+
+const _phoneQuote = 'A note kept so it can be found again.';
+
+const _brandPadding = 64.0;
+
+// CSS linear-gradient(150deg): 0deg points up and angles run clockwise.
+const _brandBegin = Alignment(-0.5, -0.8660254037844386);
+const _brandEnd = Alignment(0.5, 0.8660254037844386);
+
+const _lightBrandGradient = LinearGradient(
+  begin: _brandBegin,
+  end: _brandEnd,
+  colors: [Color(0xFF4A55C8), Color(0xFF2E3694)],
+);
+
+const _darkBrandGradient = LinearGradient(
+  begin: _brandBegin,
+  end: _brandEnd,
+  colors: [Color(0xFF2B3290), Color(0xFF151A55)],
+);
+
+const _resetSentMessage = 'Check your email for a password reset link.';
+const _resetFailedMessage = 'A reset link could not be sent. Try again.';
+const _signInFailedMessage = 'Authentication failed.';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({required this.authService, super.key});
 
@@ -38,13 +67,13 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _emailFocus = FocusNode();
   final _passwordFocus = FocusNode();
+  final _forgotPasswordAnchor = GlobalKey();
 
   String? _emailError;
   String? _passwordError;
-  String? _authError;
-  String? _confirmation;
   var _submitting = false;
-  var _resettingPassword = false;
+  LoginNotice? _notice;
+  var _noticeId = 0;
 
   bool get _emailIsValid =>
       _emailValidationError(_emailController.text) == null;
@@ -53,8 +82,6 @@ class _LoginScreenState extends State<LoginScreen> {
       !_submitting &&
       _emailIsValid &&
       _passwordValidationError(_passwordController.text) == null;
-
-  bool get _canResetPassword => !_submitting && _emailIsValid;
 
   @override
   void initState() {
@@ -91,10 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signIn() async {
-    setState(() {
-      _submitting = true;
-      _authError = null;
-    });
+    setState(() => _submitting = true);
     try {
       await widget.authService.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -105,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) {
         return;
       }
-      setState(() => _authError = 'Authentication failed.');
+      _showErrorSnackBar(_signInFailedMessage);
     } finally {
       if (mounted) {
         setState(() => _submitting = false);
@@ -113,31 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _showResetForm() {
-    setState(() {
-      _resettingPassword = true;
-      _authError = null;
-      _confirmation = null;
-      _passwordError = null;
-    });
-  }
-
-  void _showSignInForm() {
-    setState(() {
-      _resettingPassword = false;
-      _authError = null;
-      _confirmation = null;
-      _passwordError = null;
-    });
-  }
-
   void _submitEmailField(String _) {
-    if (_resettingPassword) {
-      if (_canResetPassword) {
-        _sendResetEmail();
-      }
-      return;
-    }
     _passwordFocus.requestFocus();
   }
 
@@ -147,12 +147,13 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _sendResetEmail() async {
-    setState(() {
-      _submitting = true;
-      _authError = null;
-      _confirmation = null;
-    });
+  Future<void> _forgotPassword() async {
+    final emailError = _emailValidationError(_emailController.text);
+    if (emailError != null) {
+      setState(() => _emailError = emailError);
+      return;
+    }
+    setState(() => _submitting = true);
     try {
       await widget.authService.sendPasswordResetEmail(
         email: _emailController.text.trim(),
@@ -160,19 +161,55 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) {
         return;
       }
-      setState(
-        () => _confirmation = 'Check your email for a password reset link.',
-      );
+      _showInfoSnackBar(_resetSentMessage);
     } on AuthException {
       if (!mounted) {
         return;
       }
-      setState(() => _authError = 'Failed to send password reset email.');
+      _showErrorSnackBar(_resetFailedMessage);
     } finally {
       if (mounted) {
         setState(() => _submitting = false);
       }
     }
+  }
+
+  void _showInfoSnackBar(String message) {
+    final colors = Theme.of(context).extension<AppColors>()!;
+    _showSnackBar(
+      message: message,
+      icon: Icons.info_outline,
+      background: colors.infoContainer,
+      foreground: colors.info,
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    final scheme = Theme.of(context).colorScheme;
+    _showSnackBar(
+      message: message,
+      icon: Icons.error_outline,
+      background: scheme.errorContainer,
+      foreground: scheme.error,
+    );
+  }
+
+  void _showSnackBar({
+    required String message,
+    required IconData icon,
+    required Color background,
+    required Color foreground,
+  }) {
+    setState(() {
+      _noticeId += 1;
+      _notice = LoginNotice(
+        id: _noticeId,
+        message: message,
+        icon: icon,
+        background: background,
+        foreground: foreground,
+      );
+    });
   }
 
   Widget _emailField() {
@@ -181,9 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: _emailController,
       focusNode: _emailFocus,
       keyboardType: TextInputType.emailAddress,
-      textInputAction: _resettingPassword
-          ? TextInputAction.done
-          : TextInputAction.next,
+      textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.email],
       decoration: InputDecoration(labelText: 'Email', errorText: _emailError),
       onChanged: (_) => setState(() => _emailError = null),
@@ -191,75 +226,234 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  List<Widget> _feedback() {
-    return [
-      if (_authError != null) ...[
-        const SizedBox(height: 16),
-        Text(
-          _authError!,
-          key: const Key('login-error'),
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
-        ),
-      ],
-      if (_confirmation != null) ...[
-        const SizedBox(height: 16),
-        Text(_confirmation!, key: const Key('login-reset-confirmation')),
-      ],
-    ];
-  }
-
   Widget _form() {
     return AutofillGroup(
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _emailField(),
-            if (_resettingPassword) ...[
-              ..._feedback(),
-              const SizedBox(height: 24),
-              FilledButton(
-                key: const Key('login-send-reset'),
-                onPressed: _canResetPassword ? _sendResetEmail : null,
-                child: const Text('Send reset email'),
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                key: const Key('login-back-to-sign-in'),
-                onPressed: _submitting ? null : _showSignInForm,
-                child: const Text('Back to sign in'),
-              ),
-            ] else ...[
-              const SizedBox(height: 16),
-              TextField(
-                key: const Key('login-password'),
-                controller: _passwordController,
-                focusNode: _passwordFocus,
-                obscureText: true,
-                textInputAction: TextInputAction.done,
-                autofillHints: const [AutofillHints.password],
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  errorText: _passwordError,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _emailField(),
+          const SizedBox(height: 16),
+          TextField(
+            key: const Key('login-password'),
+            controller: _passwordController,
+            focusNode: _passwordFocus,
+            obscureText: true,
+            textInputAction: TextInputAction.done,
+            autofillHints: const [AutofillHints.password],
+            decoration: InputDecoration(
+              labelText: 'Password',
+              errorText: _passwordError,
+            ),
+            onChanged: (_) => setState(() => _passwordError = null),
+            onSubmitted: _submitPasswordField,
+          ),
+          const SizedBox(height: 24),
+          FilledButton(
+            key: const Key('login-sign-in'),
+            onPressed: _canSignIn ? _signIn : null,
+            child: const Text('Sign in'),
+          ),
+          const SizedBox(height: 8),
+          KeyedSubtree(
+            key: _forgotPasswordAnchor,
+            child: TextButton(
+              key: const Key('login-forgot-password'),
+              onPressed: _submitting ? null : _forgotPassword,
+              child: const Text('Forgot password'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _brandContent() {
+    return Padding(
+      padding: const EdgeInsets.all(_brandPadding),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const HypomnemaLogo(key: Key('login-logo')),
+          const SizedBox(height: 28),
+          const Text(
+            'Hypomnema',
+            style: TextStyle(
+              color: Color(0xFFFFFFFF),
+              fontSize: 40,
+              fontWeight: FontWeight.w400,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            _desktopQuote,
+            style: TextStyle(
+              color: const Color(0xFFFFFFFF).withValues(alpha: 0.85),
+              fontSize: 18,
+              fontStyle: FontStyle.italic,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _brandPanel() {
+    final gradient = Theme.of(context).brightness == Brightness.light
+        ? _lightBrandGradient
+        : _darkBrandGradient;
+    return DecoratedBox(
+      key: const Key('login-brand'),
+      decoration: BoxDecoration(gradient: gradient),
+      child: Material(
+        type: MaterialType.transparency,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final narrow = constraints.maxWidth < _brandPadding * 2 + 72;
+            if (narrow) {
+              return ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.centerLeft,
+                  minWidth: 0,
+                  maxWidth: double.infinity,
+                  maxHeight: constraints.maxHeight,
+                  child: _brandContent(),
                 ),
-                onChanged: (_) => setState(() => _passwordError = null),
-                onSubmitted: _submitPasswordField,
+              );
+            }
+            return CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _brandContent(),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _scaffold({required Widget body}) {
+    final notice = _notice;
+    return Scaffold(
+      body: Stack(
+        children: [
+          body,
+          if (notice != null)
+            Positioned.fill(
+              child: ClipRect(
+                child: LoginSnackBar(
+                  key: ValueKey(notice.id),
+                  anchorKey: _forgotPasswordAnchor,
+                  message: notice.message,
+                  icon: notice.icon,
+                  background: notice.background,
+                  foreground: notice.foreground,
+                  onDismissed: () {
+                    if (mounted) {
+                      setState(() => _notice = null);
+                    }
+                  },
+                ),
               ),
-              ..._feedback(),
-              const SizedBox(height: 24),
-              FilledButton(
-                key: const Key('login-sign-in'),
-                onPressed: _canSignIn ? _signIn : null,
-                child: const Text('Sign in'),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _desktopLayout() {
+    return Row(
+      children: [
+        Expanded(child: _brandPanel()),
+        SizedBox(
+          key: const Key('login-form-side'),
+          width: 520,
+          child: _scaffold(
+            body: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: ConstrainedBox(
+                      key: const Key('login-form-column'),
+                      constraints: const BoxConstraints(maxWidth: 360),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'Sign in',
+                            key: Key('login-heading'),
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          _form(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _phoneLayout() {
+    final onSurfaceVariant = Theme.of(context).colorScheme.onSurfaceVariant;
+    return _scaffold(
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 28,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Align(child: HypomnemaLogo(key: Key('login-logo'))),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Hypomnema',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _phoneQuote,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: onSurfaceVariant,
+                        fontSize: 15,
+                        fontStyle: FontStyle.italic,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _form(),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-              TextButton(
-                key: const Key('login-forgot-password'),
-                onPressed: _canResetPassword ? _showResetForm : null,
-                child: const Text('Forgot password'),
-              ),
-            ],
+            ),
           ],
         ),
       ),
@@ -270,28 +464,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final form = _form();
         if (constraints.maxWidth > 600) {
-          return Scaffold(
-            body: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400),
-                child: Card(
-                  key: const Key('login-form-card'),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: form,
-                  ),
-                ),
-              ),
-            ),
-          );
+          return _desktopLayout();
         }
-        return Scaffold(
-          body: SafeArea(
-            child: Padding(padding: const EdgeInsets.all(16), child: form),
-          ),
-        );
+        return _phoneLayout();
       },
     );
   }

@@ -110,6 +110,8 @@ class _ContractPalette {
     required this.scaffoldBackgroundColor,
     required this.warning,
     required this.warningContainer,
+    required this.info,
+    required this.infoContainer,
   });
 
   final Color primary;
@@ -136,6 +138,8 @@ class _ContractPalette {
   final Color scaffoldBackgroundColor;
   final Color warning;
   final Color warningContainer;
+  final Color info;
+  final Color infoContainer;
 }
 
 const _lightPalette = _ContractPalette(
@@ -163,6 +167,8 @@ const _lightPalette = _ContractPalette(
   scaffoldBackgroundColor: Color(0xFFF4F4FA),
   warning: Color(0xFF8A5000),
   warningContainer: Color(0xFFFFDDB3),
+  info: Color(0xFF0C5DA8),
+  infoContainer: Color(0xFFD4E3FF),
 );
 
 const _darkPalette = _ContractPalette(
@@ -190,6 +196,8 @@ const _darkPalette = _ContractPalette(
   scaffoldBackgroundColor: Color(0xFF131318),
   warning: Color(0xFFFFB86B),
   warningContainer: Color(0xFF6A3C00),
+  info: Color(0xFFA5C8FF),
+  infoContainer: Color(0xFF00468A),
 );
 
 void _expectContractColors(ThemeData theme, _ContractPalette palette) {
@@ -219,6 +227,8 @@ void _expectContractColors(ThemeData theme, _ContractPalette palette) {
   final colors = theme.extension<AppColors>()!;
   expect(colors.warning, palette.warning);
   expect(colors.warningContainer, palette.warningContainer);
+  expect(colors.info, palette.info);
+  expect(colors.infoContainer, palette.infoContainer);
 }
 
 void expectMainAppTheme(WidgetTester tester, Brightness brightness) {
