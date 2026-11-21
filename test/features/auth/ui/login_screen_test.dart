@@ -91,25 +91,13 @@ const _snackBarKey = Key('login-snackbar');
 
 Finder snackBarFinder() => find.byKey(_snackBarKey);
 
-double standardLineHeight(WidgetTester tester) {
-  final context = tester.element(find.byType(LoginScreen));
-  final painter = TextPainter(
-    text: TextSpan(text: 'Hg', style: Theme.of(context).textTheme.bodyMedium),
-    textDirection: Directionality.of(context),
-    maxLines: 1,
-  )..layout();
-  final height = painter.height;
-  painter.dispose();
-  return height;
-}
-
 void expectSnackBarPlacement(WidgetTester tester) {
   final snackBar = snackBarFinder();
   final button = find.byKey(const Key('login-forgot-password'));
   final scaffold = find.ancestor(of: snackBar, matching: find.byType(Scaffold));
   final snackTop = tester.getTopLeft(snackBar).dy;
   final buttonBottom = tester.getBottomLeft(button).dy;
-  expect(snackTop, closeTo(buttonBottom + standardLineHeight(tester), 1));
+  expect(snackTop, closeTo(buttonBottom + 16, 1));
 
   final snackSize = tester.getSize(snackBar);
   final snackLeft = tester.getTopLeft(snackBar).dx;

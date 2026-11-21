@@ -63,17 +63,7 @@ const _snackBarVerticalPadding = 12.0;
 const _snackBarIconSize = 24.0;
 const _snackBarMotion = Duration(milliseconds: 250);
 const _snackBarVisible = Duration(seconds: 4);
-
-double _standardLineHeight(BuildContext context) {
-  final painter = TextPainter(
-    text: TextSpan(text: 'Hg', style: Theme.of(context).textTheme.bodyMedium),
-    textDirection: Directionality.of(context),
-    maxLines: 1,
-  )..layout();
-  final height = painter.height;
-  painter.dispose();
-  return height;
-}
+const _snackBarGap = 16.0;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({required this.authService, super.key});
@@ -372,7 +362,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: _SnackBarSlot(
                   key: ValueKey(notice.id),
                   anchorKey: _forgotPasswordAnchor,
-                  lineHeight: _standardLineHeight(context),
                   message: notice.message,
                   icon: notice.icon,
                   background: notice.background,
@@ -516,7 +505,6 @@ class _SnackBarSlot extends StatefulWidget {
   const _SnackBarSlot({
     super.key,
     required this.anchorKey,
-    required this.lineHeight,
     required this.message,
     required this.icon,
     required this.background,
@@ -525,7 +513,6 @@ class _SnackBarSlot extends StatefulWidget {
   });
 
   final GlobalKey anchorKey;
-  final double lineHeight;
   final String message;
   final IconData icon;
   final Color background;
@@ -605,7 +592,6 @@ class _SnackBarSlotState extends State<_SnackBarSlot>
     final foreground = widget.foreground;
     return _SnackBarPosition(
       anchorBottom: _anchorBottom,
-      lineHeight: widget.lineHeight,
       animation: _motion,
       child: Semantics(
         liveRegion: true,
@@ -646,20 +632,17 @@ class _SnackBarSlotState extends State<_SnackBarSlot>
 class _SnackBarPosition extends SingleChildRenderObjectWidget {
   const _SnackBarPosition({
     required this.anchorBottom,
-    required this.lineHeight,
     required this.animation,
     required super.child,
   });
 
   final double? anchorBottom;
-  final double lineHeight;
   final Animation<double> animation;
 
   @override
   RenderObject createRenderObject(BuildContext context) {
     return _RenderSnackBarPosition(
       anchorBottom: anchorBottom,
-      lineHeight: lineHeight,
       animation: animation,
     );
   }
@@ -671,7 +654,6 @@ class _SnackBarPosition extends SingleChildRenderObjectWidget {
   ) {
     renderObject
       ..anchorBottom = anchorBottom
-      ..lineHeight = lineHeight
       ..animation = animation;
   }
 }
@@ -679,12 +661,10 @@ class _SnackBarPosition extends SingleChildRenderObjectWidget {
 class _RenderSnackBarPosition extends RenderShiftedBox {
   _RenderSnackBarPosition({
     required this._anchorBottom,
-    required this._lineHeight,
     required this._animation,
   }) : super(null);
 
   double? _anchorBottom;
-  double _lineHeight;
   Animation<double> _animation;
 
   double? get anchorBottom => _anchorBottom;
@@ -694,16 +674,6 @@ class _RenderSnackBarPosition extends RenderShiftedBox {
       return;
     }
     _anchorBottom = value;
-    markNeedsLayout();
-  }
-
-  double get lineHeight => _lineHeight;
-
-  set lineHeight(double value) {
-    if (value == _lineHeight) {
-      return;
-    }
-    _lineHeight = value;
     markNeedsLayout();
   }
 
@@ -750,7 +720,7 @@ class _RenderSnackBarPosition extends RenderShiftedBox {
     final anchorBottom = _anchorBottom;
     final restTop = anchorBottom == null
         ? size.height
-        : anchorBottom + _lineHeight;
+        : anchorBottom + _snackBarGap;
     final top = size.height + (restTop - size.height) * _animation.value;
     final parentData = bar.parentData! as BoxParentData;
     parentData.offset = Offset((size.width - bar.size.width) / 2, top);
