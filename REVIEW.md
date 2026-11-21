@@ -1,6 +1,6 @@
 ## Summary
 
-Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_screen.dart`, new `hypomnema_logo.dart`, `AppColors` info tokens, expanded widget tests, and new root `PLAN.md`. CI (`format_analyze_test`) is green. The layout contract, single-screen reset flow, themed snackbars, and test coverage (phone/desktop × light/dark, placement, dismissal) match the issue and PR description well. **Recommendation: approve**, with a documentation nit to address before or right after merge—nothing that blocks merge if you accept the current `PLAN.md` drift.
+Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_screen.dart`, new `hypomnema_logo.dart`, `AppColors` info tokens, expanded widget tests, and new root `PLAN.md`. CI (`format_analyze_test`) is green. The layout contract, single-screen reset flow, themed snackbars, and test coverage (phone/desktop × light/dark, placement, dismissal) match the issue and PR description well. **Recommendation: approve.** `PLAN.md` will be deleted just prior to merge. The remaining discussion is whether the custom snackbar stays a sign-in one-off.
 
 ## Finding counts
 
@@ -9,11 +9,11 @@ Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_scree
 | 🔒 Security concerns (immediate attention) |     0 |
 | ⚡ Performance issues/optimizations        |     0 |
 | 🧹 Code cleanup and maintainability        |     0 |
-| 📚 Documentation gaps                      |     1 |
+| 📚 Documentation gaps                      |     0 |
 | ✅ Positive feedback                       |     3 |
 | 🚨 Critical blockers                       |     0 |
-| 💭 Questions for discussion                |     2 |
-| **Total**                                  |     6 |
+| 💭 Questions for discussion                |     1 |
+| **Total**                                  |     4 |
 
 ## Findings
 
@@ -59,13 +59,11 @@ Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_scree
 
 ### 📚 Documentation gaps
 
-[DOC-001]
+#### [DOC-001] — answered
 
 **Issue:** New `PLAN.md` still describes the pre-change screen (reset form, inline errors) in the opening paragraph, lists STEP-002 as incomplete, and under **Decisions** says info colors stay on the sign-in screen and `AppTheme` is out of scope—while this PR adds `AppColors.info` / `infoContainer` and implements STEP-002 behavior.
 
-**Suggestion:** Before merge, refresh `PLAN.md`: mark STEP-002 complete, update **Decisions** to record theme extension for info colors, and shorten the intro to past tense or remove the stale baseline paragraph.
-
-**Why:** Contributors using `PLAN.md` per `CONTRIBUTING.md` should not see contradictions with the merged tree.
+**Resolution:** `PLAN.md` is transient and will be deleted just prior to the PR being merged, so it does not need to be refreshed to match the tree.
 
 ### ✅ Positive feedback
 
@@ -101,13 +99,11 @@ Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_scree
 
 ### 💭 Questions for discussion
 
-[QST-001]
+#### [QST-001] — answered
 
 **Issue:** Should `PLAN.md` remain on `main` after the feature merges, or is it branch-only working notes that should be dropped or archived when #20 closes?
 
-**Suggestion:** Align with team convention (e.g. keep for audit trail vs. delete to avoid stale plans).
-
-**Why:** Avoids an accumulating set of out-of-date plans at repo root.
+**Resolution:** `PLAN.md` is transient and will be deleted just prior to the PR being merged. It will not remain on `main`.
 
 [QST-002]
 
