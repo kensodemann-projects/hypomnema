@@ -31,7 +31,7 @@ Related to [#17](https://github.com/kensodemann-projects/hypomnema/issues/17).
 
 | Order | Step       | Status | Files                                              |
 | ----- | ---------- | ------ | -------------------------------------------------- |
-| 1     | [STEP-001] |        | `lib/app/shell.dart`, then `test/app/app_test.dart` |
+| 1     | [STEP-001] | complete | `lib/app/shell.dart`, then `test/app/app_test.dart` |
 | 2     | [STEP-002] |        | `lib/app/shell.dart`, then `test/app/app_test.dart` |
 
 **Commit gate**
@@ -47,7 +47,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Show Dashboard, Journal, and Archive in the shell
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** Above a width of 600 the signed-in shell is a navigation rail, and at 600 and below it is a bottom bar. Both offer Dashboard, Journal, Archive, and Sign out. Dashboard is selected on arrival and the content text is "Dashboard". Choosing Journal or Archive selects that destination and shows its name. The content texts "Desktop" and "Phone" are absent. Sign out sits at the bottom of the rail and is the last bottom-bar item. Tapping it still signs out immediately. While `signedIn` has not emitted, the progress indicator still shows.
 
