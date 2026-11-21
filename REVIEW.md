@@ -7,13 +7,13 @@ Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_scree
 | Category                                   | Count |
 | ------------------------------------------ | ----: |
 | 🔒 Security concerns (immediate attention) |     0 |
-| ⚡ Performance issues/optimizations        |     1 |
-| 🧹 Code cleanup and maintainability        |     4 |
+| ⚡ Performance issues/optimizations        |     0 |
+| 🧹 Code cleanup and maintainability        |     3 |
 | 📚 Documentation gaps                      |     1 |
 | ✅ Positive feedback                       |     3 |
 | 🚨 Critical blockers                       |     0 |
 | 💭 Questions for discussion                |     2 |
-| **Total**                                  |    11 |
+| **Total**                                  |     9 |
 
 ## Findings
 
@@ -23,23 +23,21 @@ Reviewed PR #29 (*Redesign the sign-in screen*): ~1.1k lines across `login_scree
 
 ### ⚡ Performance issues/optimizations
 
-[PERF-001]
+*(none — [PERF-001] resolved in `39d756d`.)*
 
-**Issue:** `_standardLineHeight` builds a `TextPainter` and lays out text on every rebuild of `_scaffold` while a notice is visible, because it is called directly in the `build` path when constructing `_SnackBarSlot`.
+#### [PERF-001] — complete
 
-**Suggestion:** Compute line height once per `LoginScreen` state (e.g. cache in `didChangeDependencies` or pass a lazy getter only into `_SnackBarSlot`’s `initState`), or use `Theme.of(context).textTheme.bodyMedium?.height` with a fixed font metric if that matches the contract.
+**Issue:** `_standardLineHeight` built a `TextPainter` on every rebuild while a notice was visible.
 
-**Why:** Avoids repeated layout work on every `setState` during snackbar animation and keeps the hot path cheaper on low-end devices.
+**Resolution:** Removed text measurement; snackbars anchor with a fixed `_snackBarGap` (16px) under Forgot password. Tests assert `buttonBottom + 16`. No per-frame layout in the notice path.
 
 ### 🧹 Code cleanup and maintainability
 
-[CLN-001]
+#### [CLN-001] — complete
 
-**Issue:** `login_screen.dart` is now ~760 lines and contains three layers of snackbar UI (`_SnackBarSlot`, `_SnackBarPosition`, `_RenderSnackBarPosition`) alongside layout and auth logic.
+**Issue:** `login_screen.dart` mixed layout, auth, and three layers of custom snackbar UI.
 
-**Suggestion:** Move the notice/snackbar types and custom render object into something like `lib/features/auth/ui/login_notice_bar.dart` (or `lib/shared/ui/` if you expect reuse), leaving `LoginScreen` focused on layout and auth.
-
-**Why:** Smaller files are easier to review, test in isolation, and reuse if other auth surfaces need the same anchored notice pattern.
+**Resolution:** Uncommitted work moves `LoginNotice`, `LoginSnackBar`, and the anchored `RenderObject` stack into `lib/features/auth/ui/login_snackbar.dart`. `login_screen.dart` is ~474 lines and only composes `LoginSnackBar` with notice state and theme colors. Same feature-scoped split the review suggested.
 
 [CLN-002]
 
