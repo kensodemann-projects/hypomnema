@@ -10,19 +10,19 @@ Mock-ups are in [docs/ui-mockups](docs/ui-mockups). Open `desktop/index.html` or
 
 ## Order at a glance
 
-| # | Feature | Depends on | Likely issue type |
-| --- | --- | --- | --- |
-| 1 | App shell, sign-in, and sign-out | — | Feature |
-| 2 | Journal entries | 1 | Feature |
-| 3 | Journaling goal and dashboard | 2 | Feature |
-| 4 | Mood trend | 2 | Task |
-| 5 | Frequency goals | 3 | Feature |
-| 6 | Editing goals | 5 | Feature |
-| 7 | Accumulation goals | 5 | Feature |
-| 8 | Target value goals | 5, 4 (chart) | Feature |
-| 9 | Avoidance goals | 5 | Feature |
-| 10 | Resources | 5 | Task |
-| 11 | Archive and delete goals | 5 | Feature |
+| # | Feature | Depends on | Likely issue type | Status |
+| --- | --- | --- | --- | --- |
+| 1 | App shell, sign-in, and sign-out | — | Feature | Complete |
+| 2 | Journal entries | 1 | Feature | |
+| 3 | Journaling goal and dashboard | 2 | Feature | |
+| 4 | Mood trend | 2 | Task | |
+| 5 | Frequency goals | 3 | Feature | |
+| 6 | Editing goals | 5 | Feature | |
+| 7 | Accumulation goals | 5 | Feature | |
+| 8 | Target value goals | 5, 4 (chart) | Feature | |
+| 9 | Avoidance goals | 5 | Feature | |
+| 10 | Resources | 5 | Task | |
+| 11 | Archive and delete goals | 5 | Feature | |
 
 **Why this order:** The journal comes first because it is self-contained and sets up the patterns every later feature uses: a Firestore collection with security rules, a list-and-detail screen in both layouts, and the 24-hour edit window. The journaling goal then adds the calendar period engine (day, week, month) and the dashboard, which frequency goals reuse. Frequency goals introduce goal records, the entry form, and entry corrections, so the other goal types only add what is unique to them. After feature 5, features 6 through 11 can be worked on in parallel, except that target value goals reuse the chart from the mood trend.
 
@@ -48,6 +48,8 @@ Each shared piece is built with the first feature that needs it, and later featu
 ## Features
 
 ### 1. App shell, sign-in, and sign-out
+
+**Status:** Complete
 
 **Intent:** I want a signed-out user to see the redesigned sign-in screen and a signed-in user to land in a navigation shell with Dashboard, Journal, Archive, and Sign Out (a rail on desktop and a bottom bar on phone), where Sign Out asks for confirmation, so that every later feature has a place to live (§2, §7.5, §9).
 
