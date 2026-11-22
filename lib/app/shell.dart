@@ -1,48 +1,126 @@
 import 'package:hypomnema/features/auth/data/auth_service.dart';
+import 'package:hypomnema/shared/ui/confirmation_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 
-class Shell extends StatelessWidget {
+class _NavDestination {
+  const _NavDestination({required this.label, required this.icon});
+
+  final String label;
+  final IconData icon;
+}
+
+const _destinations = <_NavDestination>[
+  _NavDestination(label: 'Dashboard', icon: Icons.space_dashboard),
+  _NavDestination(label: 'Journal', icon: Icons.menu_book),
+  _NavDestination(label: 'Archive', icon: Icons.inventory_2),
+];
+
+class Shell extends StatefulWidget {
   const Shell({required this.authService, super.key});
 
   final AuthService authService;
 
   @override
+  State<Shell> createState() => _ShellState();
+}
+
+class _ShellState extends State<Shell> {
+  var _selectedIndex = 0;
+
+  Future<void> _signOut() async {
+    final confirmed = await showConfirmationDialog(
+      context: context,
+      title: 'Sign out?',
+      message: "You'll need your email and password to sign back in.",
+      confirmLabel: 'Sign out',
+      style: ConfirmationStyle.normal,
+    );
+    if (!confirmed || !mounted) {
+      return;
+    }
+    try {
+      await widget.authService.signOut();
+    } on AuthException {
+      if (!mounted) {
+        return;
+      }
+      final scheme = Theme.of(context).colorScheme;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: scheme.errorContainer,
+          content: Text(
+            'Failed to sign out.',
+            style: TextStyle(color: scheme.error),
+          ),
+        ),
+      );
+    }
+  }
+
+  void _selectDestination(int index) {
+    setState(() => _selectedIndex = index);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final label = _destinations[_selectedIndex].label;
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth > 600) {
-          return DesktopScaffold(authService: authService);
-        } else {
-          return PhoneScaffold(authService: authService);
+          return DesktopScaffold(
+            selectedIndex: _selectedIndex,
+            label: label,
+            onDestinationSelected: _selectDestination,
+            onSignOut: _signOut,
+          );
         }
+        return PhoneScaffold(
+          selectedIndex: _selectedIndex,
+          label: label,
+          onDestinationSelected: _selectDestination,
+          onSignOut: _signOut,
+        );
       },
     );
   }
 }
 
 class DesktopScaffold extends StatelessWidget {
-  const DesktopScaffold({required this.authService, super.key});
+  const DesktopScaffold({
+    required this.selectedIndex,
+    required this.label,
+    required this.onDestinationSelected,
+    required this.onSignOut,
+    super.key,
+  });
 
-  final AuthService authService;
+  final int selectedIndex;
+  final String label;
+  final ValueChanged<int> onDestinationSelected;
+  final Future<void> Function() onSignOut;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
-          SizedBox(
-            key: const Key('shell-side-panel'),
-            width: 72,
-            height: double.infinity,
-            child: ColoredBox(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh,
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: _SignOutButton(authService: authService),
-              ),
-            ),
+          NavigationRail(
+            key: const Key('shell-navigation-rail'),
+            selectedIndex: selectedIndex,
+            onDestinationSelected: onDestinationSelected,
+            labelType: NavigationRailLabelType.all,
+            trailingAtBottom: true,
+            trailing: _SignOutRailButton(onSignOut: onSignOut),
+            destinations: [
+              for (final destination in _destinations)
+                NavigationRailDestination(
+                  icon: Icon(destination.icon),
+                  label: Text(destination.label),
+                ),
+            ],
           ),
-          const Expanded(child: Center(child: Text('Desktop'))),
+          Expanded(child: _ShellContent(label: label)),
         ],
       ),
     );
@@ -50,37 +128,89 @@ class DesktopScaffold extends StatelessWidget {
 }
 
 class PhoneScaffold extends StatelessWidget {
-  const PhoneScaffold({required this.authService, super.key});
+  const PhoneScaffold({
+    required this.selectedIndex,
+    required this.label,
+    required this.onDestinationSelected,
+    required this.onSignOut,
+    super.key,
+  });
 
-  final AuthService authService;
+  final int selectedIndex;
+  final String label;
+  final ValueChanged<int> onDestinationSelected;
+  final Future<void> Function() onSignOut;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(actions: [_SignOutButton(authService: authService)]),
-      body: const Center(child: Text('Phone')),
+      body: _ShellContent(label: label),
+      bottomNavigationBar: NavigationBar(
+        key: const Key('shell-navigation-bar'),
+        selectedIndex: selectedIndex,
+        onDestinationSelected: (index) async {
+          if (index == _destinations.length) {
+            await onSignOut();
+            return;
+          }
+          onDestinationSelected(index);
+        },
+        destinations: [
+          for (final destination in _destinations)
+            NavigationDestination(
+              icon: Icon(destination.icon),
+              label: destination.label,
+            ),
+          const NavigationDestination(
+            icon: Icon(Icons.logout, key: Key('shell-sign-out')),
+            label: 'Sign out',
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _SignOutButton extends StatelessWidget {
-  const _SignOutButton({required this.authService});
+class _ShellContent extends StatelessWidget {
+  const _ShellContent({required this.label});
 
-  final AuthService authService;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      key: const Key('shell-sign-out'),
-      tooltip: 'Sign out',
-      onPressed: () async {
-        try {
-          await authService.signOut();
-        } on AuthException {
-          // Stay on the shell. signedIn does not emit false.
-        }
-      },
-      icon: const Icon(Icons.logout),
+    return Center(child: Text(label, key: const Key('shell-content')));
+  }
+}
+
+class _SignOutRailButton extends StatelessWidget {
+  const _SignOutRailButton({required this.onSignOut});
+
+  final Future<void> Function() onSignOut;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Divider(),
+        InkWell(
+          key: const Key('shell-sign-out'),
+          onTap: () async {
+            await onSignOut();
+          },
+          child: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.logout),
+                SizedBox(height: 4),
+                Text('Sign out'),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
