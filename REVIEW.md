@@ -31,6 +31,8 @@ Reviewed the full PR diff against `main`: `lib/app/shell.dart` (desktop rail Sig
 
 **[CLN-001]**
 
+**Status:** complete
+
 **Issue:** The new semantics test asserts `data.flagsCollection.isFocused` is `isNot(Tristate.none)` to mean the control can receive focus. That matches current Flutter semantics modeling (focusability is encoded in the `isFocused` tristate), but the assertion reads as “currently focused” rather than “focusable,” which may confuse the next maintainer.
 
 **Suggestion:** Add a short comment above the expectation, or assert via the transitional API if your team still prefers the name:

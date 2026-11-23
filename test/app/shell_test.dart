@@ -432,6 +432,7 @@ void main() {
           .getSemanticsData();
       expect(data.label, 'Sign out');
       expect(data.flagsCollection.isButton, isTrue);
+      // Focusable nodes expose isFocused as true/false; Tristate.none means not focusable.
       expect(data.flagsCollection.isFocused, isNot(Tristate.none));
       expect(data.hasAction(SemanticsAction.tap), isTrue);
 
