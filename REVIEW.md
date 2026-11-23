@@ -76,6 +76,10 @@ expect(data.flagsCollection.isFocused, isNot(Tristate.none));
 
 **[QST-001]**
 
+**Status:** addressed
+
+Usage testing verifies the current hit target is good.
+
 **Issue:** `TextButton.styleFrom` sets `tapTargetSize: MaterialTapTargetSize.shrinkWrap` and `minimumSize: Size.zero`, which minimizes the hit target to the icon/column footprint.
 
 **Suggestion:** No change required if desktop-only; optionally confirm in manual QA that focus rings and clickable area still feel acceptable on the rail (some users use trackpads or assistive switching on desktop).
