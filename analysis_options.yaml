@@ -9,3 +9,4 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
+    - test/rules/node_modules/**
