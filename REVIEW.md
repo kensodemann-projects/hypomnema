@@ -97,11 +97,15 @@ await expectLater(
 
 **[CLN-003]**
 
+**Status:** deferred
+
 **Issue:** `FirestoreJournalEntryRepository.save` inlines the Firestore field map; a future read/load path will need the inverse mapping.
 
 **Suggestion:** When adding `get`/`list`, introduce a single `JournalEntry` ↔ `Map<String, dynamic>` (or `DocumentSnapshot`) conversion used by save, update, and read.
 
 **Why:** One serialization site avoids drift between write and read (e.g. `Timestamp` vs `DateTime`, field renames).
+
+**Disposition:** Deferred until a `get` or `list` is implemented. There is no read path yet, so the write maps stay inline. The shared conversion belongs in that later change.
 
 ---
 
@@ -141,18 +145,26 @@ await expectLater(
 
 **[QST-001]**
 
+**Status:** deferred
+
 **Issue:** Rules tests assert owner isolation for journal paths but not delete. Product/docs mention delete behavior later; rules still permit owner delete today.
 
 **Suggestion:** Confirm whether a near-term rules change should deny `delete` on `journalEntries` before UI ships, or whether soft-delete is planned elsewhere.
 
 **Why:** Aligns security rules with the repository’s “no delete” API and future 24-hour edit window.
 
+**Disposition:** Deferred. Owner `write` still includes delete. [#43](https://github.com/kensodemann-projects/hypomnema/issues/43) separates create, update, and delete after the product decides whether an entry can be deleted. Delete is denied there unless that decision allows it.
+
 ---
 
 **[QST-002]**
+
+**Status:** deferred
 
 **Issue:** This PR deliberately does not wire the repository into `app/` or add read/stream APIs.
 
 **Suggestion:** When picking up list/editor UI (#32 and related), decide whether the next PR adds `JournalEntry.fromFirestore` + repository `get`/`watch` in the same feature folder or splits data loading from UI.
 
 **Why:** Avoids a large UI PR duplicating timestamp parsing or path conventions.
+
+**Disposition:** Deferred until a read is implemented. Whether `get` or `list` arrives with that screen or in an earlier repository change is decided then. The repository stays unwired from `app/` until a screen needs it.
