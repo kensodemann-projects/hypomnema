@@ -60,15 +60,21 @@ This PR adds a well-scoped data layer for journal entries (create/update under `
 
 **[CLN-001]**
 
+**Status:** complete
+
 **Issue:** `InvalidJournalEntryException` and `JournalEntryRepositoryException` are marker types with no `message` or `toString` override.
 
 **Suggestion:** Add a brief `toString` (or optional message) so logs and future UI error handling are easier to diagnose.
 
 **Why:** Empty exception types are hard to tell apart in crash reports and integration tests that only capture `toString()`.
 
+**Disposition:** `InvalidJournalEntryException.toString` returns `Invalid journal entry.` `JournalEntryRepositoryException.toString` returns `Journal entry requires a signed-in user.` Tests assert those strings.
+
 ---
 
 **[CLN-002]**
+
+**Status:** complete
 
 **Issue:** Repository tests cover signed-out `save` but not signed-out `update`, though `update` uses the same `_uid()` guard and PLAN calls out both paths.
 
@@ -84,6 +90,8 @@ await expectLater(
 (with `currentUser` null on `_FakeFirebaseAuth`).
 
 **Why:** Keeps repository auth behavior symmetric and prevents regressions if `_uid()` usage diverges between methods.
+
+**Disposition:** A signed-out `update` test builds an entry with `JournalEntry.create`, calls `update` with no current user, and expects `JournalEntryRepositoryException` with nothing written. `update` checks the signed-in user before it revises the entry, so this path cannot be covered by saving first.
 
 ---
 

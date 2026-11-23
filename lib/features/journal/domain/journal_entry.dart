@@ -1,5 +1,8 @@
 class InvalidJournalEntryException implements Exception {
   const InvalidJournalEntryException();
+
+  @override
+  String toString() => 'Invalid journal entry.';
 }
 
 class JournalEntry {

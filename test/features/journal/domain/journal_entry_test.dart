@@ -192,4 +192,11 @@ void main() {
     expect(revised.localDateTime, entry.localDateTime);
     expect(revised.createdAt, entry.createdAt);
   });
+
+  test('Given an invalid journal entry exception, when it is converted to a string, then the string names that failure', () {
+    expect(
+      const InvalidJournalEntryException().toString(),
+      'Invalid journal entry.',
+    );
+  });
 }

@@ -21,6 +21,9 @@ abstract interface class JournalEntryRepository {
 
 class JournalEntryRepositoryException implements Exception {
   const JournalEntryRepositoryException();
+
+  @override
+  String toString() => 'Journal entry requires a signed-in user.';
 }
 
 class FirestoreJournalEntryRepository implements JournalEntryRepository {

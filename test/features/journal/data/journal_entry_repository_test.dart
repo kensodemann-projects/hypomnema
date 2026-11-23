@@ -133,6 +133,45 @@ void main() {
     expect(users.docs, isEmpty);
   });
 
+  test('Given a signed-out user, when update is called, then JournalEntryRepositoryException is thrown and nothing is written', () async {
+    // Given
+    final firestore = FakeFirebaseFirestore();
+    final repository = FirestoreJournalEntryRepository(
+      firestore: firestore,
+      firebaseAuth: _FakeFirebaseAuth(),
+      clock: () => firstInstant,
+    );
+    final entry = JournalEntry.create(
+      id: 'entry-1',
+      subject: 'Note',
+      mood: 3,
+      text: 'hello',
+      private: false,
+      now: firstInstant,
+    );
+
+    // When, then
+    await expectLater(
+      repository.update(
+        entry: entry,
+        subject: 'X',
+        mood: 3,
+        text: 'y',
+        private: false,
+      ),
+      throwsA(isA<JournalEntryRepositoryException>()),
+    );
+    final users = await firestore.collection('users').get();
+    expect(users.docs, isEmpty);
+  });
+
+  test('Given a repository exception, when it is converted to a string, then the string names the missing user', () {
+    expect(
+      const JournalEntryRepositoryException().toString(),
+      'Journal entry requires a signed-in user.',
+    );
+  });
+
   test('Given a mood outside 1 to 5, when save is called, then InvalidJournalEntryException is thrown and nothing is written', () async {
     // Given
     final firestore = FakeFirebaseFirestore();
