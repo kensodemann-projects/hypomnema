@@ -14,7 +14,7 @@ analyze:
 
 test:
 	flutter test
-	npm --prefix test/rules exec -- firebase --config test/rules/firebase.json emulators:exec --only firestore --project kws-hypomnema "npm --prefix test/rules test"
+	npm --prefix test/rules exec -- firebase --config firebase.rules-test.json emulators:exec --only firestore --project kws-hypomnema "npm --prefix test/rules test"
 
 check: format-check analyze test
 
