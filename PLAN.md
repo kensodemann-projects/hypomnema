@@ -43,7 +43,7 @@ An update writes `subject`, `mood`, `text`, and `private` only. `localDateTime` 
 
 | Order | Step | Status | Files |
 | --- | --- | --- | --- |
-| 1 | [STEP-001] | | `pubspec.yaml`, then `pubspec.lock`, then `lib/features/journal/domain/journal_entry.dart`, then `lib/features/journal/data/journal_entry_repository.dart`, then `test/features/journal/domain/journal_entry_test.dart`, then `test/features/journal/data/journal_entry_repository_test.dart` |
+| 1 | [STEP-001] | complete | `pubspec.yaml`, then `pubspec.lock`, then `lib/features/journal/domain/journal_entry.dart`, then `lib/features/journal/data/journal_entry_repository.dart`, then `test/features/journal/domain/journal_entry_test.dart`, then `test/features/journal/data/journal_entry_repository_test.dart` |
 | 2 | [STEP-002] | | `test/rules/package.json`, then `test/rules/package-lock.json`, then `test/rules/journal_entries.test.js`, then `.gitignore`, then `Makefile`, then `.github/workflows/flutter_ci.yml` |
 
 **Commit gate**
@@ -59,7 +59,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Save and update a journal entry
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** A saved entry stores the contract fields under `users/{uid}/journalEntries/{entryId}`. A mood outside 1–5, or text that is empty after trim, is rejected and writes nothing. Updating changes subject, mood, text, and private, and leaves `localDateTime` and `createdAt` as first saved. The repository exposes no delete.
 
