@@ -43,6 +43,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: npm
+          cache-dependency-path: test/rules/package-lock.json
 
       - name: Install rules test dependencies
         run: npm ci --prefix test/rules

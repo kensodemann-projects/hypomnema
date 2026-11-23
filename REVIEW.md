@@ -44,11 +44,15 @@ This PR adds a well-scoped data layer for journal entries (create/update under `
 
 **[PERF-001]**
 
+**Status:** complete
+
 **Issue:** CI installs `test/rules` dependencies with `npm ci` on every run and does not cache `test/rules/node_modules`, while Flutter dependencies are cached.
 
 **Suggestion:** Add `actions/setup-node` `cache: npm` with `cache-dependency-path: test/rules/package-lock.json`, or cache the rules `node_modules` path explicitly.
 
 **Why:** Rules tests add JDK + emulator startup; shaving npm install time keeps PR feedback snappy as the suite grows.
+
+**Disposition:** The Node setup step now sets `cache: npm` and `cache-dependency-path: test/rules/package-lock.json`. That caches npm's download cache, keyed to the lockfile. `npm ci --prefix test/rules` still installs from that lockfile. `node_modules` is not cached: `npm ci` deletes it before installing, and a restored tree can hold binaries and install-script results from another runner.
 
 ---
 
