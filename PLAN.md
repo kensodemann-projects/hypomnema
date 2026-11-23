@@ -44,7 +44,7 @@ An update writes `subject`, `mood`, `text`, and `private` only. `localDateTime` 
 | Order | Step | Status | Files |
 | --- | --- | --- | --- |
 | 1 | [STEP-001] | complete | `pubspec.yaml`, then `pubspec.lock`, then `lib/features/journal/domain/journal_entry.dart`, then `lib/features/journal/data/journal_entry_repository.dart`, then `test/features/journal/domain/journal_entry_test.dart`, then `test/features/journal/data/journal_entry_repository_test.dart` |
-| 2 | [STEP-002] | | `test/rules/package.json`, then `test/rules/package-lock.json`, then `test/rules/journal_entries.test.js`, then `.gitignore`, then `Makefile`, then `.github/workflows/flutter_ci.yml` |
+| 2 | [STEP-002] | complete | `test/rules/package.json`, then `test/rules/package-lock.json`, then `test/rules/journal_entries.test.js`, then `.gitignore`, then `Makefile`, then `.github/workflows/flutter_ci.yml` |
 
 **Commit gate**
 
@@ -55,7 +55,7 @@ make web
 make check
 ```
 
-Every commit-gate command must succeed with no warning or error before that commit.
+Every commit-gate command must succeed with no warning or error before that commit. One warning is allowed: the Firebase CLI notice that another emulator suite is already running for project `kws-hypomnema`. The rules tests start their own emulator on port 8180 while the dev suite stays on port 8080.
 
 ## [STEP-001] Save and update a journal entry
 
@@ -113,7 +113,7 @@ flutter test test/features/journal
 
 ## [STEP-002] Lock journal entry rules with emulator tests
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** With the Firestore emulator enforcing `firestore.rules`, a signed-in user can read and write only their own `users/{uid}/journalEntries/{entryId}` documents. Another signed-in user cannot read or write those documents. A signed-out person cannot read or write them.
 
