@@ -193,21 +193,24 @@ class _SignOutRailButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         const Divider(),
-        InkWell(
+        TextButton(
           key: const Key('shell-sign-out'),
-          onTap: () async {
-            await onSignOut();
+          style: TextButton.styleFrom(
+            foregroundColor: IconTheme.of(context).color,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          onPressed: () {
+            onSignOut();
           },
-          child: const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.logout),
-                SizedBox(height: 4),
-                Text('Sign out'),
-              ],
-            ),
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.logout),
+              SizedBox(height: 4),
+              Text('Sign out'),
+            ],
           ),
         ),
       ],

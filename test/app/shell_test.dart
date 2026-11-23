@@ -1,3 +1,7 @@
+import 'dart:ui' show Tristate;
+
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/app/shell.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
@@ -275,6 +279,19 @@ void main() {
               .dy,
         ),
       );
+      expect(
+        tester.getTopLeft(find.byKey(const Key('shell-sign-out'))).dy,
+        greaterThan(
+          tester
+              .getTopLeft(
+                find.descendant(
+                  of: find.byKey(const Key('shell-navigation-rail')),
+                  matching: find.byType(Divider),
+                ),
+              )
+              .dy,
+        ),
+      );
       expectDestinationIcons();
     },
   );
@@ -392,6 +409,63 @@ void main() {
       );
 
       expectPhoneShellExists();
+      expectSignOutDialog(tester);
+      expect(auth.signOutCalls, 0);
+      expect(shellSelectedIndex(tester), 1);
+      expectContent(tester, 'Journal');
+    },
+  );
+
+  testWidgets(
+    'Given the desktop shell, when Sign out is built, then it is a button named Sign out',
+    (tester) async {
+      await pumpShell(tester, size: const Size(601, 800));
+      final handle = tester.ensureSemantics();
+
+      expect(find.byKey(const Key('shell-sign-out')), findsOneWidget);
+      expect(
+        tester.widget(find.byKey(const Key('shell-sign-out'))),
+        isA<TextButton>(),
+      );
+      final data = tester
+          .getSemantics(find.byKey(const Key('shell-sign-out')))
+          .getSemanticsData();
+      expect(data.label, 'Sign out');
+      expect(data.flagsCollection.isButton, isTrue);
+      // Focusable nodes expose isFocused as true/false; Tristate.none means not focusable.
+      expect(data.flagsCollection.isFocused, isNot(Tristate.none));
+      expect(data.hasAction(SemanticsAction.tap), isTrue);
+
+      handle.dispose();
+    },
+  );
+
+  testWidgets(
+    'Given Journal is selected on the desktop shell, when Sign out is activated from the keyboard, then the confirmation dialog opens',
+    (tester) async {
+      final auth = _FakeAuthService();
+      await pumpShell(tester, size: const Size(601, 800), authService: auth);
+      await tester.tap(chromeLabel(_desktopChrome, 'Journal'));
+      await tester.pumpAndSettle();
+
+      final focusFinder = find.descendant(
+        of: find.byKey(const Key('shell-sign-out')),
+        matching: find.byType(Focus),
+      );
+      expect(focusFinder, findsOneWidget);
+      final focusNode = Focus.of(
+        tester.element(
+          find.descendant(of: focusFinder, matching: find.text('Sign out')),
+        ),
+      );
+      focusNode.requestFocus();
+      await tester.pump();
+      expect(focusNode.hasFocus, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      expectDesktopShellExists();
       expectSignOutDialog(tester);
       expect(auth.signOutCalls, 0);
       expect(shellSelectedIndex(tester), 1);
