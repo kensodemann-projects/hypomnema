@@ -196,7 +196,7 @@ Journaling is a separate feature from goals. Each user has one journal and one j
 - **Date/Time** — Set automatically when the entry is first saved. It is not changed when the entry is edited.
 - **Subject** — Required.
 - **Mood** — Required. A value from 1 to 5 (see Section 6.2).
-- **Journal** — Required. Long-form text.
+- **Text** — Required. Long-form journal text.
 - **Private** — Whether the entry is private (see Section 6.3).
 
 ### 6.2 Mood
