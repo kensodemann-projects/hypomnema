@@ -26,6 +26,8 @@ This PR adds a well-scoped data layer for journal entries (create/update under `
 
 **[SEC-001]**
 
+**Status:** complete
+
 **Issue:** `firestore.rules` still allow any owner `write` (including `delete`) on all subcollections under `users/{userId}`, and the rules tests do not assert field shape. A modified client could persist invalid journal documents (e.g. missing `createdAt`, wrong types) or delete entries despite the app repository omitting delete.
 
 **Suggestion:** Track a follow-up issue to tighten rules for `journalEntries/{entryId}` (required fields, `mood` range, immutable timestamps on update, optional delete denial) once product rules for delete and the 24-hour window are fixed.
@@ -33,6 +35,8 @@ This PR adds a well-scoped data layer for journal entries (create/update under `
 **Why:** Defense in depth: Dart validation in this PR protects well-behaved clients; rules are the enforcement layer for tampered clients.
 
 **Documentation:** [MDN Web Security](https://developer.mozilla.org/en-US/docs/Web/Security)
+
+**Disposition:** Filed as [#43](https://github.com/kensodemann-projects/hypomnema/issues/43), for later, after the product decides whether a journal entry can be deleted and how the 24-hour edit window works. That task separates read, create, update, and delete on `users/{uid}/journalEntries/{entryId}` instead of one owner `write`. Delete is denied unless the product allows deletion. Field shape is out of scope: the rules will not require fields, check the mood range, or freeze `localDateTime` and `createdAt`. The 24-hour window stays an application concern.
 
 ---
 
