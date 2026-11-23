@@ -40,19 +40,34 @@ void main() {
     expect(entry.text, 'hello');
   });
 
-  test('Given a whitespace subject, when an entry is created, then the subject is null', () {
-    // Given, when
-    final entry = JournalEntry.create(
-      id: 'entry-1',
-      subject: '   ',
-      mood: 3,
-      text: 'hello',
-      private: false,
-      now: now,
+  test('Given an empty subject, when an entry is created, then InvalidJournalEntryException is thrown', () {
+    // Given, when, then
+    expect(
+      () => JournalEntry.create(
+        id: 'entry-1',
+        subject: '',
+        mood: 3,
+        text: 'hello',
+        private: false,
+        now: now,
+      ),
+      throwsA(isA<InvalidJournalEntryException>()),
     );
+  });
 
-    // Then
-    expect(entry.subject, isNull);
+  test('Given a whitespace subject, when an entry is created, then InvalidJournalEntryException is thrown', () {
+    // Given, when, then
+    expect(
+      () => JournalEntry.create(
+        id: 'entry-1',
+        subject: '   ',
+        mood: 3,
+        text: 'hello',
+        private: false,
+        now: now,
+      ),
+      throwsA(isA<InvalidJournalEntryException>()),
+    );
   });
 
   test(
@@ -61,6 +76,7 @@ void main() {
       // Given, when
       final low = JournalEntry.create(
         id: 'entry-1',
+        subject: 'Note',
         mood: 1,
         text: 'hello',
         private: false,
@@ -68,6 +84,7 @@ void main() {
       );
       final high = JournalEntry.create(
         id: 'entry-2',
+        subject: 'Note',
         mood: 5,
         text: 'hello',
         private: true,
@@ -85,6 +102,7 @@ void main() {
     expect(
       () => JournalEntry.create(
         id: 'entry-1',
+        subject: 'Note',
         mood: 0,
         text: 'hello',
         private: false,
@@ -95,6 +113,7 @@ void main() {
     expect(
       () => JournalEntry.create(
         id: 'entry-1',
+        subject: 'Note',
         mood: 6,
         text: 'hello',
         private: false,
@@ -109,6 +128,7 @@ void main() {
     expect(
       () => JournalEntry.create(
         id: 'entry-1',
+        subject: 'Note',
         mood: 3,
         text: '',
         private: false,
@@ -119,6 +139,7 @@ void main() {
     expect(
       () => JournalEntry.create(
         id: 'entry-1',
+        subject: 'Note',
         mood: 3,
         text: '   ',
         private: false,
@@ -133,6 +154,7 @@ void main() {
     expect(
       () => JournalEntry.create(
         id: '',
+        subject: 'Note',
         mood: 3,
         text: 'hello',
         private: false,

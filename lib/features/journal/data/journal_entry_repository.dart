@@ -4,7 +4,7 @@ import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 
 abstract interface class JournalEntryRepository {
   Future<JournalEntry> save({
-    String? subject,
+    required String subject,
     required int mood,
     required String text,
     required bool private,
@@ -12,7 +12,7 @@ abstract interface class JournalEntryRepository {
 
   Future<JournalEntry> update({
     required JournalEntry entry,
-    String? subject,
+    required String subject,
     required int mood,
     required String text,
     required bool private,
@@ -36,7 +36,7 @@ class FirestoreJournalEntryRepository implements JournalEntryRepository {
 
   @override
   Future<JournalEntry> save({
-    String? subject,
+    required String subject,
     required int mood,
     required String text,
     required bool private,
@@ -50,25 +50,21 @@ class FirestoreJournalEntryRepository implements JournalEntryRepository {
       private: private,
       now: _clock(),
     );
-    final data = <String, dynamic>{
+    await collection.doc(entry.id).set({
+      'subject': entry.subject,
       'mood': entry.mood,
       'text': entry.text,
       'private': entry.private,
       'localDateTime': entry.localDateTime,
       'createdAt': Timestamp.fromDate(entry.createdAt),
-    };
-    final storedSubject = entry.subject;
-    if (storedSubject != null) {
-      data['subject'] = storedSubject;
-    }
-    await collection.doc(entry.id).set(data);
+    });
     return entry;
   }
 
   @override
   Future<JournalEntry> update({
     required JournalEntry entry,
-    String? subject,
+    required String subject,
     required int mood,
     required String text,
     required bool private,
@@ -81,10 +77,10 @@ class FirestoreJournalEntryRepository implements JournalEntryRepository {
       private: private,
     );
     await _entries(uid).doc(entry.id).update({
+      'subject': revised.subject,
       'mood': revised.mood,
       'text': revised.text,
       'private': revised.private,
-      'subject': revised.subject ?? FieldValue.delete(),
     });
     return revised;
   }

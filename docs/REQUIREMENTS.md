@@ -194,7 +194,7 @@ Journaling is a separate feature from goals. Each user has one journal and one j
 ### 6.1 Journal Entry Records
 
 - **Date/Time** — Set automatically when the entry is first saved. It is not changed when the entry is edited.
-- **Subject** — Optional. When it is blank, lists show the first line of the journal text, shortened to fit.
+- **Subject** — Required.
 - **Mood** — Required. A value from 1 to 5 (see Section 6.2).
 - **Journal** — Required. Long-form text.
 - **Private** — Whether the entry is private (see Section 6.3).
@@ -297,7 +297,7 @@ The dashboard also has an **Add Goal** action. Selecting a goal panel opens that
 
 ### 7.3 Journal
 
-- **Journal List** — Entries newest first, each showing date, time, mood, and subject (or the first line of the text). Private entries show a private indicator in place of the subject.
+- **Journal List** — Entries newest first, each showing date, time, mood, and subject. Private entries show a private indicator in place of the subject.
 - **Entry Details** — The full entry, an Edit option while within the 24-hour window, Make Private or Make Public, and Show Content for private entries.
 - **Journal Editor** — Subject, mood picker, journal text, and I'm Stuck.
 - **Mood Trend** — A chart of mood over time, with a choice of range (e.g., the last 30 days, 90 days, or year). Private entries are included.

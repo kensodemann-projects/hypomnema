@@ -9,7 +9,7 @@ Nothing in the app writes a journal entry. `main` initializes `FirebaseFirestore
 **Decisions**
 
 - The local date and time is one string field, `localDateTime`, formatted `YYYY-MM-DDTHH:mm:ss` from the device's local clock at first save, with no offset. `createdAt` is a Firestore `Timestamp` of that same instant.
-- A blank or whitespace-only subject is omitted. A stored subject and the stored text are trimmed. Text that is empty after trim is rejected. `mood` is an `int` from 1 to 5. `private` is a bool.
+- A stored subject and the stored text are trimmed. A subject or text that is empty after trim is rejected. `mood` is an `int` from 1 to 5. `private` is a bool.
 - The path uid is the signed-in user's uid. The document does not store a uid field. Document ids come from Firestore's auto-id.
 - Dart repository tests use `fake_cloud_firestore` 4.5.0, the release that matches `cloud_firestore` 7.1.0, with no security rules loaded. Emulator tests are Node tests on `@firebase/rules-unit-testing` and `node --test`, and they run as part of `make test`.
 - `firestore.rules` stays as it is. An owner write at the rules layer still includes delete. The application repository exposes save and update only.
@@ -30,14 +30,14 @@ A document at `users/{uid}/journalEntries/{entryId}` stores:
 
 | Field | Value |
 | --- | --- |
-| `subject` | Trimmed string. The field is absent when the subject is null, empty, or whitespace. |
+| `subject` | Trimmed string. Empty or whitespace-only is rejected. |
 | `mood` | Whole number from 1 to 5. |
 | `text` | Trimmed string. Empty or whitespace-only text is rejected. |
 | `private` | `true` or `false`. |
 | `localDateTime` | `YYYY-MM-DDTHH:mm:ss`, no offset, from the local clock at first save. |
 | `createdAt` | Firestore `Timestamp` of that same instant. |
 
-An update writes `subject`, `mood`, `text`, and `private` only. `localDateTime` and `createdAt` stay as first saved. Clearing the subject removes the field.
+An update writes `subject`, `mood`, `text`, and `private` only. `localDateTime` and `createdAt` stay as first saved.
 
 **File order**
 
@@ -74,14 +74,15 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 **Change**
 
-`JournalEntry` holds `id`, `subject` (`String?`), `mood`, `text`, `private`, `localDateTime`, and `createdAt` (`DateTime` in UTC). `JournalEntry.create` takes those inputs plus a non-empty `id` and the clock instant `now`. It formats `localDateTime` from `now.toLocal()` as `YYYY-MM-DDTHH:mm:ss` with zero-padded parts, and stores `createdAt` as `now.toUtc()`. `InvalidJournalEntryException` is thrown when `id` is empty, `mood` is outside 1–5, or `text` is empty after trim. A null, empty, or whitespace subject becomes null; otherwise the subject is trimmed. Text is stored trimmed. `revise` takes subject, mood, text, and private, runs the same validation, and returns a new entry with the same `id`, `localDateTime`, and `createdAt`. This file is the only place that formats `localDateTime`.
+`JournalEntry` holds `id`, `subject`, `mood`, `text`, `private`, `localDateTime`, and `createdAt` (`DateTime` in UTC). `JournalEntry.create` takes those inputs plus a non-empty `id` and the clock instant `now`. It formats `localDateTime` from `now.toLocal()` as `YYYY-MM-DDTHH:mm:ss` with zero-padded parts, and stores `createdAt` as `now.toUtc()`. `InvalidJournalEntryException` is thrown when `id` is empty, `subject` is empty after trim, `mood` is outside 1–5, or `text` is empty after trim. Subject and text are stored trimmed. `revise` takes subject, mood, text, and private, runs the same validation, and returns a new entry with the same `id`, `localDateTime`, and `createdAt`. This file is the only place that formats `localDateTime`.
 
-`JournalEntryRepository` is an interface with `save` and `update` only. `save` takes subject, mood, text, and private. `update` takes the existing `JournalEntry` plus the same four fields. `FirestoreJournalEntryRepository` takes `FirebaseFirestore`, `FirebaseAuth`, and a `DateTime Function()` clock that defaults to `DateTime.now`. The uid is `FirebaseAuth.currentUser?.uid`. When that is null, `save` and `update` throw `JournalEntryRepositoryException` and write nothing. Otherwise the path is `users/{uid}/journalEntries/{entryId}`. `save` takes the id from `collection.doc().id`, calls `JournalEntry.create` with one clock reading, and `set`s the contract fields. `subject` is left out of the map when it is null. `createdAt` is `Timestamp.fromDate`. `update` calls `entry.revise` and does not read the clock. It `update`s `mood`, `text`, and `private`, sets `subject` when present, and sends `FieldValue.delete()` for `subject` when the revised subject is null. It does not write `localDateTime` or `createdAt`. Both methods return the `JournalEntry`.
+`JournalEntryRepository` is an interface with `save` and `update` only. `save` takes subject, mood, text, and private. `update` takes the existing `JournalEntry` plus the same four fields. `FirestoreJournalEntryRepository` takes `FirebaseFirestore`, `FirebaseAuth`, and a `DateTime Function()` clock that defaults to `DateTime.now`. The uid is `FirebaseAuth.currentUser?.uid`. When that is null, `save` and `update` throw `JournalEntryRepositoryException` and write nothing. Otherwise the path is `users/{uid}/journalEntries/{entryId}`. `save` takes the id from `collection.doc().id`, calls `JournalEntry.create` with one clock reading, and `set`s the contract fields. `createdAt` is `Timestamp.fromDate`. `update` calls `entry.revise` and does not read the clock. It `update`s `subject`, `mood`, `text`, and `private`. It does not write `localDateTime` or `createdAt`. Both methods return the `JournalEntry`.
 
 Tests use the `Given ..., when ..., then ...` names already used in `test/features/auth/data/auth_service_test.dart`. Domain tests assert:
 
 - `DateTime(2026, 11, 23, 16, 35, 4)` becomes `localDateTime` `2026-11-23T16:35:04` and a UTC `createdAt` of that instant.
-- A whitespace subject is stored as null, and surrounding spaces are trimmed off a real subject and off text.
+- Surrounding spaces are trimmed off the subject and off the text.
+- An empty subject is rejected with `InvalidJournalEntryException`. A whitespace subject is rejected the same way.
 - Moods 1 and 5 are accepted. Moods 0 and 6 throw `InvalidJournalEntryException`.
 - Empty and whitespace-only text throw `InvalidJournalEntryException`.
 - An empty id throws `InvalidJournalEntryException`.
@@ -91,11 +92,11 @@ Repository tests build `FirestoreJournalEntryRepository` with `FakeFirebaseFires
 
 - `save` writes `users/user-1/journalEntries/{id}` with the contract fields, `mood` as an int, and `createdAt` as a `Timestamp` of the clock instant. The returned entry's id is that document id.
 - Two saves write two document ids.
-- A whitespace subject omits `subject`.
+- A whitespace subject makes `save` throw `InvalidJournalEntryException` and leaves the fake empty.
 - A signed-out user (`currentUser` null) makes `save` throw `JournalEntryRepositoryException` and leaves the fake empty.
 - Mood 0 and whitespace text make `save` throw `InvalidJournalEntryException` and leave the fake empty.
 - After `save` at the first clock instant, `update` with a later clock instant changes subject, mood, text, and private, leaves `localDateTime` and `createdAt` on the first instant, and leaves exactly one document.
-- `update` with a null subject removes `subject`.
+- `update` with a whitespace subject throws `InvalidJournalEntryException` and leaves the stored subject unchanged.
 - The clock is called once for `save` and is not called for `update`.
 
 **Spot-check**

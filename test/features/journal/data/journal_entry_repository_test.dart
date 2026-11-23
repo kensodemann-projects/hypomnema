@@ -74,8 +74,18 @@ void main() {
     );
 
     // When
-    final first = await repository.save(mood: 1, text: 'one', private: false);
-    final second = await repository.save(mood: 2, text: 'two', private: false);
+    final first = await repository.save(
+      subject: 'One',
+      mood: 1,
+      text: 'one',
+      private: false,
+    );
+    final second = await repository.save(
+      subject: 'Two',
+      mood: 2,
+      text: 'two',
+      private: false,
+    );
 
     // Then
     expect(first.id, isNot(second.id));
@@ -87,7 +97,7 @@ void main() {
     expect(saved.docs.map((doc) => doc.id).toSet(), {first.id, second.id});
   });
 
-  test('Given a whitespace subject, when an entry is saved, then the subject field is omitted', () async {
+  test('Given a whitespace subject, when save is called, then InvalidJournalEntryException is thrown and nothing is written', () async {
     // Given
     final firestore = FakeFirebaseFirestore();
     final repository = FirestoreJournalEntryRepository(
@@ -96,22 +106,13 @@ void main() {
       clock: () => firstInstant,
     );
 
-    // When
-    final entry = await repository.save(
-      subject: '   ',
-      mood: 3,
-      text: 'hello',
-      private: false,
+    // When, then
+    await expectLater(
+      repository.save(subject: '   ', mood: 3, text: 'hello', private: false),
+      throwsA(isA<InvalidJournalEntryException>()),
     );
-
-    // Then
-    final snapshot = await firestore
-        .collection('users')
-        .doc('user-1')
-        .collection('journalEntries')
-        .doc(entry.id)
-        .get();
-    expect(snapshot.data()!.containsKey('subject'), isFalse);
+    final users = await firestore.collection('users').get();
+    expect(users.docs, isEmpty);
   });
 
   test('Given a signed-out user, when save is called, then JournalEntryRepositoryException is thrown and nothing is written', () async {
@@ -125,7 +126,7 @@ void main() {
 
     // When, then
     await expectLater(
-      repository.save(mood: 3, text: 'hello', private: false),
+      repository.save(subject: 'Note', mood: 3, text: 'hello', private: false),
       throwsA(isA<JournalEntryRepositoryException>()),
     );
     final users = await firestore.collection('users').get();
@@ -143,7 +144,7 @@ void main() {
 
     // When, then
     await expectLater(
-      repository.save(mood: 0, text: 'hello', private: false),
+      repository.save(subject: 'Note', mood: 0, text: 'hello', private: false),
       throwsA(isA<InvalidJournalEntryException>()),
     );
     final users = await firestore.collection('users').get();
@@ -161,7 +162,7 @@ void main() {
 
     // When, then
     await expectLater(
-      repository.save(mood: 3, text: '   ', private: false),
+      repository.save(subject: 'Note', mood: 3, text: '   ', private: false),
       throwsA(isA<InvalidJournalEntryException>()),
     );
     final users = await firestore.collection('users').get();
@@ -215,7 +216,7 @@ void main() {
     expect(data['createdAt'], Timestamp.fromDate(firstInstant));
   });
 
-  test('Given a saved entry with a subject, when update clears the subject, then the subject field is removed', () async {
+  test('Given a saved entry, when update is called with a whitespace subject, then InvalidJournalEntryException is thrown and the subject stays', () async {
     // Given
     final firestore = FakeFirebaseFirestore();
     final repository = FirestoreJournalEntryRepository(
@@ -230,21 +231,23 @@ void main() {
       private: false,
     );
 
-    // When
-    await repository.update(
-      entry: saved,
-      mood: 2,
-      text: 'hello',
-      private: false,
+    // When, then
+    await expectLater(
+      repository.update(
+        entry: saved,
+        subject: '   ',
+        mood: 2,
+        text: 'hello',
+        private: false,
+      ),
+      throwsA(isA<InvalidJournalEntryException>()),
     );
-
-    // Then
     final snapshot = await firestore
         .collection('users')
         .doc('user-1')
         .collection('journalEntries')
         .doc(saved.id)
         .get();
-    expect(snapshot.data()!.containsKey('subject'), isFalse);
+    expect(snapshot.data()!['subject'], 'Note');
   });
 }

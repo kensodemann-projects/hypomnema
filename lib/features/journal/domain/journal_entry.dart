@@ -14,7 +14,7 @@ class JournalEntry {
   });
 
   final String id;
-  final String? subject;
+  final String subject;
   final int mood;
   final String text;
   final bool private;
@@ -23,19 +23,23 @@ class JournalEntry {
 
   static JournalEntry create({
     required String id,
-    String? subject,
+    required String subject,
     required int mood,
     required String text,
     required bool private,
     required DateTime now,
   }) {
+    final trimmedSubject = subject.trim();
     final trimmedText = text.trim();
-    if (id.isEmpty || !_isMood(mood) || trimmedText.isEmpty) {
+    if (id.isEmpty ||
+        trimmedSubject.isEmpty ||
+        !_isMood(mood) ||
+        trimmedText.isEmpty) {
       throw const InvalidJournalEntryException();
     }
     return JournalEntry._(
       id: id,
-      subject: _subject(subject),
+      subject: trimmedSubject,
       mood: mood,
       text: trimmedText,
       private: private,
@@ -45,18 +49,19 @@ class JournalEntry {
   }
 
   JournalEntry revise({
-    String? subject,
+    required String subject,
     required int mood,
     required String text,
     required bool private,
   }) {
+    final trimmedSubject = subject.trim();
     final trimmedText = text.trim();
-    if (!_isMood(mood) || trimmedText.isEmpty) {
+    if (trimmedSubject.isEmpty || !_isMood(mood) || trimmedText.isEmpty) {
       throw const InvalidJournalEntryException();
     }
     return JournalEntry._(
       id: id,
-      subject: _subject(subject),
+      subject: trimmedSubject,
       mood: mood,
       text: trimmedText,
       private: private,
@@ -67,17 +72,6 @@ class JournalEntry {
 }
 
 bool _isMood(int mood) => mood >= 1 && mood <= 5;
-
-String? _subject(String? subject) {
-  if (subject == null) {
-    return null;
-  }
-  final trimmed = subject.trim();
-  if (trimmed.isEmpty) {
-    return null;
-  }
-  return trimmed;
-}
 
 String _formatLocalDateTime(DateTime local) {
   String two(int value) => value.toString().padLeft(2, '0');
