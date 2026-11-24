@@ -47,7 +47,7 @@ Your journal has a journaling goal, once per day by default. You can change it t
 
 Each journal entry has:
 
-- **Subject** — Optional.
+- **Subject** — Required.
 - **Mood** — From 1 ("Awful") to 5 ("Great"), shown as a colored number.
 - **Journal** — Your writing.
 

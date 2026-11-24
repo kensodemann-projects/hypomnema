@@ -42,3 +42,4 @@ lib/
 - Place a login screen at `lib/features/auth/ui/login_screen.dart`. Place a repository at `lib/features/auth/data/`.
 - A feature navigates inside itself. The login screen switching between sign-in and password reset stays in `features/auth/ui`.
 - Cross-feature navigation belongs in `app/`: the auth gate, the signed-in shell, and a future route table. A feature reaches another feature's screen through that composition, and `app/` may depend on the other feature's screen or repository while assembling the tree.
+- The commit gate is `make web`, then `make check`. Write that into each root `PLAN.md`. Every commit-gate command must succeed with no warning or error, except one warning that must also be written into that gate: the Firebase CLI notice that another emulator suite is already running for project `kws-hypomnema`. The rules tests start their own emulator on port 8180 while the dev suite stays on port 8080. That notice does not fail the gate.
