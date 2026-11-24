@@ -42,7 +42,7 @@ Selecting Journal in `Shell` (`lib/app/shell.dart`) shows the centered label `Jo
 
 | Order | Step       | Status | Files |
 | ----- | ---------- | ------ | ----- |
-| 1     | [STEP-001] |        | `lib/features/journal/ui/journal_editor.dart`, then `test/features/journal/ui/journal_editor_test.dart` |
+| 1     | [STEP-001] | complete | `lib/features/journal/ui/journal_editor.dart`, then `test/features/journal/ui/journal_editor_test.dart` |
 | 2     | [STEP-002] |        | `lib/features/journal/ui/journal_screen.dart`, then `lib/app/shell.dart`, then `lib/app/app.dart`, then `lib/main.dart`, then `test/features/journal/ui/journal_screen_test.dart`, then `test/app/shell_test.dart`, then `test/app/app_test.dart` |
 
 **Commit gate** — the human commits. A spot-check does not replace the gate.
@@ -56,7 +56,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Build the journal editor
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** The phone editor is a full-screen page with Close and Save, the desktop editor is a 720px dialog with Close, Cancel, and Save, and both show the date line under the title in light and dark themes. Save stays disabled until a subject, a mood from 1 to 5, and journal text are present, then calls `JournalEntryRepository.save` with `private: false` and dismisses. A failed save stays on the editor and shows the failure snackbar.
 
