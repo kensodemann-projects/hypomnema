@@ -44,7 +44,13 @@ class MoodSwatch extends StatelessWidget {
         decoration: BoxDecoration(
           color: _fills[mood - 1],
           borderRadius: BorderRadius.circular(radius),
-          border: dark ? Border.all(color: _darkBorderColor, width: 1) : null,
+          border: dark
+              ? Border.all(
+                  color: _darkBorderColor,
+                  width: 1,
+                  strokeAlign: BorderSide.strokeAlignInside,
+                )
+              : null,
         ),
         child: Center(
           child: Text(
