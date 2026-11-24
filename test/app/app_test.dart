@@ -5,10 +5,9 @@ import 'package:hypomnema/app/app.dart';
 import 'package:hypomnema/app/shell.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
-import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
-import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../helpers/fake_journal_entry_repository.dart';
 import '../helpers/viewport.dart';
 
 void expectPhoneShellExists() {
@@ -41,40 +40,6 @@ void expectLoginFormExists() {
 void expectLoginFormNotExists() {
   expect(find.byKey(const Key('login-email')), findsNothing);
   expect(find.byKey(const Key('login-sign-in')), findsNothing);
-}
-
-class _FakeJournalEntries implements JournalEntryRepository {
-  @override
-  Future<JournalEntry> save({
-    required String subject,
-    required int mood,
-    required String text,
-    required bool private,
-  }) {
-    return Future.value(
-      JournalEntry.create(
-        id: 'entry-1',
-        subject: subject,
-        mood: mood,
-        text: text,
-        private: private,
-        now: DateTime.utc(2026, 11, 24, 18),
-      ),
-    );
-  }
-
-  @override
-  Future<JournalEntry> update({
-    required JournalEntry entry,
-    required String subject,
-    required int mood,
-    required String text,
-    required bool private,
-  }) {
-    return Future.value(
-      entry.revise(subject: subject, mood: mood, text: text, private: private),
-    );
-  }
 }
 
 class _FakeAuthService implements AuthService {
@@ -122,7 +87,7 @@ Future<_FakeAuthService> _openSignOutDialog(
   final auth = _authEmitting(true);
   setLogicalViewportSize(tester, size);
   await tester.pumpWidget(
-    MainApp(authService: auth, journalEntries: _FakeJournalEntries()),
+    MainApp(authService: auth, journalEntries: FakeJournalEntryRepository()),
   );
   await tester.pumpAndSettle();
   await tester.tap(_chromeLabel(chromeKey, 'Journal'));
@@ -175,7 +140,7 @@ void main() {
       await tester.pumpWidget(
         MainApp(
           authService: _authEmitting(true),
-          journalEntries: _FakeJournalEntries(),
+          journalEntries: FakeJournalEntryRepository(),
         ),
       );
       await tester.pumpAndSettle();
@@ -198,7 +163,7 @@ void main() {
       await tester.pumpWidget(
         MainApp(
           authService: _authEmitting(true),
-          journalEntries: _FakeJournalEntries(),
+          journalEntries: FakeJournalEntryRepository(),
         ),
       );
       await tester.pumpAndSettle();
@@ -216,14 +181,20 @@ void main() {
       final auth = _authEmitting(true);
       setLogicalViewportSize(tester, const Size(400, 800));
       await tester.pumpWidget(
-        MainApp(authService: auth, journalEntries: _FakeJournalEntries()),
+        MainApp(
+          authService: auth,
+          journalEntries: FakeJournalEntryRepository(),
+        ),
       );
       await tester.pumpAndSettle();
       expectPhoneShellExists();
 
       // When
       await tester.pumpWidget(
-        MainApp(authService: auth, journalEntries: _FakeJournalEntries()),
+        MainApp(
+          authService: auth,
+          journalEntries: FakeJournalEntryRepository(),
+        ),
       );
       await tester.pump();
 
@@ -243,7 +214,10 @@ void main() {
 
       // When
       await tester.pumpWidget(
-        MainApp(authService: auth, journalEntries: _FakeJournalEntries()),
+        MainApp(
+          authService: auth,
+          journalEntries: FakeJournalEntryRepository(),
+        ),
       );
 
       // Then
@@ -267,7 +241,10 @@ void main() {
 
       // When
       await tester.pumpWidget(
-        MainApp(authService: auth, journalEntries: _FakeJournalEntries()),
+        MainApp(
+          authService: auth,
+          journalEntries: FakeJournalEntryRepository(),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -285,7 +262,10 @@ void main() {
       final auth = _authEmitting(false);
       setLogicalViewportSize(tester, const Size(400, 800));
       await tester.pumpWidget(
-        MainApp(authService: auth, journalEntries: _FakeJournalEntries()),
+        MainApp(
+          authService: auth,
+          journalEntries: FakeJournalEntryRepository(),
+        ),
       );
       await tester.pumpAndSettle();
 
