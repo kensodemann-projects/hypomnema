@@ -241,50 +241,54 @@ void main() {
     },
   );
 
-  testWidgets(
-    'Given a width of 400, when the picker is shown, then the options spread from edge to edge with equal gaps',
-    (tester) async {
-      await pumpPicker(tester, theme: AppTheme.light, width: 400, value: 3);
+  for (final width in [400.0, 600.0]) {
+    testWidgets(
+      'Given a width of $width, when the picker is shown, then the options spread from edge to edge with equal gaps',
+      (tester) async {
+        await pumpPicker(tester, theme: AppTheme.light, width: width, value: 3);
 
-      final picker = tester.getRect(find.byType(MoodPicker));
-      final rects = [
-        for (var mood = 1; mood <= 5; mood++) tester.getRect(option(mood)),
-      ];
-      expect(rects.first.left, moreOrLessEquals(picker.left));
-      expect(rects.last.right, moreOrLessEquals(picker.right));
-      final gaps = [
-        for (var index = 0; index < 4; index++)
-          rects[index + 1].left - rects[index].right,
-      ];
-      for (final gap in gaps) {
-        expect(gap, moreOrLessEquals(gaps.first));
-        expect(gap, greaterThan(0));
-      }
-    },
-  );
+        final picker = tester.getRect(find.byType(MoodPicker));
+        final rects = [
+          for (var mood = 1; mood <= 5; mood++) tester.getRect(option(mood)),
+        ];
+        expect(rects.first.left, moreOrLessEquals(picker.left));
+        expect(rects.last.right, moreOrLessEquals(picker.right));
+        final gaps = [
+          for (var index = 0; index < 4; index++)
+            rects[index + 1].left - rects[index].right,
+        ];
+        for (final gap in gaps) {
+          expect(gap, moreOrLessEquals(gaps.first));
+          expect(gap, greaterThan(0));
+        }
+      },
+    );
+  }
 
-  testWidgets(
-    'Given a width of 1000, when the picker is shown, then the options are 64 wide and 12 apart',
-    (tester) async {
-      await pumpPicker(tester, theme: AppTheme.light, width: 1000, value: 3);
+  for (final width in [601.0, 1000.0]) {
+    testWidgets(
+      'Given a width of $width, when the picker is shown, then the options are 64 wide and 12 apart',
+      (tester) async {
+        await pumpPicker(tester, theme: AppTheme.light, width: width, value: 3);
 
-      final picker = tester.getRect(find.byType(MoodPicker));
-      final rects = [
-        for (var mood = 1; mood <= 5; mood++) tester.getRect(option(mood)),
-      ];
-      expect(rects.first.left, moreOrLessEquals(picker.left));
-      expect(rects.last.right, lessThan(picker.right));
-      for (final rect in rects) {
-        expect(rect.width, moreOrLessEquals(64));
-      }
-      for (var index = 0; index < 4; index++) {
-        expect(
-          rects[index + 1].left - rects[index].right,
-          moreOrLessEquals(12),
-        );
-      }
-    },
-  );
+        final picker = tester.getRect(find.byType(MoodPicker));
+        final rects = [
+          for (var mood = 1; mood <= 5; mood++) tester.getRect(option(mood)),
+        ];
+        expect(rects.first.left, moreOrLessEquals(picker.left));
+        expect(rects.last.right, lessThan(picker.right));
+        for (final rect in rects) {
+          expect(rect.width, moreOrLessEquals(64));
+        }
+        for (var index = 0; index < 4; index++) {
+          expect(
+            rects[index + 1].left - rects[index].right,
+            moreOrLessEquals(12),
+          );
+        }
+      },
+    );
+  }
 
   test(
     'Given value 0, when a picker is created, then ArgumentError is thrown',

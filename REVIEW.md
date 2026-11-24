@@ -14,8 +14,8 @@ Reviewed the full PR diff: new `MoodSwatch` and `MoodPicker` under `lib/features
 | 📚 Documentation gaps                      |     0 |
 | ✅ Positive feedback                       |     2 |
 | 🚨 Critical blockers                       |     0 |
-| 💭 Questions for discussion                |     2 |
-| **Total**                                  |     4 |
+| 💭 Questions for discussion                |     1 |
+| **Total**                                  |     3 |
 
 ## Findings
 
@@ -79,6 +79,8 @@ _(none)_
 
 ### 💭 Questions for discussion
 
+_(one open: [QST-001]. [QST-002] complete.)_
+
 **[QST-001]**
 
 **Issue:** `_MoodOption` uses a bare `GestureDetector` without `Semantics` (e.g. button / selected / radio-group semantics). When this picker lands on journal create/edit screens, assistive technologies may only hear isolated digits (`2`, `3`, …) and may not announce which mood is selected.
@@ -89,10 +91,12 @@ _(none)_
 
 **Documentation:** https://www.w3.org/WAI/ARIA/apg/
 
-**[QST-002]**
+**[QST-002]** — **Status:** complete
 
-**Issue:** Layout tests cover phone width 400 and desktop 1000, but not the breakpoint at exactly 600 vs 601, where `MoodPicker` switches between `spaceBetween` and fixed 64px columns.
+**Issue:** Layout tests covered phone width 400 and desktop 1000, but not the breakpoint at exactly 600 vs 601, where `MoodPicker` switches between `spaceBetween` and fixed 64px columns.
 
 **Suggestion:** Add one test at `width: 600` (phone row) and one at `width: 601` (desktop row), mirroring coverage in `test/app/shell_test.dart` for the same cutoff.
 
 **Why:** Breakpoint off-by-one regressions are easy to introduce when adjusting `LayoutBuilder` logic; cheap tests guard the contract edge.
+
+**Resolution:** `mood_picker_test.dart` parametrizes the phone layout loop over widths 400 and 600 and the desktop loop over 601 and 1000.
