@@ -119,6 +119,7 @@ Each shared piece is built with the first feature that needs it, and later featu
 - Builds the dashboard page, the panel layout, and the "Today" indicator.
 - Adds the goal pill to the Journal header.
 - The Add Goal button can be hidden or disabled until feature 6.
+- Revisit using `provider` for dependency injection when the goals repository is created. The journal repository is still passed through constructors.
 
 ### 5. Mood trend
 
