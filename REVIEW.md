@@ -5,7 +5,23 @@ Scope: journal domain/repository, Dart tests, Firestore rules emulator harness, 
 
 ## Summary
 
-This PR adds a well-scoped data layer for journal entries (create/update under `users/{uid}/journalEntries/{id}`), strong Dart-side validation and tests, and Node-based rules tests on a dedicated emulator port so they coexist with the dev suite. Feature-first layout matches project conventions; CI (`format_analyze_test`) passes. **Recommendation: approve.** The main follow-ups are intentional deferrals (no UI, no read path, coarse Firestore rules) and small test gaps—not merge blockers for this issue’s scope.
+This PR adds a well-scoped data layer for journal entries (create/update under `users/{uid}/journalEntries/{id}`), strong Dart-side validation and tests, and Node-based rules tests on a dedicated emulator port so they coexist with the dev suite. Feature-first layout matches project conventions; CI (`format_analyze_test`) passes.
+
+**Initial review:** approve, with follow-ups on exceptions, tests, CI cache, and rules hardening.
+
+**Recheck (2026-11-23):** Every actionable finding is implemented or explicitly deferred with a tracked next step ([#43](https://github.com/kensodemann-projects/hypomnema/issues/43) for rules granularity; read/serialization deferred until a read path exists). Verified in tree: `toString` on both exceptions with tests; signed-out `update` test; `actions/setup-node` npm cache for `test/rules/package-lock.json`; dispositions recorded per finding below. CI still green on the PR. **Recommendation: approve (merge-ready).**
+
+## Recheck verification
+
+| ID | Expected disposition | Verified |
+| --- | --- | --- |
+| SEC-001 | Track rules follow-up [#43](https://github.com/kensodemann-projects/hypomnema/issues/43) | Open issue exists; scoped to post–product decision on delete / edit window |
+| PERF-001 | npm cache in Flutter CI for rules tests | `.github/workflows/flutter_ci.yml`: `cache: npm`, `cache-dependency-path: test/rules/package-lock.json` |
+| CLN-001 | Exception `toString` + tests | `journal_entry.dart`, `journal_entry_repository.dart`; domain + repository tests assert strings |
+| CLN-002 | Signed-out `update` test | `journal_entry_repository_test.dart`: updates in-memory entry without Firestore write |
+| CLN-003 | Defer shared Firestore map until read | No read API in PR; inline write maps only |
+| QST-001 | Same as SEC-001 / [#43](https://github.com/kensodemann-projects/hypomnema/issues/43) | Documented in issue body |
+| QST-002 | Defer wiring + `get`/`list` until UI needs it | Repository still not wired in `app/` |
 
 ## Finding counts
 
