@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/app/shell.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
+import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
+import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../helpers/viewport.dart';
@@ -39,6 +41,11 @@ void expectContent(WidgetTester tester, String label) {
   );
 }
 
+void expectJournalWrite(WidgetTester tester) {
+  expect(find.byKey(const Key('journal-write')), findsOneWidget);
+  expect(find.byKey(const Key('shell-content')), findsNothing);
+}
+
 void expectDestinationIcons() {
   expect(find.byIcon(Icons.space_dashboard), findsOneWidget);
   expect(find.byIcon(Icons.menu_book), findsOneWidget);
@@ -55,6 +62,40 @@ const _signOutMessage = "You'll need your email and password to sign back in.";
 const _signOutFailure = 'Failed to sign out.';
 const _phoneChrome = Key('shell-navigation-bar');
 const _desktopChrome = Key('shell-navigation-rail');
+
+class _FakeJournalEntries implements JournalEntryRepository {
+  @override
+  Future<JournalEntry> save({
+    required String subject,
+    required int mood,
+    required String text,
+    required bool private,
+  }) {
+    return Future.value(
+      JournalEntry.create(
+        id: 'entry-1',
+        subject: subject,
+        mood: mood,
+        text: text,
+        private: private,
+        now: DateTime.utc(2026, 11, 24, 18),
+      ),
+    );
+  }
+
+  @override
+  Future<JournalEntry> update({
+    required JournalEntry entry,
+    required String subject,
+    required int mood,
+    required String text,
+    required bool private,
+  }) {
+    return Future.value(
+      entry.revise(subject: subject, mood: mood, text: text, private: private),
+    );
+  }
+}
 
 class _FakeAuthService implements AuthService {
   int signOutCalls = 0;
@@ -100,7 +141,10 @@ Future<void> pumpShell(
   await tester.pumpWidget(
     MaterialApp(
       theme: AppTheme.light,
-      home: Shell(authService: authService ?? _FakeAuthService()),
+      home: Shell(
+        authService: authService ?? _FakeAuthService(),
+        journalEntries: _FakeJournalEntries(),
+      ),
     ),
   );
   await tester.pumpAndSettle();
@@ -307,7 +351,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
       expect(
         tester
             .widget<NavigationBar>(
@@ -345,7 +389,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
       expect(
         tester
             .widget<NavigationRail>(
@@ -380,13 +424,13 @@ void main() {
         chromeLabel(const Key('shell-navigation-bar'), 'Journal'),
       );
       await tester.pumpAndSettle();
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
 
       tester.view.physicalSize = const Size(601, 800);
       await tester.pumpAndSettle();
 
       expectDesktopShellExists();
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
       expect(
         tester
             .widget<NavigationRail>(
@@ -412,7 +456,7 @@ void main() {
       expectSignOutDialog(tester);
       expect(auth.signOutCalls, 0);
       expect(shellSelectedIndex(tester), 1);
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
     },
   );
 
@@ -469,7 +513,7 @@ void main() {
       expectSignOutDialog(tester);
       expect(auth.signOutCalls, 0);
       expect(shellSelectedIndex(tester), 1);
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
     },
   );
 
@@ -487,7 +531,7 @@ void main() {
       expectSignOutDialog(tester);
       expect(auth.signOutCalls, 0);
       expect(shellSelectedIndex(tester), 1);
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
     },
   );
 
@@ -506,7 +550,7 @@ void main() {
 
       expect(find.byKey(const Key('confirmation-dialog')), findsNothing);
       expect(auth.signOutCalls, 0);
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
       expect(shellSelectedIndex(tester), 1);
       expectPhoneShellExists();
     },
@@ -527,7 +571,7 @@ void main() {
 
       expect(find.byKey(const Key('confirmation-dialog')), findsNothing);
       expect(auth.signOutCalls, 0);
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
       expect(shellSelectedIndex(tester), 1);
       expectDesktopShellExists();
     },

@@ -1,4 +1,6 @@
 import 'package:hypomnema/features/auth/data/auth_service.dart';
+import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
+import 'package:hypomnema/features/journal/ui/journal_screen.dart';
 import 'package:hypomnema/shared/ui/confirmation_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -16,9 +18,14 @@ const _destinations = <_NavDestination>[
 ];
 
 class Shell extends StatefulWidget {
-  const Shell({required this.authService, super.key});
+  const Shell({
+    required this.authService,
+    required this.journalEntries,
+    super.key,
+  });
 
   final AuthService authService;
+  final JournalEntryRepository journalEntries;
 
   @override
   State<Shell> createState() => _ShellState();
@@ -65,19 +72,22 @@ class _ShellState extends State<Shell> {
   @override
   Widget build(BuildContext context) {
     final label = _destinations[_selectedIndex].label;
+    final content = label == 'Journal'
+        ? JournalScreen(repository: widget.journalEntries)
+        : _ShellContent(label: label);
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth > 600) {
           return DesktopScaffold(
             selectedIndex: _selectedIndex,
-            label: label,
+            content: content,
             onDestinationSelected: _selectDestination,
             onSignOut: _signOut,
           );
         }
         return PhoneScaffold(
           selectedIndex: _selectedIndex,
-          label: label,
+          content: content,
           onDestinationSelected: _selectDestination,
           onSignOut: _signOut,
         );
@@ -89,14 +99,14 @@ class _ShellState extends State<Shell> {
 class DesktopScaffold extends StatelessWidget {
   const DesktopScaffold({
     required this.selectedIndex,
-    required this.label,
+    required this.content,
     required this.onDestinationSelected,
     required this.onSignOut,
     super.key,
   });
 
   final int selectedIndex;
-  final String label;
+  final Widget content;
   final ValueChanged<int> onDestinationSelected;
   final Future<void> Function() onSignOut;
 
@@ -120,7 +130,7 @@ class DesktopScaffold extends StatelessWidget {
                 ),
             ],
           ),
-          Expanded(child: _ShellContent(label: label)),
+          Expanded(child: content),
         ],
       ),
     );
@@ -130,21 +140,21 @@ class DesktopScaffold extends StatelessWidget {
 class PhoneScaffold extends StatelessWidget {
   const PhoneScaffold({
     required this.selectedIndex,
-    required this.label,
+    required this.content,
     required this.onDestinationSelected,
     required this.onSignOut,
     super.key,
   });
 
   final int selectedIndex;
-  final String label;
+  final Widget content;
   final ValueChanged<int> onDestinationSelected;
   final Future<void> Function() onSignOut;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _ShellContent(label: label),
+      body: content,
       bottomNavigationBar: NavigationBar(
         key: const Key('shell-navigation-bar'),
         selectedIndex: selectedIndex,
