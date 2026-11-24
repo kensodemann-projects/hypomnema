@@ -43,7 +43,7 @@ Selecting Journal in `Shell` (`lib/app/shell.dart`) shows the centered label `Jo
 | Order | Step       | Status | Files |
 | ----- | ---------- | ------ | ----- |
 | 1     | [STEP-001] | complete | `lib/features/journal/ui/journal_editor.dart`, then `test/features/journal/ui/journal_editor_test.dart` |
-| 2     | [STEP-002] |        | `lib/features/journal/ui/journal_screen.dart`, then `lib/app/shell.dart`, then `lib/app/app.dart`, then `lib/main.dart`, then `test/features/journal/ui/journal_screen_test.dart`, then `test/app/shell_test.dart`, then `test/app/app_test.dart` |
+| 2     | [STEP-002] | complete | `lib/features/journal/ui/journal_screen.dart`, then `lib/app/shell.dart`, then `lib/app/app.dart`, then `lib/main.dart`, then `test/features/journal/ui/journal_screen_test.dart`, then `test/app/shell_test.dart`, then `test/app/app_test.dart` |
 
 **Commit gate** — the human commits. A spot-check does not replace the gate.
 
@@ -96,7 +96,7 @@ Add phone and desktop previews in light and dark, following `MoodPicker` and `Co
 
 ## [STEP-002] Open the editor from Journal
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** Journal shows a centered Write button in place of the centered `Journal` label. Write opens the phone page or the desktop dialog, and Close, Cancel, and a successful Save return to Write. Dashboard and Archive stay centered labels. A successful save from this path is the repository's first `save`.
 
