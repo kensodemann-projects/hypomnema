@@ -5,17 +5,16 @@ import 'package:hypomnema/shared/ui/confirmation_dialog.dart';
 import 'package:material_ui/material_ui.dart';
 
 class _NavDestination {
-  const _NavDestination({required this.label, required this.icon});
+  const _NavDestination({
+    required this.label,
+    required this.icon,
+    required this.build,
+  });
 
   final String label;
   final IconData icon;
+  final WidgetBuilder build;
 }
-
-const _destinations = <_NavDestination>[
-  _NavDestination(label: 'Dashboard', icon: Icons.space_dashboard),
-  _NavDestination(label: 'Journal', icon: Icons.menu_book),
-  _NavDestination(label: 'Archive', icon: Icons.inventory_2),
-];
 
 class Shell extends StatefulWidget {
   const Shell({
@@ -69,18 +68,43 @@ class _ShellState extends State<Shell> {
     setState(() => _selectedIndex = index);
   }
 
+  List<_NavDestination> _destinations() {
+    return [
+      _NavDestination(
+        label: 'Dashboard',
+        icon: Icons.space_dashboard,
+        build: (context) => const _ShellContent(label: 'Dashboard'),
+      ),
+      _NavDestination(
+        label: 'Journal',
+        icon: Icons.menu_book,
+        build: (context) => JournalScreen(repository: widget.journalEntries),
+      ),
+      _NavDestination(
+        label: 'Archive',
+        icon: Icons.inventory_2,
+        build: (context) => const _ShellContent(label: 'Archive'),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
-    final label = _destinations[_selectedIndex].label;
-    final content = label == 'Journal'
-        ? JournalScreen(repository: widget.journalEntries)
-        : _ShellContent(label: label);
+    final destinations = _destinations();
+    final content = destinations[_selectedIndex].build(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth > 600) {
           return DesktopScaffold(
             selectedIndex: _selectedIndex,
             content: content,
+            destinations: [
+              for (final destination in destinations)
+                NavigationRailDestination(
+                  icon: Icon(destination.icon),
+                  label: Text(destination.label),
+                ),
+            ],
             onDestinationSelected: _selectDestination,
             onSignOut: _signOut,
           );
@@ -88,6 +112,13 @@ class _ShellState extends State<Shell> {
         return PhoneScaffold(
           selectedIndex: _selectedIndex,
           content: content,
+          destinations: [
+            for (final destination in destinations)
+              NavigationDestination(
+                icon: Icon(destination.icon),
+                label: destination.label,
+              ),
+          ],
           onDestinationSelected: _selectDestination,
           onSignOut: _signOut,
         );
@@ -100,6 +131,7 @@ class DesktopScaffold extends StatelessWidget {
   const DesktopScaffold({
     required this.selectedIndex,
     required this.content,
+    required this.destinations,
     required this.onDestinationSelected,
     required this.onSignOut,
     super.key,
@@ -107,6 +139,7 @@ class DesktopScaffold extends StatelessWidget {
 
   final int selectedIndex;
   final Widget content;
+  final List<NavigationRailDestination> destinations;
   final ValueChanged<int> onDestinationSelected;
   final Future<void> Function() onSignOut;
 
@@ -122,13 +155,7 @@ class DesktopScaffold extends StatelessWidget {
             labelType: NavigationRailLabelType.all,
             trailingAtBottom: true,
             trailing: _SignOutRailButton(onSignOut: onSignOut),
-            destinations: [
-              for (final destination in _destinations)
-                NavigationRailDestination(
-                  icon: Icon(destination.icon),
-                  label: Text(destination.label),
-                ),
-            ],
+            destinations: destinations,
           ),
           Expanded(child: content),
         ],
@@ -141,6 +168,7 @@ class PhoneScaffold extends StatelessWidget {
   const PhoneScaffold({
     required this.selectedIndex,
     required this.content,
+    required this.destinations,
     required this.onDestinationSelected,
     required this.onSignOut,
     super.key,
@@ -148,6 +176,7 @@ class PhoneScaffold extends StatelessWidget {
 
   final int selectedIndex;
   final Widget content;
+  final List<NavigationDestination> destinations;
   final ValueChanged<int> onDestinationSelected;
   final Future<void> Function() onSignOut;
 
@@ -159,18 +188,14 @@ class PhoneScaffold extends StatelessWidget {
         key: const Key('shell-navigation-bar'),
         selectedIndex: selectedIndex,
         onDestinationSelected: (index) async {
-          if (index == _destinations.length) {
+          if (index == destinations.length) {
             await onSignOut();
             return;
           }
           onDestinationSelected(index);
         },
         destinations: [
-          for (final destination in _destinations)
-            NavigationDestination(
-              icon: Icon(destination.icon),
-              label: destination.label,
-            ),
+          ...destinations,
           const NavigationDestination(
             icon: Icon(Icons.logout, key: Key('shell-sign-out')),
             label: 'Sign out',
