@@ -10,12 +10,12 @@ Reviewed the full PR diff: new `MoodSwatch` and `MoodPicker` under `lib/features
 | ------------------------------------------ | ----: |
 | 🔒 Security concerns (immediate attention) |     0 |
 | ⚡ Performance issues/optimizations        |     0 |
-| 🧹 Code cleanup and maintainability        |     1 |
+| 🧹 Code cleanup and maintainability        |     0 |
 | 📚 Documentation gaps                      |     0 |
 | ✅ Positive feedback                       |     2 |
 | 🚨 Critical blockers                       |     0 |
 | 💭 Questions for discussion                |     2 |
-| **Total**                                  |     5 |
+| **Total**                                  |     4 |
 
 ## Findings
 
@@ -29,9 +29,11 @@ _(none)_
 
 ### 🧹 Code cleanup and maintainability
 
-**[CLN-001]**
+_(none open; [CLN-001] complete.)_
 
-**Issue:** The dark-theme swatch border is specified in the PLAN and tests as a 1px border drawn **inside** the swatch (`strokeAlignInside`). `MoodSwatch` uses `Border.all(...)` without an explicit `strokeAlign`.
+**[CLN-001]** — **Status:** complete
+
+**Issue:** The dark-theme swatch border is specified in the PLAN and tests as a 1px border drawn **inside** the swatch (`strokeAlignInside`). `MoodSwatch` used `Border.all(...)` without an explicit `strokeAlign`.
 
 **Suggestion:** Set the border side explicitly so the contract stays obvious if Flutter defaults change:
 
@@ -46,6 +48,8 @@ border: dark
 ```
 
 **Why:** Tests currently lock in inside alignment; making it explicit in production code removes reliance on framework defaults and keeps the widget self-documenting.
+
+**Resolution:** `MoodSwatch` now sets `strokeAlign: BorderSide.strokeAlignInside` on the dark border (`0a9d909`).
 
 ### 📚 Documentation gaps
 
