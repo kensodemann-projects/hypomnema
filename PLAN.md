@@ -45,7 +45,7 @@ A journal mood is an `int` on `JournalEntry` in `lib/features/journal/domain/jou
 | Order | Step | Status | Files |
 | --- | --- | --- | --- |
 | 1 | [STEP-001] | complete | `lib/features/journal/ui/mood_swatch.dart`, then `test/features/journal/ui/mood_swatch_test.dart` |
-| 2 | [STEP-002] | | `lib/features/journal/ui/mood_picker.dart`, then `test/features/journal/ui/mood_picker_test.dart` |
+| 2 | [STEP-002] | complete | `lib/features/journal/ui/mood_picker.dart`, then `test/features/journal/ui/mood_picker_test.dart` |
 
 ## Commit gate
 
@@ -93,7 +93,7 @@ flutter test test/features/journal/ui/mood_swatch_test.dart
 
 ## [STEP-002] Add the mood picker
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** The picker offers moods 1 through 5, labels only `Awful` and `Great`, and shows each number on its contract fill in `#111111` in both themes. The selected mood is the scaled swatch with the contract ring. A mood shown as a `MoodSwatch` outside the picker has no labels. Phone and desktop use the contract layouts.
 
