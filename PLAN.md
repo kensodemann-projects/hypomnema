@@ -44,7 +44,7 @@ A journal mood is an `int` on `JournalEntry` in `lib/features/journal/domain/jou
 
 | Order | Step | Status | Files |
 | --- | --- | --- | --- |
-| 1 | [STEP-001] | | `lib/features/journal/ui/mood_swatch.dart`, then `test/features/journal/ui/mood_swatch_test.dart` |
+| 1 | [STEP-001] | complete | `lib/features/journal/ui/mood_swatch.dart`, then `test/features/journal/ui/mood_swatch_test.dart` |
 | 2 | [STEP-002] | | `lib/features/journal/ui/mood_picker.dart`, then `test/features/journal/ui/mood_picker_test.dart` |
 
 ## Commit gate
@@ -60,7 +60,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Add the mood swatch
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** Each mood from 1 through 5 is a square of its contract fill with its digit centered in `#111111`, at the regular size and the large size, in both light and dark themes. The dark theme adds the inside border. A mood outside 1 through 5 throws `ArgumentError`.
 
