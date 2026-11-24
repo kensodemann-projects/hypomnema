@@ -4,7 +4,7 @@ Reviewed: resulting diff on `35-write-a-journal-entry` vs `main` (issue #35). `P
 
 ## Summary
 
-This PR wires journal writing end-to-end: a centered **Write** action on the Journal tab, a responsive `JournalEditor` (full-screen phone / 720px desktop dialog), repository injection through `MainApp` → `Shell` → `JournalScreen`, and broad widget tests for layout, validation, save, dismiss, and failure paths. The `onSubmit` callback on `JournalEditor` keeps the widget testable without Firebase and is a solid layering choice. Overall this is ready to merge; remaining open notes are two maintainability items and one edge-case UX gap, not blockers.
+This PR wires journal writing end-to-end: a centered **Write** action on the Journal tab, a responsive `JournalEditor` (full-screen phone / 720px desktop dialog), repository injection through `MainApp` → `Shell` → `JournalScreen`, and broad widget tests for layout, validation, save, dismiss, and failure paths. The `onSubmit` callback on `JournalEditor` keeps the widget testable without Firebase and is a solid layering choice. Overall this is ready to merge; remaining open notes are one maintainability item and one edge-case UX gap, not blockers.
 
 **Recommendation:** Approve (comment-only follow-ups welcome).
 
@@ -14,12 +14,12 @@ This PR wires journal writing end-to-end: a centered **Write** action on the Jou
 | ------------------------------------------ | ----: |
 | 🔒 Security concerns (immediate attention) |     0 |
 | ⚡ Performance issues/optimizations        |     0 |
-| 🧹 Code cleanup and maintainability        |     2 |
+| 🧹 Code cleanup and maintainability        |     1 |
 | 📚 Documentation gaps                      |     0 |
 | ✅ Positive feedback                       |     3 |
 | 🚨 Critical blockers                       |     0 |
 | 💭 Questions for discussion                |     1 |
-| **Total**                                  |     6 |
+| **Total**                                  |     5 |
 
 ## Findings
 
@@ -45,7 +45,7 @@ This PR wires journal writing end-to-end: a centered **Write** action on the Jou
 
 ---
 
-**[CLN-002]**
+**[CLN-002]** — **Complete** (`c2f07f3`)
 
 **Issue:** `Shell` selects the Journal UI with `label == 'Journal'` on the destination’s display string rather than the selected index or a dedicated destination id.
 
@@ -58,6 +58,8 @@ final content = _selectedIndex == /* journal index */ 1
 ```
 
 **Why:** Nav copy and shell composition stay decoupled; avoids a subtle regression if labels are localized or shortened later.
+
+**Resolution:** `_NavDestination` carries label, icon, and a `WidgetBuilder`; `Shell` builds content with `destinations[_selectedIndex].build(context)`, so nav labels no longer drive which screen is shown.
 
 ---
 
