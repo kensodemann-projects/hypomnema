@@ -4,7 +4,7 @@ Reviewed: resulting diff on `35-write-a-journal-entry` vs `main` (issue #35). `P
 
 ## Summary
 
-This PR wires journal writing end-to-end: a centered **Write** action on the Journal tab, a responsive `JournalEditor` (full-screen phone / 720px desktop dialog), repository injection through `MainApp` → `Shell` → `JournalScreen`, and broad widget tests for layout, validation, save, dismiss, and failure paths. The `onSubmit` callback on `JournalEditor` keeps the widget testable without Firebase and is a solid layering choice. Overall this is ready to merge; remaining notes are maintainability and one edge-case UX gap, not blockers.
+This PR wires journal writing end-to-end: a centered **Write** action on the Journal tab, a responsive `JournalEditor` (full-screen phone / 720px desktop dialog), repository injection through `MainApp` → `Shell` → `JournalScreen`, and broad widget tests for layout, validation, save, dismiss, and failure paths. The `onSubmit` callback on `JournalEditor` keeps the widget testable without Firebase and is a solid layering choice. Overall this is ready to merge; remaining open notes are two maintainability items and one edge-case UX gap, not blockers.
 
 **Recommendation:** Approve (comment-only follow-ups welcome).
 
@@ -14,12 +14,12 @@ This PR wires journal writing end-to-end: a centered **Write** action on the Jou
 | ------------------------------------------ | ----: |
 | 🔒 Security concerns (immediate attention) |     0 |
 | ⚡ Performance issues/optimizations        |     0 |
-| 🧹 Code cleanup and maintainability        |     3 |
+| 🧹 Code cleanup and maintainability        |     2 |
 | 📚 Documentation gaps                      |     0 |
 | ✅ Positive feedback                       |     3 |
 | 🚨 Critical blockers                       |     0 |
 | 💭 Questions for discussion                |     1 |
-| **Total**                                  |     7 |
+| **Total**                                  |     6 |
 
 ## Findings
 
@@ -33,13 +33,15 @@ This PR wires journal writing end-to-end: a centered **Write** action on the Jou
 
 ### Code cleanup and maintainability
 
-**[CLN-001]**
+**[CLN-001]** — **Complete** (`1d8eefa`)
 
 **Issue:** `_FakeJournalEntries` is duplicated in `test/app/app_test.dart` and `test/app/shell_test.dart` with identical `save` / `update` implementations. `journal_screen_test.dart` adds a third variant (`_RecordingJournalEntries`) that only differs by recording behavior.
 
 **Suggestion:** Add a small shared fake under `test/helpers/` (or next to existing test helpers), e.g. `FakeJournalEntryRepository` with optional `saveError` / recording hooks, and reuse it across app, shell, and journal screen tests.
 
 **Why:** One place to update when `JournalEntryRepository` grows (e.g. delete or list), and less noise in already large shell/app tests.
+
+**Resolution:** `test/helpers/fake_journal_entry_repository.dart` centralizes `FakeJournalEntryRepository` with `saves`, `updateCalls`, and `saveError`; app, shell, and journal screen tests import it and drop the local duplicates.
 
 ---
 
