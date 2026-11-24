@@ -2,8 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/widget_previews.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
-import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
-import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:hypomnema/features/journal/ui/mood_picker.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -13,21 +11,32 @@ const _saveFailed = 'The entry could not be saved.';
 
 class JournalEditor extends StatefulWidget {
   const JournalEditor({
-    required this.repository,
     required this.desktop,
+    required this.onSubmit,
+    this.subject = '',
+    this.mood,
+    this.text = '',
     super.key,
   });
 
-  final JournalEntryRepository repository;
   final bool desktop;
+  final String subject;
+  final int? mood;
+  final String text;
+  final Future<void> Function({
+    required String subject,
+    required int mood,
+    required String text,
+  })
+  onSubmit;
 
   @override
   State<JournalEditor> createState() => _JournalEditorState();
 }
 
 class _JournalEditorState extends State<JournalEditor> {
-  final _subjectController = TextEditingController();
-  final _textController = TextEditingController();
+  late final TextEditingController _subjectController;
+  late final TextEditingController _textController;
   int? _mood;
   var _saving = false;
   var _dismissAfterSave = false;
@@ -35,6 +44,9 @@ class _JournalEditorState extends State<JournalEditor> {
   @override
   void initState() {
     super.initState();
+    _subjectController = TextEditingController(text: widget.subject);
+    _textController = TextEditingController(text: widget.text);
+    _mood = widget.mood;
     _subjectController.addListener(_onEdited);
     _textController.addListener(_onEdited);
   }
@@ -83,12 +95,7 @@ class _JournalEditorState extends State<JournalEditor> {
     final messenger = ScaffoldMessenger.of(context);
     final scheme = Theme.of(context).colorScheme;
     try {
-      await widget.repository.save(
-        subject: subject,
-        mood: mood,
-        text: text,
-        private: false,
-      );
+      await widget.onSubmit(subject: subject, mood: mood, text: text);
       if (!mounted) {
         return;
       }
@@ -536,41 +543,11 @@ class _CloseButton extends StatelessWidget {
   }
 }
 
-class _PreviewJournalEntries implements JournalEntryRepository {
-  const _PreviewJournalEntries();
-
-  @override
-  Future<JournalEntry> save({
-    required String subject,
-    required int mood,
-    required String text,
-    required bool private,
-  }) {
-    return Future.value(
-      JournalEntry.create(
-        id: 'preview',
-        subject: subject,
-        mood: mood,
-        text: text,
-        private: private,
-        now: DateTime.now(),
-      ),
-    );
-  }
-
-  @override
-  Future<JournalEntry> update({
-    required JournalEntry entry,
-    required String subject,
-    required int mood,
-    required String text,
-    required bool private,
-  }) {
-    return Future.value(
-      entry.revise(subject: subject, mood: mood, text: text, private: private),
-    );
-  }
-}
+Future<void> _previewSubmit({
+  required String subject,
+  required int mood,
+  required String text,
+}) async {}
 
 @Preview(name: 'Journal editor — Phone', size: Size(400, 800))
 @Preview(name: 'Journal editor — Desktop', size: Size(1000, 700))
@@ -625,12 +602,12 @@ class _PreviewTheme extends StatelessWidget {
                 child: desktop
                     ? const Center(
                         child: JournalEditor(
-                          repository: _PreviewJournalEntries(),
+                          onSubmit: _previewSubmit,
                           desktop: true,
                         ),
                       )
                     : const JournalEditor(
-                        repository: _PreviewJournalEntries(),
+                        onSubmit: _previewSubmit,
                         desktop: false,
                       ),
               ),

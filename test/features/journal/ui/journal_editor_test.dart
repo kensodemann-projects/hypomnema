@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
-import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
-import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:hypomnema/features/journal/ui/journal_editor.dart';
 import 'package:hypomnema/features/journal/ui/mood_picker.dart';
 import 'package:material_ui/material_ui.dart';
@@ -19,64 +17,39 @@ const _closeKey = Key('journal-close');
 const _subjectKey = Key('journal-subject');
 const _textKey = Key('journal-text');
 
-class _RecordingJournalEntries implements JournalEntryRepository {
-  final saves = <({String subject, int mood, String text, bool private})>[];
-  var updateCalls = 0;
-  Object? saveError;
-  Future<void> Function()? onSave;
+class _Submissions {
+  final calls = <({String subject, int mood, String text})>[];
+  Object? error;
+  Future<void> Function()? gate;
 
-  @override
-  Future<JournalEntry> save({
+  Future<void> submit({
     required String subject,
     required int mood,
     required String text,
-    required bool private,
   }) async {
-    saves.add((subject: subject, mood: mood, text: text, private: private));
-    final hook = onSave;
-    if (hook != null) {
-      await hook();
+    calls.add((subject: subject, mood: mood, text: text));
+    final gate = this.gate;
+    if (gate != null) {
+      await gate();
     }
-    final error = saveError;
+    final error = this.error;
     if (error != null) {
       throw error;
     }
-    return JournalEntry.create(
-      id: 'entry-1',
-      subject: subject,
-      mood: mood,
-      text: text,
-      private: private,
-      now: DateTime.utc(2026, 11, 24, 18),
-    );
-  }
-
-  @override
-  Future<JournalEntry> update({
-    required JournalEntry entry,
-    required String subject,
-    required int mood,
-    required String text,
-    required bool private,
-  }) async {
-    updateCalls += 1;
-    return entry.revise(
-      subject: subject,
-      mood: mood,
-      text: text,
-      private: private,
-    );
   }
 }
 
-Future<_RecordingJournalEntries> _openEditor(
+Future<_Submissions> _openEditor(
   WidgetTester tester, {
   required bool desktop,
   required ThemeData theme,
   required Size size,
-  _RecordingJournalEntries? repository,
+  _Submissions? submissions,
+  String subject = '',
+  int? mood,
+  String text = '',
 }) async {
-  final repo = repository ?? _RecordingJournalEntries();
+  final recorder = submissions ?? _Submissions();
   setLogicalViewportSize(tester, size);
   await tester.pumpWidget(
     MaterialApp(
@@ -87,8 +60,11 @@ Future<_RecordingJournalEntries> _openEditor(
             body: TextButton(
               onPressed: () {
                 final editor = JournalEditor(
-                  repository: repo,
                   desktop: desktop,
+                  onSubmit: recorder.submit,
+                  subject: subject,
+                  mood: mood,
+                  text: text,
                 );
                 if (desktop) {
                   showDialog<void>(
@@ -111,7 +87,7 @@ Future<_RecordingJournalEntries> _openEditor(
   );
   await tester.tap(find.text('Open'));
   await tester.pumpAndSettle();
-  return repo;
+  return recorder;
 }
 
 Future<void> enterEntry(
@@ -339,7 +315,7 @@ void main() {
   testWidgets(
     'Given an empty editor, when Save is read, then it is disabled and nothing is written',
     (tester) async {
-      final repo = await _openEditor(
+      final submissions = await _openEditor(
         tester,
         desktop: false,
         theme: AppTheme.light,
@@ -347,15 +323,14 @@ void main() {
       );
 
       expectSaveDisabled(tester);
-      expect(repo.saves, isEmpty);
-      expect(repo.updateCalls, 0);
+      expect(submissions.calls, isEmpty);
     },
   );
 
   testWidgets(
     'Given a whitespace subject, when the other fields are filled, then Save stays disabled',
     (tester) async {
-      final repo = await _openEditor(
+      final submissions = await _openEditor(
         tester,
         desktop: false,
         theme: AppTheme.light,
@@ -365,14 +340,14 @@ void main() {
       await enterEntry(tester, subject: '   ', text: 'hello', mood: 3);
 
       expectSaveDisabled(tester);
-      expect(repo.saves, isEmpty);
+      expect(submissions.calls, isEmpty);
     },
   );
 
   testWidgets(
     'Given whitespace journal text, when the other fields are filled, then Save stays disabled',
     (tester) async {
-      final repo = await _openEditor(
+      final submissions = await _openEditor(
         tester,
         desktop: false,
         theme: AppTheme.light,
@@ -382,14 +357,14 @@ void main() {
       await enterEntry(tester, subject: 'Note', text: '   ', mood: 4);
 
       expectSaveDisabled(tester);
-      expect(repo.saves, isEmpty);
+      expect(submissions.calls, isEmpty);
     },
   );
 
   testWidgets(
     'Given no mood, when subject and text are filled, then Save stays disabled',
     (tester) async {
-      final repo = await _openEditor(
+      final submissions = await _openEditor(
         tester,
         desktop: false,
         theme: AppTheme.light,
@@ -399,14 +374,14 @@ void main() {
       await enterEntry(tester, subject: 'Note', text: 'hello');
 
       expectSaveDisabled(tester);
-      expect(repo.saves, isEmpty);
+      expect(submissions.calls, isEmpty);
     },
   );
 
   testWidgets(
-    'Given a subject, mood, and text, when Save is tapped on the phone, then save stores the trimmed public entry and the page closes',
+    'Given a subject, mood, and text, when Save is tapped on the phone, then onSubmit receives the trimmed values and the page closes',
     (tester) async {
-      final repo = await _openEditor(
+      final submissions = await _openEditor(
         tester,
         desktop: false,
         theme: AppTheme.light,
@@ -417,19 +392,16 @@ void main() {
       await tester.tap(find.byKey(_saveKey));
       await tester.pumpAndSettle();
 
-      expect(repo.saves, [
-        (subject: 'Note', mood: 4, text: 'hello', private: false),
-      ]);
-      expect(repo.updateCalls, 0);
+      expect(submissions.calls, [(subject: 'Note', mood: 4, text: 'hello')]);
       expect(find.byKey(_editorKey), findsNothing);
       expect(find.text('Open'), findsOneWidget);
     },
   );
 
   testWidgets(
-    'Given a subject, mood, and text, when Save is tapped on the desktop, then save stores the trimmed public entry and the dialog closes',
+    'Given a subject, mood, and text, when Save is tapped on the desktop, then onSubmit receives the trimmed values and the dialog closes',
     (tester) async {
-      final repo = await _openEditor(
+      final submissions = await _openEditor(
         tester,
         desktop: true,
         theme: AppTheme.light,
@@ -440,10 +412,42 @@ void main() {
       await tester.tap(find.byKey(_saveKey));
       await tester.pumpAndSettle();
 
-      expect(repo.saves, [
-        (subject: 'Note', mood: 2, text: 'hello', private: false),
-      ]);
-      expect(repo.updateCalls, 0);
+      expect(submissions.calls, [(subject: 'Note', mood: 2, text: 'hello')]);
+      expect(find.byKey(_editorKey), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'Given an entry already filled in, when Save is tapped, then onSubmit receives those trimmed values',
+    (tester) async {
+      final submissions = await _openEditor(
+        tester,
+        desktop: false,
+        theme: AppTheme.light,
+        size: const Size(400, 800),
+        subject: '  Note  ',
+        mood: 3,
+        text: '  hello  ',
+      );
+
+      expect(
+        tester.widget<TextField>(find.byKey(_subjectKey)).controller?.text,
+        '  Note  ',
+      );
+      expect(
+        tester.widget<TextField>(find.byKey(_textKey)).controller?.text,
+        '  hello  ',
+      );
+      expect(tester.widget<MoodPicker>(find.byType(MoodPicker)).value, 3);
+      expect(
+        tester.widget<ButtonStyleButton>(find.byKey(_saveKey)).onPressed,
+        isNotNull,
+      );
+
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pumpAndSettle();
+
+      expect(submissions.calls, [(subject: 'Note', mood: 3, text: 'hello')]);
       expect(find.byKey(_editorKey), findsNothing);
     },
   );
@@ -452,13 +456,13 @@ void main() {
     'Given a save in flight, when Save is tapped again, then save is called once',
     (tester) async {
       final gate = Completer<void>();
-      final repo = _RecordingJournalEntries()..onSave = () => gate.future;
+      final submissions = _Submissions()..gate = () => gate.future;
       await _openEditor(
         tester,
         desktop: false,
         theme: AppTheme.light,
         size: const Size(400, 800),
-        repository: repo,
+        submissions: submissions,
       );
       await enterEntry(tester, subject: 'Note', text: 'hello', mood: 3);
 
@@ -467,10 +471,10 @@ void main() {
       await tester.tap(find.byKey(_saveKey));
       await tester.pump();
 
-      expect(repo.saves, hasLength(1));
+      expect(submissions.calls, hasLength(1));
       gate.complete();
       await tester.pumpAndSettle();
-      expect(repo.saves, hasLength(1));
+      expect(submissions.calls, hasLength(1));
       expect(find.byKey(_editorKey), findsNothing);
     },
   );
@@ -479,13 +483,13 @@ void main() {
     'Given a save in flight, when Close is tapped, then the editor stays until the save finishes',
     (tester) async {
       final gate = Completer<void>();
-      final repo = _RecordingJournalEntries()..onSave = () => gate.future;
+      final submissions = _Submissions()..gate = () => gate.future;
       await _openEditor(
         tester,
         desktop: false,
         theme: AppTheme.light,
         size: const Size(400, 800),
-        repository: repo,
+        submissions: submissions,
       );
       await enterEntry(tester, subject: 'Note', text: 'hello', mood: 1);
 
@@ -495,7 +499,7 @@ void main() {
       await tester.pump();
 
       expect(find.byKey(_editorKey), findsOneWidget);
-      expect(repo.saves, hasLength(1));
+      expect(submissions.calls, hasLength(1));
       gate.complete();
       await tester.pumpAndSettle();
       expect(find.byKey(_editorKey), findsNothing);
@@ -505,13 +509,13 @@ void main() {
   testWidgets(
     'Given a save that fails, when Save is tapped, then the editor stays open and the failure snackbar is shown',
     (tester) async {
-      final repo = _RecordingJournalEntries()..saveError = Exception('offline');
+      final submissions = _Submissions()..error = Exception('offline');
       await _openEditor(
         tester,
         desktop: false,
         theme: AppTheme.light,
         size: const Size(400, 800),
-        repository: repo,
+        submissions: submissions,
       );
       await enterEntry(tester, subject: 'Note', text: 'hello', mood: 5);
 
@@ -528,14 +532,14 @@ void main() {
         tester.widget<Text>(find.text(_saveFailed)).style?.color,
         scheme.error,
       );
-      expect(repo.updateCalls, 0);
+      expect(submissions.calls, hasLength(1));
     },
   );
 
   testWidgets(
     'Given the phone editor, when Close is tapped, then the page closes and nothing is written',
     (tester) async {
-      final repo = await _openEditor(
+      final submissions = await _openEditor(
         tester,
         desktop: false,
         theme: AppTheme.light,
@@ -546,14 +550,14 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(_editorKey), findsNothing);
-      expect(repo.saves, isEmpty);
+      expect(submissions.calls, isEmpty);
     },
   );
 
   testWidgets(
     'Given the desktop editor, when Cancel is tapped, then the dialog closes and nothing is written',
     (tester) async {
-      final repo = await _openEditor(
+      final submissions = await _openEditor(
         tester,
         desktop: true,
         theme: AppTheme.light,
@@ -564,14 +568,14 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(_editorKey), findsNothing);
-      expect(repo.saves, isEmpty);
+      expect(submissions.calls, isEmpty);
     },
   );
 
   testWidgets(
     'Given the desktop editor, when Close is tapped, then the dialog closes and nothing is written',
     (tester) async {
-      final repo = await _openEditor(
+      final submissions = await _openEditor(
         tester,
         desktop: true,
         theme: AppTheme.light,
@@ -582,7 +586,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(_editorKey), findsNothing);
-      expect(repo.saves, isEmpty);
+      expect(submissions.calls, isEmpty);
     },
   );
 
