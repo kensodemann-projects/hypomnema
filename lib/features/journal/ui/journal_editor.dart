@@ -39,7 +39,6 @@ class _JournalEditorState extends State<JournalEditor> {
   late final TextEditingController _textController;
   int? _mood;
   var _saving = false;
-  var _dismissAfterSave = false;
 
   @override
   void initState() {
@@ -76,10 +75,6 @@ class _JournalEditorState extends State<JournalEditor> {
   }
 
   void _dismiss() {
-    if (_saving) {
-      _dismissAfterSave = true;
-      return;
-    }
     Navigator.of(context).pop();
   }
 
@@ -102,10 +97,6 @@ class _JournalEditorState extends State<JournalEditor> {
       navigator.pop();
     } catch (_) {
       if (!mounted) {
-        return;
-      }
-      if (_dismissAfterSave) {
-        navigator.pop();
         return;
       }
       messenger.showSnackBar(
@@ -131,14 +122,14 @@ class _JournalEditorState extends State<JournalEditor> {
     );
     if (widget.desktop) {
       return _DesktopEditor(
-        onDismiss: _dismiss,
+        onDismiss: _saving ? null : _dismiss,
         onSave: _canSave ? _save : null,
         fields: fields,
         surface: scheme.surface,
       );
     }
     return _PhoneEditor(
-      onDismiss: _dismiss,
+      onDismiss: _saving ? null : _dismiss,
       onSave: _canSave ? _save : null,
       fields: fields,
       surface: scheme.surface,
@@ -340,7 +331,7 @@ class _PhoneEditor extends StatelessWidget {
     required this.primary,
   });
 
-  final VoidCallback onDismiss;
+  final VoidCallback? onDismiss;
   final VoidCallback? onSave;
   final Widget fields;
   final Color surface;
@@ -412,7 +403,7 @@ class _DesktopEditor extends StatelessWidget {
     required this.surface,
   });
 
-  final VoidCallback onDismiss;
+  final VoidCallback? onDismiss;
   final VoidCallback? onSave;
   final Widget fields;
   final Color surface;
@@ -515,7 +506,7 @@ class _DateNote extends StatelessWidget {
 class _CloseButton extends StatelessWidget {
   const _CloseButton({required this.onPressed, required this.size});
 
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double size;
 
   @override

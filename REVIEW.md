@@ -120,3 +120,5 @@ final content = _selectedIndex == /* journal index */ 1
 **Suggestion:** Confirm product intent: either document “dismiss wins over error feedback” or, on failure with `_dismissAfterSave`, still show the snackbar on the route underneath (Journal) after pop.
 
 **Why:** Today a failed save during a dismiss is silent; users may think the entry was saved or simply lost without explanation.
+
+**Resolution:** Close and Cancel are disabled while a save is in flight, so a failed save stays on the editor and shows the snackbar.

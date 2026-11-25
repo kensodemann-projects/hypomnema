@@ -480,10 +480,12 @@ void main() {
   );
 
   testWidgets(
-    'Given a save in flight, when Close is tapped, then the editor stays until the save finishes',
+    'Given a save in flight, when Close is tapped, then it does nothing and a failed save stays on the editor',
     (tester) async {
       final gate = Completer<void>();
-      final submissions = _Submissions()..gate = () => gate.future;
+      final submissions = _Submissions();
+      submissions.gate = () => gate.future;
+      submissions.error = Exception('offline');
       await _openEditor(
         tester,
         desktop: false,
@@ -495,11 +497,56 @@ void main() {
 
       await tester.tap(find.byKey(_saveKey));
       await tester.pump();
+
+      expect(
+        tester.widget<IconButton>(find.byKey(_closeKey)).onPressed,
+        isNull,
+      );
       await tester.tap(find.byKey(_closeKey));
       await tester.pump();
 
       expect(find.byKey(_editorKey), findsOneWidget);
       expect(submissions.calls, hasLength(1));
+      gate.complete();
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(_editorKey), findsOneWidget);
+      expect(find.text(_saveFailed), findsOneWidget);
+      expect(
+        tester.widget<IconButton>(find.byKey(_closeKey)).onPressed,
+        isNotNull,
+      );
+    },
+  );
+
+  testWidgets(
+    'Given a save in flight on the desktop, when Cancel and Close are read, then they are disabled',
+    (tester) async {
+      final gate = Completer<void>();
+      final submissions = _Submissions()..gate = () => gate.future;
+      await _openEditor(
+        tester,
+        desktop: true,
+        theme: AppTheme.light,
+        size: const Size(1200, 800),
+        submissions: submissions,
+      );
+      await enterEntry(tester, subject: 'Note', text: 'hello', mood: 2);
+
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pump();
+
+      expect(
+        tester.widget<IconButton>(find.byKey(_closeKey)).onPressed,
+        isNull,
+      );
+      expect(
+        tester
+            .widget<TextButton>(find.byKey(const Key('journal-cancel')))
+            .onPressed,
+        isNull,
+      );
+
       gate.complete();
       await tester.pumpAndSettle();
       expect(find.byKey(_editorKey), findsNothing);
