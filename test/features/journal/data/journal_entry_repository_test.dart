@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -288,5 +290,161 @@ void main() {
         .doc(saved.id)
         .get();
     expect(snapshot.data()!['subject'], 'Note');
+  });
+
+  test('Given a signed-in user with no entries, when watch is listened to, then it emits an empty list', () async {
+    // Given
+    final firestore = FakeFirebaseFirestore();
+    final repository = FirestoreJournalEntryRepository(
+      firestore: firestore,
+      firebaseAuth: _FakeFirebaseAuth(currentUser: _FakeUser('user-1')),
+      clock: () => firstInstant,
+    );
+
+    // When
+    final entries = await repository.watch().first;
+
+    // Then
+    expect(entries, isEmpty);
+  });
+
+  test('Given saved entries, when watch is listened to, then they emit newest first and a later save appears', () async {
+    // Given
+    final newestInstant = DateTime(2026, 11, 23, 19, 5, 6);
+    final instants = [firstInstant, laterInstant, newestInstant];
+    var clockCalls = 0;
+    final firestore = FakeFirebaseFirestore();
+    final repository = FirestoreJournalEntryRepository(
+      firestore: firestore,
+      firebaseAuth: _FakeFirebaseAuth(currentUser: _FakeUser('user-1')),
+      clock: () {
+        final instant = instants[clockCalls];
+        clockCalls += 1;
+        return instant;
+      },
+    );
+    final older = await repository.save(
+      subject: 'Older',
+      mood: 2,
+      text: 'one',
+      private: false,
+    );
+    final newer = await repository.save(
+      subject: 'Newer',
+      mood: 4,
+      text: 'two',
+      private: true,
+    );
+    final watch = StreamIterator(repository.watch());
+
+    // When
+    final hasFirst = await watch.moveNext();
+    final first = watch.current;
+    final newest = await repository.save(
+      subject: 'Newest',
+      mood: 5,
+      text: 'three',
+      private: false,
+    );
+    final hasSecond = await watch.moveNext();
+    final second = watch.current;
+    await watch.cancel();
+
+    // Then
+    expect(hasFirst, isTrue);
+    expect(first.map((entry) => entry.id), [newer.id, older.id]);
+    expect(first.first.localDateTime, newer.localDateTime);
+    expect(first.first.createdAt, newer.createdAt);
+    expect(first.first.createdAt.isUtc, isTrue);
+    expect(first.last.localDateTime, older.localDateTime);
+    expect(first.last.createdAt, older.createdAt);
+    expect(hasSecond, isTrue);
+    expect(second.map((entry) => entry.subject), ['Newest', 'Newer', 'Older']);
+    expect(second.first.id, newest.id);
+    expect(second.first.localDateTime, newest.localDateTime);
+    expect(second.first.createdAt, newest.createdAt);
+  });
+
+  test('Given an entry stored for another user, when watch is listened to, then that entry is absent', () async {
+    // Given
+    final firestore = FakeFirebaseFirestore();
+    final repository = FirestoreJournalEntryRepository(
+      firestore: firestore,
+      firebaseAuth: _FakeFirebaseAuth(currentUser: _FakeUser('user-1')),
+      clock: () => firstInstant,
+    );
+    await firestore
+        .collection('users')
+        .doc('user-2')
+        .collection('journalEntries')
+        .doc('theirs')
+        .set({
+          'subject': 'Theirs',
+          'mood': 3,
+          'text': 'secret',
+          'private': false,
+          'localDateTime': '2026-11-23T16:35:04',
+          'createdAt': Timestamp.fromDate(laterInstant),
+        });
+    final saved = await repository.save(
+      subject: 'Mine',
+      mood: 1,
+      text: 'hello',
+      private: false,
+    );
+
+    // When
+    final entries = await repository.watch().first;
+
+    // Then
+    expect(entries.map((entry) => entry.id), [saved.id]);
+    expect(entries.single.subject, 'Mine');
+  });
+
+  test('Given a stored document restore rejects, when watch is listened to, then the stream emits InvalidJournalEntryException', () async {
+    // Given
+    final firestore = FakeFirebaseFirestore();
+    final repository = FirestoreJournalEntryRepository(
+      firestore: firestore,
+      firebaseAuth: _FakeFirebaseAuth(currentUser: _FakeUser('user-1')),
+      clock: () => firstInstant,
+    );
+    await firestore
+        .collection('users')
+        .doc('user-1')
+        .collection('journalEntries')
+        .doc('bad')
+        .set({
+          'subject': '   ',
+          'mood': 3,
+          'text': 'hello',
+          'private': false,
+          'localDateTime': '2026-11-23T16:35:04',
+          'createdAt': Timestamp.fromDate(firstInstant),
+        });
+
+    // When, then
+    await expectLater(
+      repository.watch(),
+      emitsError(isA<InvalidJournalEntryException>()),
+    );
+  });
+
+  test('Given a signed-out user, when watch is listened to, then JournalEntryRepositoryException is emitted and nothing is written', () async {
+    // Given
+    final firestore = FakeFirebaseFirestore();
+    final repository = FirestoreJournalEntryRepository(
+      firestore: firestore,
+      firebaseAuth: _FakeFirebaseAuth(),
+      clock: () => firstInstant,
+    );
+
+    // When, then
+    await expectLater(
+      repository.watch(),
+      emitsError(isA<JournalEntryRepositoryException>()),
+    );
+    final users = await firestore.collection('users').get();
+    expect(users.docs, isEmpty);
   });
 }

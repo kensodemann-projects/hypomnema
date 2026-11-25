@@ -17,6 +17,8 @@ abstract interface class JournalEntryRepository {
     required String text,
     required bool private,
   });
+
+  Stream<List<JournalEntry>> watch();
 }
 
 class JournalEntryRepositoryException implements Exception {
@@ -86,6 +88,47 @@ class FirestoreJournalEntryRepository implements JournalEntryRepository {
       'private': revised.private,
     });
     return revised;
+  }
+
+  @override
+  Stream<List<JournalEntry>> watch() {
+    final uid = _firebaseAuth.currentUser?.uid;
+    if (uid == null) {
+      return Stream<List<JournalEntry>>.error(
+        const JournalEntryRepositoryException(),
+      );
+    }
+    return _entries(uid)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => [for (final doc in snapshot.docs) _read(doc)]);
+  }
+
+  JournalEntry _read(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data();
+    final subject = data['subject'];
+    final mood = data['mood'];
+    final text = data['text'];
+    final private = data['private'];
+    final localDateTime = data['localDateTime'];
+    final createdAt = data['createdAt'];
+    if (subject is! String ||
+        mood is! int ||
+        text is! String ||
+        private is! bool ||
+        localDateTime is! String ||
+        createdAt is! Timestamp) {
+      throw const InvalidJournalEntryException();
+    }
+    return JournalEntry.restore(
+      id: doc.id,
+      subject: subject,
+      mood: mood,
+      text: text,
+      private: private,
+      localDateTime: localDateTime,
+      createdAt: createdAt.toDate(),
+    );
   }
 
   String _uid() {

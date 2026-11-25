@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 
 class FakeJournalEntryRepository implements JournalEntryRepository {
   final saves = <({String subject, int mood, String text, bool private})>[];
+  final _stored = <JournalEntry>[];
+  final _updates = StreamController<List<JournalEntry>>.broadcast();
   var updateCalls = 0;
+  var _nextId = 0;
   Object? saveError;
 
   @override
@@ -18,14 +23,18 @@ class FakeJournalEntryRepository implements JournalEntryRepository {
     if (error != null) {
       throw error;
     }
-    return JournalEntry.create(
-      id: 'entry-1',
+    _nextId += 1;
+    final entry = JournalEntry.create(
+      id: 'entry-$_nextId',
       subject: subject,
       mood: mood,
       text: text,
       private: private,
       now: DateTime.utc(2026, 11, 24, 18),
     );
+    _stored.insert(0, entry);
+    _publish();
+    return entry;
   }
 
   @override
@@ -37,11 +46,29 @@ class FakeJournalEntryRepository implements JournalEntryRepository {
     required bool private,
   }) async {
     updateCalls += 1;
-    return entry.revise(
+    final revised = entry.revise(
       subject: subject,
       mood: mood,
       text: text,
       private: private,
     );
+    final index = _stored.indexWhere((stored) => stored.id == entry.id);
+    if (index >= 0) {
+      _stored[index] = revised;
+    }
+    _publish();
+    return revised;
+  }
+
+  @override
+  Stream<List<JournalEntry>> watch() async* {
+    yield List<JournalEntry>.unmodifiable(_stored);
+    yield* _updates.stream;
+  }
+
+  void _publish() {
+    if (_updates.hasListener) {
+      _updates.add(List<JournalEntry>.unmodifiable(_stored));
+    }
   }
 }
