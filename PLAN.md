@@ -61,7 +61,7 @@ With the clock on Monday, November 16, 2026, Sunday November 15 is `Yesterday` a
 | ----- | ---- | ------ | ----- |
 | 1 | [STEP-001] | complete | `lib/features/journal/domain/journal_entry.dart`, then `test/features/journal/domain/journal_entry_test.dart`, then `lib/features/journal/data/journal_entry_repository.dart`, then `test/features/journal/data/journal_entry_repository_test.dart`, then `test/helpers/fake_journal_entry_repository.dart` |
 | 2 | [STEP-002] | complete | `lib/features/journal/domain/journal_list.dart`, then `test/features/journal/domain/journal_list_test.dart` |
-| 3 | [STEP-003] | | `lib/shared/ui/empty_state.dart`, then `test/shared/ui/empty_state_test.dart` |
+| 3 | [STEP-003] | complete | `lib/shared/ui/empty_state.dart`, then `test/shared/ui/empty_state_test.dart` |
 | 4 | [STEP-004] | | `test/helpers/fake_journal_entry_repository.dart`, then `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart`, then `test/app/shell_test.dart` |
 | 5 | [STEP-005] | | `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 
@@ -143,7 +143,7 @@ flutter test test/features/journal/domain/journal_list_test.dart
 
 ## [STEP-003] Add the shared empty state
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** `EmptyState` shows a primary icon, a title, a message, and a filled action. The action calls `onAction`. Light and dark themes take title, message, and icon colors from the theme.
 
