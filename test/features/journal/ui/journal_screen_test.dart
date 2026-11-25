@@ -508,6 +508,10 @@ void main() {
       );
       expect(swatch.size, MoodSwatchSize.large);
       expect(find.text('Moved early.'), findsOneWidget);
+      expect(
+        tester.getSize(find.byKey(const Key('journal-detail-card'))).width,
+        tester.getSize(find.byKey(const Key('journal-detail-pane'))).width - 64,
+      );
 
       await tester.tap(find.byKey(const Key('journal-entry-private')));
       await tester.pumpAndSettle();
