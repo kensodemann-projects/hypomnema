@@ -428,4 +428,191 @@ void main() {
       },
     );
   }
+
+  Finder inPane(Key pane, String text) {
+    return find.descendant(of: find.byKey(pane), matching: find.text(text));
+  }
+
+  testWidgets(
+    'Given an empty desktop journal, when either Write action is tapped, then the editor dialog opens and dismissing it returns to the header',
+    (tester) async {
+      await _pumpJournalScreen(tester, size: _desktop);
+
+      expect(find.byKey(const Key('journal-header')), findsOneWidget);
+      expect(find.text('No entries yet.'), findsOneWidget);
+      expect(find.text(_emptyTitle), findsOneWidget);
+      expect(find.text(_emptyMessage), findsOneWidget);
+      expect(find.text(_emptyAction), findsOneWidget);
+      expect(find.byKey(_writeKey), findsOneWidget);
+      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(
+        tester.getSize(find.byKey(const Key('journal-list-pane'))).width,
+        380,
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('journal-header'))).height,
+        greaterThanOrEqualTo(72),
+      );
+
+      await tester.tap(find.text(_emptyAction));
+      await tester.pumpAndSettle();
+      expect(find.text('New journal entry'), findsOneWidget);
+      await tester.tap(find.byKey(_cancelKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(_editorKey), findsNothing);
+      expect(find.byKey(_writeKey), findsOneWidget);
+
+      await tester.tap(find.byKey(_writeKey));
+      await tester.pumpAndSettle();
+      expect(find.text('New journal entry'), findsOneWidget);
+      await tester.tap(find.byKey(_closeKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(_editorKey), findsNothing);
+      expect(find.byKey(_writeKey), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'Given desktop entries, when an older row is selected and a newer entry is saved, then the older detail stays and the new subject leads the list',
+    (tester) async {
+      final repository = await _pumpJournalScreen(
+        tester,
+        size: _desktop,
+        repository: _seededJournal(),
+        clock: () => DateTime(2026, 11, 14, 12),
+      );
+
+      expect(
+        inPane(
+          const Key('journal-detail-pane'),
+          'Saturday, November 14, 2026 · 8:02 AM',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Early run'),
+        findsOneWidget,
+      );
+      final subject = tester.widget<Text>(
+        inPane(const Key('journal-detail-pane'), 'Early run'),
+      );
+      expect(subject.style?.fontSize, 26);
+      expect(subject.style?.fontWeight, FontWeight.w400);
+      expect(subject.style?.letterSpacing, -0.3);
+      expect(subject.style?.height, 1.25);
+      final swatch = tester.widget<MoodSwatch>(
+        find.descendant(
+          of: find.byKey(const Key('journal-detail-pane')),
+          matching: find.byType(MoodSwatch),
+        ),
+      );
+      expect(swatch.size, MoodSwatchSize.large);
+      expect(find.text('Moved early.'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('journal-entry-private')));
+      await tester.pumpAndSettle();
+
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Quiet thought'),
+        findsOneWidget,
+      );
+      expect(find.text('Line one\nstill one.'), findsOneWidget);
+      expect(find.text('Line two.'), findsOneWidget);
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Early run'),
+        findsNothing,
+      );
+
+      await tester.tap(find.byKey(const Key('journal-entry-last-week')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(_writeKey));
+      await tester.pumpAndSettle();
+      await _enterEntry(tester, subject: 'Later note', text: 'hello', mood: 3);
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pumpAndSettle();
+
+      expect(repository.saves, [
+        (subject: 'Later note', mood: 3, text: 'hello', private: false),
+      ]);
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Long call'),
+        findsOneWidget,
+      );
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Later note'),
+        findsNothing,
+      );
+      expect(
+        tester
+            .getTopLeft(inPane(const Key('journal-list-pane'), 'Later note'))
+            .dy,
+        lessThan(
+          tester
+              .getTopLeft(inPane(const Key('journal-list-pane'), 'Early run'))
+              .dy,
+        ),
+      );
+    },
+  );
+
+  for (final theme in [AppTheme.light, AppTheme.dark]) {
+    testWidgets(
+      'Given a ${theme.brightness.name} desktop journal with entries, when the newest row is selected, then the row and detail card use the scheme colors',
+      (tester) async {
+        await _pumpJournalScreen(
+          tester,
+          size: _desktop,
+          theme: theme,
+          repository: FakeJournalEntryRepository(
+            entries: [
+              _entry(
+                id: 'today',
+                subject: 'Early run',
+                mood: 4,
+                text: 'Moved early.',
+                localDateTime: '2026-11-14T08:02:00',
+              ),
+            ],
+          ),
+          clock: () => DateTime(2026, 11, 14, 12),
+        );
+
+        final scheme = theme.colorScheme;
+        final decoration =
+            tester
+                    .widget<DecoratedBox>(
+                      find.byKey(const Key('journal-entry-decoration-today')),
+                    )
+                    .decoration
+                as BoxDecoration;
+        expect(decoration.color, scheme.primaryContainer);
+        expect(decoration.border, Border.all(color: scheme.primary, width: 2));
+        expect(
+          tester
+              .widget<Text>(
+                find.descendant(
+                  of: find.byKey(const Key('journal-entry-today')),
+                  matching: find.text('Early run'),
+                ),
+              )
+              .style
+              ?.color,
+          scheme.onPrimaryContainer,
+        );
+        expect(
+          tester.widget<Text>(find.text('Today · 8:02 AM')).style?.color,
+          scheme.onPrimaryContainer,
+        );
+        final card =
+            tester
+                    .widget<DecoratedBox>(
+                      find.byKey(const Key('journal-detail-card')),
+                    )
+                    .decoration
+                as BoxDecoration;
+        expect(card.color, scheme.surface);
+        expect(card.border, Border.all(color: scheme.outlineVariant));
+      },
+    );
+  }
 }

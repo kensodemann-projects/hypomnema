@@ -32,6 +32,7 @@ class JournalScreen extends StatefulWidget {
 class _JournalScreenState extends State<JournalScreen> {
   late final Stream<List<JournalEntry>> _entries = widget.repository.watch();
   var _reportedWatchError = false;
+  String? _selectedId;
 
   Future<void> _submit({
     required String subject,
@@ -124,6 +125,7 @@ class _JournalScreenState extends State<JournalScreen> {
                       child: JournalEntryDetail(
                         entry: entry,
                         when: journalDetailWhen(entry, includeYear: false),
+                        subjectSize: 22,
                       ),
                     ),
                   ),
@@ -156,18 +158,178 @@ class _JournalScreenState extends State<JournalScreen> {
     });
   }
 
+  String _selectedIdFor(List<JournalEntry> entries) {
+    final current = _selectedId;
+    if (current != null && entries.any((entry) => entry.id == current)) {
+      return current;
+    }
+    return _selectedId = entries.first.id;
+  }
+
+  Widget _desktop(BuildContext context, ColorScheme scheme) {
+    return Column(
+      children: [
+        DecoratedBox(
+          key: const Key('journal-header'),
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            border: Border(bottom: BorderSide(color: scheme.outlineVariant)),
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 72),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(28, 18, 28, 14),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Journal',
+                      key: const Key('journal-title'),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: -0.2,
+                        color: scheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  FilledButton.icon(
+                    key: const Key('journal-write'),
+                    onPressed: () => _openEditor(context),
+                    icon: const Icon(Icons.edit),
+                    label: const Text('Write'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: StreamBuilder<List<JournalEntry>>(
+            stream: _entries,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                _reportWatchError();
+                return const SizedBox.shrink();
+              }
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: CircularProgressIndicator(key: Key('journal-loading')),
+                );
+              }
+              final entries = snapshot.data!;
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _listPane(context, scheme, entries),
+                  Expanded(child: _detailPane(context, entries)),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _listPane(
+    BuildContext context,
+    ColorScheme scheme,
+    List<JournalEntry> entries,
+  ) {
+    return SizedBox(
+      key: const Key('journal-list-pane'),
+      width: 380,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLow,
+          border: Border(right: BorderSide(color: scheme.outlineVariant)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: entries.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 32,
+                      horizontal: 16,
+                    ),
+                    child: Text(
+                      'No entries yet.',
+                      key: const Key('journal-list-empty'),
+                      style: TextStyle(color: scheme.onSurfaceVariant),
+                    ),
+                  ),
+                )
+              : JournalEntryList(
+                  key: const Key('journal-list'),
+                  entries: entries,
+                  now: widget.clock(),
+                  selectedId: _selectedIdFor(entries),
+                  headingSize: 11,
+                  headingLetterSpacing: 0.88,
+                  headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 2),
+                  padding: EdgeInsets.zero,
+                  onOpen: (entry) => setState(() => _selectedId = entry.id),
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _selectedDetail(List<JournalEntry> entries) {
+    final selectedId = _selectedIdFor(entries);
+    final entry = entries.firstWhere((entry) => entry.id == selectedId);
+    return SingleChildScrollView(
+      child: JournalEntryDetail(
+        entry: entry,
+        when: journalDetailWhen(entry, includeYear: true),
+        subjectSize: 26,
+        subjectLetterSpacing: -0.3,
+        card: true,
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+
+  Widget _detailPane(BuildContext context, List<JournalEntry> entries) {
+    return Padding(
+      key: const Key('journal-detail-pane'),
+      padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
+      child: entries.isEmpty
+          ? CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 380),
+                      child: EmptyState(
+                        key: const Key('journal-empty'),
+                        icon: Icons.edit_note,
+                        iconSize: 48,
+                        title: _emptyTitle,
+                        titleSize: 18,
+                        message: _emptyMessage,
+                        actionLabel: _emptyAction,
+                        actionIcon: Icons.edit,
+                        onAction: () => _openEditor(context),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : _selectedDetail(entries),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.sizeOf(context).width > 600) {
-      return Center(
-        child: FilledButton(
-          key: const Key('journal-write'),
-          onPressed: () => _openEditor(context),
-          child: const Text('Write'),
-        ),
-      );
-    }
     final scheme = Theme.of(context).colorScheme;
+    if (MediaQuery.sizeOf(context).width > 600) {
+      return Scaffold(body: _desktop(context, scheme));
+    }
     return Scaffold(
       body: Column(
         children: [
@@ -235,6 +397,9 @@ class _JournalScreenState extends State<JournalScreen> {
                       key: const Key('journal-list'),
                       entries: entries,
                       now: widget.clock(),
+                      headingSize: 12,
+                      headingLetterSpacing: 0.72,
+                      headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
                       onOpen: (entry) => _openEntry(context, entry),
                     ),
                     Positioned(

@@ -6,17 +6,32 @@ class JournalEntryDetail extends StatelessWidget {
   const JournalEntryDetail({
     required this.entry,
     required this.when,
+    required this.subjectSize,
+    this.subjectLetterSpacing,
+    this.card = false,
+    this.padding = const EdgeInsets.fromLTRB(16, 4, 16, 24),
     super.key,
   });
 
   final JournalEntry entry;
   final String when;
+  final double subjectSize;
+  final double? subjectLetterSpacing;
+  final bool card;
+  final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final paragraphs = [
+      for (final paragraph in _paragraphs(entry.text))
+        Text(
+          paragraph,
+          style: TextStyle(fontSize: 16, height: 1.75, color: scheme.onSurface),
+        ),
+    ];
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 14,
@@ -38,10 +53,11 @@ class JournalEntryDetail extends StatelessWidget {
                     ),
                     Text(
                       entry.subject,
-                      style: const TextStyle(
-                        fontSize: 22,
+                      style: TextStyle(
+                        fontSize: subjectSize,
                         fontWeight: FontWeight.w400,
                         height: 1.25,
+                        letterSpacing: subjectLetterSpacing,
                       ),
                     ),
                   ],
@@ -49,15 +65,34 @@ class JournalEntryDetail extends StatelessWidget {
               ),
             ],
           ),
-          for (final paragraph in _paragraphs(entry.text))
-            Text(
-              paragraph,
-              style: TextStyle(
-                fontSize: 16,
-                height: 1.75,
-                color: scheme.onSurface,
+          if (card)
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: DecoratedBox(
+                  key: const Key('journal-detail-card'),
+                  decoration: BoxDecoration(
+                    color: scheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: scheme.outlineVariant),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 28,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 14,
+                      children: paragraphs,
+                    ),
+                  ),
+                ),
               ),
-            ),
+            )
+          else
+            ...paragraphs,
         ],
       ),
     );
