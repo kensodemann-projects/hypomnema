@@ -1,12 +1,12 @@
-# PR #45 — Write a journal entry
+# PR #45 — Write a journal entry (re-review)
 
-Reviewed: resulting diff on `35-write-a-journal-entry` vs `main` (issue #35). `PLAN.md` ignored per merge practice.
+Reviewed: resulting diff on `35-write-a-journal-entry` vs `main` (issue #35), second pass as of the latest branch tip. `PLAN.md` ignored per merge practice. Root `REVIEW.md` is merge workflow artifact and is stripped before merge (see `CONTRIBUTING.md`).
 
 ## Summary
 
-This PR wires journal writing end-to-end: a centered **Write** action on the Journal tab, a responsive `JournalEditor` (full-screen phone / 720px desktop dialog), repository injection through `MainApp` → `Shell` → `JournalScreen`, and broad widget tests for layout, validation, save, dismiss, and failure paths. The `onSubmit` callback on `JournalEditor` keeps the widget testable without Firebase and is a solid layering choice. Overall this is ready to merge; remaining open notes are one maintainability item and one edge-case UX gap, not blockers.
+The branch delivers the #35 contract: Journal shows **Write**, opens a responsive `JournalEditor`, saves a new public entry through `JournalEntryRepository`, and keeps Dashboard/Archive/sign-out behavior intact. Since the first review, follow-ups landed: shared `FakeJournalEntryRepository` in `test/helpers/`, shell navigation refactored to `_NavDestination` + `WidgetBuilder`, and save-in-flight behavior now disables Close/Cancel (with tests) instead of queuing a silent dismiss on failure.
 
-**Recommendation:** Approve (comment-only follow-ups welcome).
+No open product or test gaps remain for this issue scope. **Recommendation: approve.**
 
 ## Finding counts
 
@@ -14,12 +14,12 @@ This PR wires journal writing end-to-end: a centered **Write** action on the Jou
 | ------------------------------------------ | ----: |
 | 🔒 Security concerns (immediate attention) |     0 |
 | ⚡ Performance issues/optimizations        |     0 |
-| 🧹 Code cleanup and maintainability        |     1 |
+| 🧹 Code cleanup and maintainability        |     0 |
 | 📚 Documentation gaps                      |     0 |
-| ✅ Positive feedback                       |     3 |
+| ✅ Positive feedback                       |     4 |
 | 🚨 Critical blockers                       |     0 |
-| 💭 Questions for discussion                |     1 |
-| **Total**                                  |     5 |
+| 💭 Questions for discussion                |     0 |
+| **Total**                                  |     4 |
 
 ## Findings
 
@@ -33,45 +33,7 @@ This PR wires journal writing end-to-end: a centered **Write** action on the Jou
 
 ### Code cleanup and maintainability
 
-**[CLN-001]** — **Complete** (`1d8eefa`)
-
-**Issue:** `_FakeJournalEntries` is duplicated in `test/app/app_test.dart` and `test/app/shell_test.dart` with identical `save` / `update` implementations. `journal_screen_test.dart` adds a third variant (`_RecordingJournalEntries`) that only differs by recording behavior.
-
-**Suggestion:** Add a small shared fake under `test/helpers/` (or next to existing test helpers), e.g. `FakeJournalEntryRepository` with optional `saveError` / recording hooks, and reuse it across app, shell, and journal screen tests.
-
-**Why:** One place to update when `JournalEntryRepository` grows (e.g. delete or list), and less noise in already large shell/app tests.
-
-**Resolution:** `test/helpers/fake_journal_entry_repository.dart` centralizes `FakeJournalEntryRepository` with `saves`, `updateCalls`, and `saveError`; app, shell, and journal screen tests import it and drop the local duplicates.
-
----
-
-**[CLN-002]** — **Complete** (`c2f07f3`)
-
-**Issue:** `Shell` selects the Journal UI with `label == 'Journal'` on the destination’s display string rather than the selected index or a dedicated destination id.
-
-**Suggestion:** Compare against `_destinations[_selectedIndex]` (or an enum / `const` index for Journal) so renaming the nav label cannot break routing.
-
-```dart
-final content = _selectedIndex == /* journal index */ 1
-    ? JournalScreen(repository: widget.journalEntries)
-    : _ShellContent(label: label);
-```
-
-**Why:** Nav copy and shell composition stay decoupled; avoids a subtle regression if labels are localized or shortened later.
-
-**Resolution:** `_NavDestination` carries label, icon, and a `WidgetBuilder`; `Shell` builds content with `destinations[_selectedIndex].build(context)`, so nav labels no longer drive which screen is shown.
-
----
-
-**[CLN-003]**
-
-**Issue:** The desktop editor contract in the implementation plan calls for a dialog capped at roughly viewport height minus 64px. The `Dialog` uses a `ListView` with `shrinkWrap: true` and no `maxHeight` on the scrollable body, so on short desktop windows the dialog can grow past the intended mock limit.
-
-**Suggestion:** Wrap the dialog body in something like `ConstrainedBox(constraints: BoxConstraints(maxHeight: mediaHeight - 64))` and use a scrollable child so chrome (title, actions) stays visible.
-
-**Why:** Matches desktop mockups and avoids overflow/clipping on smaller laptop viewports or when the on-screen keyboard affects layout on web.
-
-**Resolution:** Won't do. Dialog inset padding already caps the child at the viewport minus 64px, and the mock scrolls the whole dialog the same way.
+(No open findings.)
 
 ### Documentation
 
@@ -83,9 +45,9 @@ final content = _selectedIndex == /* journal index */ 1
 
 **Issue:** N/A
 
-**Suggestion:** Injecting `JournalEntryRepository` at `main` and threading it through `MainApp` / `Shell` matches the feature-first layout and keeps UI tests on fakes without emulator setup.
+**Suggestion:** `JournalEditor` exposes `onSubmit`; `JournalScreen` maps that to `repository.save(..., private: false)`. Tests use `_Submissions` or `FakeJournalEntryRepository` without Firebase.
 
-**Why:** Clear composition root and aligns with the note in `HIGH_LEVEL_PLAN.md` about revisiting `provider` later.
+**Why:** Clean UI/data boundary and straightforward widget/integration coverage.
 
 ---
 
@@ -93,9 +55,9 @@ final content = _selectedIndex == /* journal index */ 1
 
 **Issue:** N/A
 
-**Suggestion:** `JournalEditor` takes `onSubmit` instead of the repository directly, which mirrors how production (`JournalScreen._submit`) and tests (`_Submissions`) wire saves.
+**Suggestion:** Editor and screen tests cover phone/desktop chrome, trimmed-field validation, double-save suppression, failure snackbar colors, multiline text, and the Write → save → return path with `private: false`.
 
-**Why:** UI stays unaware of Firestore; the same editor widget is exercised in isolation and integrated paths.
+**Why:** Strong regression net for a UI-heavy slice and for later editor features (#37–#39).
 
 ---
 
@@ -103,9 +65,19 @@ final content = _selectedIndex == /* journal index */ 1
 
 **Issue:** N/A
 
-**Suggestion:** Editor tests cover contract visuals (light/dark, phone/desktop), trimmed validation, in-flight save (no double submit, close waits for success), failure snackbar styling, and multiline journal text.
+**Suggestion:** `Shell._destinations()` pairs each tab’s label/icon with a `WidgetBuilder` and builds `destinations[_selectedIndex].build(context)`. Phone and desktop scaffolds receive pre-built `NavigationDestination` / `NavigationRailDestination` lists from the same source.
 
-**Why:** High confidence for a UI-heavy feature and good regression harness for future editor work (#37–#39).
+**Why:** Nav copy no longer controls which screen mounts; adding tabs stays localized.
+
+---
+
+**[POS-004]**
+
+**Issue:** N/A
+
+**Suggestion:** While `_saving` is true, `_PhoneEditor` and `_DesktopEditor` receive `onDismiss: null`, so Close and Cancel cannot pop during an in-flight save. Tests assert disabled controls and that a failed save still shows the snackbar on the editor.
+
+**Why:** Resolves the earlier dismiss-during-failure edge case without surprising the user.
 
 ### Critical blockers
 
@@ -113,12 +85,13 @@ final content = _selectedIndex == /* journal index */ 1
 
 ### Questions for discussion
 
-**[QST-001]**
+(No open findings.)
 
-**Issue:** If the user taps **Close** or **Cancel** while a save is in flight and the save then **fails**, `_dismissAfterSave` causes `Navigator.pop` without showing the failure snackbar (`journal_editor.dart` catch branch).
+## Addressed since initial review
 
-**Suggestion:** Confirm product intent: either document “dismiss wins over error feedback” or, on failure with `_dismissAfterSave`, still show the snackbar on the route underneath (Journal) after pop.
-
-**Why:** Today a failed save during a dismiss is silent; users may think the entry was saved or simply lost without explanation.
-
-**Resolution:** Close and Cancel are disabled while a save is in flight, so a failed save stays on the editor and shows the snackbar.
+| Tag | Resolution |
+| --- | ---------- |
+| CLN-001 | `test/helpers/fake_journal_entry_repository.dart`; app, shell, and journal screen tests reuse `FakeJournalEntryRepository` (`1d8eefa`). Cursor rule documents the pattern. |
+| CLN-002 | Shell `_NavDestination` + index-selected `build` callbacks (`c2f07f3`). |
+| CLN-003 | Accepted as-is: `Dialog` `insetPadding` (32px vertical) keeps the dialog within the viewport; scrollable body matches mock behavior. |
+| QST-001 | Close/Cancel disabled during save; failed save shows snackbar on the editor (see `POS-004`). |
