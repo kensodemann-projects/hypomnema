@@ -59,7 +59,7 @@ With the clock on Monday, November 16, 2026, Sunday November 15 is `Yesterday` a
 
 | Order | Step | Status | Files |
 | ----- | ---- | ------ | ----- |
-| 1 | [STEP-001] | | `lib/features/journal/domain/journal_entry.dart`, then `test/features/journal/domain/journal_entry_test.dart`, then `lib/features/journal/data/journal_entry_repository.dart`, then `test/features/journal/data/journal_entry_repository_test.dart`, then `test/helpers/fake_journal_entry_repository.dart` |
+| 1 | [STEP-001] | complete | `lib/features/journal/domain/journal_entry.dart`, then `test/features/journal/domain/journal_entry_test.dart`, then `lib/features/journal/data/journal_entry_repository.dart`, then `test/features/journal/data/journal_entry_repository_test.dart`, then `test/helpers/fake_journal_entry_repository.dart` |
 | 2 | [STEP-002] | | `lib/features/journal/domain/journal_list.dart`, then `test/features/journal/domain/journal_list_test.dart` |
 | 3 | [STEP-003] | | `lib/shared/ui/empty_state.dart`, then `test/shared/ui/empty_state_test.dart` |
 | 4 | [STEP-004] | | `test/helpers/fake_journal_entry_repository.dart`, then `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart`, then `test/app/shell_test.dart` |
@@ -78,7 +78,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Read stored entries newest first
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** `watch` emits the signed-in user's stored entries, newest `createdAt` first, rebuilt with the stored `localDateTime` and `createdAt`. A signed-out `watch` emits `JournalEntryRepositoryException` and does not read Firestore. `save` and `update` keep their current behavior.
 
