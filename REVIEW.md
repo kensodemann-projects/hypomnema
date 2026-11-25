@@ -71,6 +71,8 @@ final content = _selectedIndex == /* journal index */ 1
 
 **Why:** Matches desktop mockups and avoids overflow/clipping on smaller laptop viewports or when the on-screen keyboard affects layout on web.
 
+**Resolution:** Won't do. Dialog inset padding already caps the child at the viewport minus 64px, and the mock scrolls the whole dialog the same way.
+
 ### Documentation
 
 (No findings.)
