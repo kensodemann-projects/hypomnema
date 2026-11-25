@@ -62,7 +62,7 @@ With the clock on Monday, November 16, 2026, Sunday November 15 is `Yesterday` a
 | 1 | [STEP-001] | complete | `lib/features/journal/domain/journal_entry.dart`, then `test/features/journal/domain/journal_entry_test.dart`, then `lib/features/journal/data/journal_entry_repository.dart`, then `test/features/journal/data/journal_entry_repository_test.dart`, then `test/helpers/fake_journal_entry_repository.dart` |
 | 2 | [STEP-002] | complete | `lib/features/journal/domain/journal_list.dart`, then `test/features/journal/domain/journal_list_test.dart` |
 | 3 | [STEP-003] | complete | `lib/shared/ui/empty_state.dart`, then `test/shared/ui/empty_state_test.dart` |
-| 4 | [STEP-004] | | `test/helpers/fake_journal_entry_repository.dart`, then `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart`, then `test/app/shell_test.dart` |
+| 4 | [STEP-004] | complete | `test/helpers/fake_journal_entry_repository.dart`, then `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart`, then `test/app/shell_test.dart` |
 | 5 | [STEP-005] | | `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 
 ## Commit gate
@@ -170,7 +170,7 @@ flutter test test/shared/ui/empty_state_test.dart
 
 ## [STEP-004] Show the phone list, entry, and empty journal
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** At a window width of 600 or less, an empty journal shows the shared empty state with the journal copy and no floating Write button. `Write your first entry` opens the existing full-screen editor. With entries, the list is newest first under uppercase week headings, each row shows the mood swatch, subject, and row label, and the floating Write button opens the editor. Tapping a row opens the entry full screen with the large mood swatch, the phone date and time, the full subject, and the full text, including a private entry's subject and text. Back returns to the list. A successful save from the empty journal replaces the empty state with that entry and shows the floating button. The desktop branch of `JournalScreen` stays the centered Write button.
 
