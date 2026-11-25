@@ -4,12 +4,20 @@ import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 
 class FakeJournalEntryRepository implements JournalEntryRepository {
+  FakeJournalEntryRepository({List<JournalEntry>? entries}) {
+    if (entries != null) {
+      _stored.addAll(entries);
+    }
+  }
+
   final saves = <({String subject, int mood, String text, bool private})>[];
   final _stored = <JournalEntry>[];
   final _updates = StreamController<List<JournalEntry>>.broadcast();
   var updateCalls = 0;
   var _nextId = 0;
   Object? saveError;
+  Object? watchError;
+  Completer<void>? holdWatch;
 
   @override
   Future<JournalEntry> save({
@@ -62,6 +70,14 @@ class FakeJournalEntryRepository implements JournalEntryRepository {
 
   @override
   Stream<List<JournalEntry>> watch() async* {
+    final error = watchError;
+    if (error != null) {
+      throw error;
+    }
+    final hold = holdWatch;
+    if (hold != null) {
+      await hold.future;
+    }
     yield List<JournalEntry>.unmodifiable(_stored);
     yield* _updates.stream;
   }

@@ -45,6 +45,13 @@ void expectJournalWrite(WidgetTester tester) {
   expect(find.byKey(const Key('shell-content')), findsNothing);
 }
 
+void expectJournalEmpty(WidgetTester tester) {
+  expect(find.text('Start your journal'), findsOneWidget);
+  expect(find.text('Write your first entry'), findsOneWidget);
+  expect(find.byKey(const Key('journal-write')), findsNothing);
+  expect(find.byKey(const Key('shell-content')), findsNothing);
+}
+
 void expectDestinationIcons() {
   expect(find.byIcon(Icons.space_dashboard), findsOneWidget);
   expect(find.byIcon(Icons.menu_book), findsOneWidget);
@@ -316,7 +323,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expectJournalWrite(tester);
+      expectJournalEmpty(tester);
       expect(
         tester
             .widget<NavigationBar>(
@@ -389,7 +396,7 @@ void main() {
         chromeLabel(const Key('shell-navigation-bar'), 'Journal'),
       );
       await tester.pumpAndSettle();
-      expectJournalWrite(tester);
+      expectJournalEmpty(tester);
 
       tester.view.physicalSize = const Size(601, 800);
       await tester.pumpAndSettle();
@@ -421,7 +428,7 @@ void main() {
       expectSignOutDialog(tester);
       expect(auth.signOutCalls, 0);
       expect(shellSelectedIndex(tester), 1);
-      expectJournalWrite(tester);
+      expectJournalEmpty(tester);
     },
   );
 
@@ -515,7 +522,7 @@ void main() {
 
       expect(find.byKey(const Key('confirmation-dialog')), findsNothing);
       expect(auth.signOutCalls, 0);
-      expectJournalWrite(tester);
+      expectJournalEmpty(tester);
       expect(shellSelectedIndex(tester), 1);
       expectPhoneShellExists();
     },
