@@ -8,6 +8,7 @@ import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../helpers/fake_journal_entry_repository.dart';
 import '../helpers/viewport.dart';
 
 void expectPhoneShellExists() {
@@ -37,6 +38,11 @@ void expectContent(WidgetTester tester, String label) {
     tester.widget<Text>(find.byKey(const Key('shell-content'))).data,
     label,
   );
+}
+
+void expectJournalWrite(WidgetTester tester) {
+  expect(find.byKey(const Key('journal-write')), findsOneWidget);
+  expect(find.byKey(const Key('shell-content')), findsNothing);
 }
 
 void expectDestinationIcons() {
@@ -100,7 +106,10 @@ Future<void> pumpShell(
   await tester.pumpWidget(
     MaterialApp(
       theme: AppTheme.light,
-      home: Shell(authService: authService ?? _FakeAuthService()),
+      home: Shell(
+        authService: authService ?? _FakeAuthService(),
+        journalEntries: FakeJournalEntryRepository(),
+      ),
     ),
   );
   await tester.pumpAndSettle();
@@ -307,7 +316,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
       expect(
         tester
             .widget<NavigationBar>(
@@ -345,7 +354,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
       expect(
         tester
             .widget<NavigationRail>(
@@ -380,13 +389,13 @@ void main() {
         chromeLabel(const Key('shell-navigation-bar'), 'Journal'),
       );
       await tester.pumpAndSettle();
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
 
       tester.view.physicalSize = const Size(601, 800);
       await tester.pumpAndSettle();
 
       expectDesktopShellExists();
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
       expect(
         tester
             .widget<NavigationRail>(
@@ -412,7 +421,7 @@ void main() {
       expectSignOutDialog(tester);
       expect(auth.signOutCalls, 0);
       expect(shellSelectedIndex(tester), 1);
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
     },
   );
 
@@ -469,7 +478,7 @@ void main() {
       expectSignOutDialog(tester);
       expect(auth.signOutCalls, 0);
       expect(shellSelectedIndex(tester), 1);
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
     },
   );
 
@@ -487,7 +496,7 @@ void main() {
       expectSignOutDialog(tester);
       expect(auth.signOutCalls, 0);
       expect(shellSelectedIndex(tester), 1);
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
     },
   );
 
@@ -506,7 +515,7 @@ void main() {
 
       expect(find.byKey(const Key('confirmation-dialog')), findsNothing);
       expect(auth.signOutCalls, 0);
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
       expect(shellSelectedIndex(tester), 1);
       expectPhoneShellExists();
     },
@@ -527,7 +536,7 @@ void main() {
 
       expect(find.byKey(const Key('confirmation-dialog')), findsNothing);
       expect(auth.signOutCalls, 0);
-      expectContent(tester, 'Journal');
+      expectJournalWrite(tester);
       expect(shellSelectedIndex(tester), 1);
       expectDesktopShellExists();
     },

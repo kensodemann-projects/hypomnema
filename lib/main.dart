@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kDebugMode, kIsWeb;
 import 'package:hypomnema/app/app.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
+import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'firebase_options.dart';
@@ -27,5 +28,13 @@ Future<void> main() async {
       FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
     }
   }
-  runApp(MainApp(authService: FirebaseAuthService()));
+  runApp(
+    MainApp(
+      authService: FirebaseAuthService(),
+      journalEntries: FirestoreJournalEntryRepository(
+        firestore: FirebaseFirestore.instance,
+        firebaseAuth: FirebaseAuth.instance,
+      ),
+    ),
+  );
 }

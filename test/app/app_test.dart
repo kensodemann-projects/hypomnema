@@ -7,6 +7,7 @@ import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../helpers/fake_journal_entry_repository.dart';
 import '../helpers/viewport.dart';
 
 void expectPhoneShellExists() {
@@ -85,7 +86,9 @@ Future<_FakeAuthService> _openSignOutDialog(
 }) async {
   final auth = _authEmitting(true);
   setLogicalViewportSize(tester, size);
-  await tester.pumpWidget(MainApp(authService: auth));
+  await tester.pumpWidget(
+    MainApp(authService: auth, journalEntries: FakeJournalEntryRepository()),
+  );
   await tester.pumpAndSettle();
   await tester.tap(_chromeLabel(chromeKey, 'Journal'));
   await tester.pumpAndSettle();
@@ -134,7 +137,12 @@ void main() {
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
 
       // When
-      await tester.pumpWidget(MainApp(authService: _authEmitting(true)));
+      await tester.pumpWidget(
+        MainApp(
+          authService: _authEmitting(true),
+          journalEntries: FakeJournalEntryRepository(),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Then
@@ -152,7 +160,12 @@ void main() {
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
 
       // When
-      await tester.pumpWidget(MainApp(authService: _authEmitting(true)));
+      await tester.pumpWidget(
+        MainApp(
+          authService: _authEmitting(true),
+          journalEntries: FakeJournalEntryRepository(),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Then
@@ -167,12 +180,22 @@ void main() {
       // Given
       final auth = _authEmitting(true);
       setLogicalViewportSize(tester, const Size(400, 800));
-      await tester.pumpWidget(MainApp(authService: auth));
+      await tester.pumpWidget(
+        MainApp(
+          authService: auth,
+          journalEntries: FakeJournalEntryRepository(),
+        ),
+      );
       await tester.pumpAndSettle();
       expectPhoneShellExists();
 
       // When
-      await tester.pumpWidget(MainApp(authService: auth));
+      await tester.pumpWidget(
+        MainApp(
+          authService: auth,
+          journalEntries: FakeJournalEntryRepository(),
+        ),
+      );
       await tester.pump();
 
       // Then
@@ -190,7 +213,12 @@ void main() {
       setLogicalViewportSize(tester, const Size(400, 800));
 
       // When
-      await tester.pumpWidget(MainApp(authService: auth));
+      await tester.pumpWidget(
+        MainApp(
+          authService: auth,
+          journalEntries: FakeJournalEntryRepository(),
+        ),
+      );
 
       // Then
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -212,7 +240,12 @@ void main() {
       setLogicalViewportSize(tester, const Size(400, 800));
 
       // When
-      await tester.pumpWidget(MainApp(authService: auth));
+      await tester.pumpWidget(
+        MainApp(
+          authService: auth,
+          journalEntries: FakeJournalEntryRepository(),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Then
@@ -228,7 +261,12 @@ void main() {
       // Given
       final auth = _authEmitting(false);
       setLogicalViewportSize(tester, const Size(400, 800));
-      await tester.pumpWidget(MainApp(authService: auth));
+      await tester.pumpWidget(
+        MainApp(
+          authService: auth,
+          journalEntries: FakeJournalEntryRepository(),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // When
