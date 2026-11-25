@@ -63,7 +63,7 @@ With the clock on Monday, November 16, 2026, Sunday November 15 is `Yesterday` a
 | 2 | [STEP-002] | complete | `lib/features/journal/domain/journal_list.dart`, then `test/features/journal/domain/journal_list_test.dart` |
 | 3 | [STEP-003] | complete | `lib/shared/ui/empty_state.dart`, then `test/shared/ui/empty_state_test.dart` |
 | 4 | [STEP-004] | complete | `test/helpers/fake_journal_entry_repository.dart`, then `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart`, then `test/app/shell_test.dart` |
-| 5 | [STEP-005] | | `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
+| 5 | [STEP-005] | complete | `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 
 ## Commit gate
 
@@ -211,7 +211,7 @@ flutter test test/features/journal/ui/journal_screen_test.dart test/app/shell_te
 
 ## [STEP-005] Show the desktop list beside the selected entry
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** Above a window width of 600, the header shows `Journal` and Write, and Write opens the existing editor dialog. The list sits in a 380-pixel pane beside the selected entry. The newest entry is selected on first load. Choosing another row keeps that entry selected when a newer one is saved. The detail shows the large mood swatch, the desktop date and time including the year, the full subject, and the full text. An empty journal keeps header Write, shows `No entries yet.` in the list pane, and shows the shared empty state in the detail pane. Both Write actions open the editor. Light and dark themes use the scheme colors below. Phone behavior from [STEP-004] stays.
 
