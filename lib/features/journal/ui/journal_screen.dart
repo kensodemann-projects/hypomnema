@@ -216,7 +216,7 @@ class _JournalScreenState extends State<JournalScreen> {
     });
   }
 
-  Widget _phone(BuildContext context, ColorScheme scheme) {
+  Widget _phoneLayout(BuildContext context, ColorScheme scheme) {
     return Column(
       children: [
         ColoredBox(
@@ -245,7 +245,7 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _desktop(BuildContext context, ColorScheme scheme) {
+  Widget _desktopLayout(BuildContext context, ColorScheme scheme) {
     return Column(
       children: [
         DecoratedBox(
@@ -454,9 +454,9 @@ class _JournalScreenState extends State<JournalScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     if (MediaQuery.sizeOf(context).width > 600) {
-      return Scaffold(body: _desktop(context, scheme));
+      return Scaffold(body: _desktopLayout(context, scheme));
     }
-    return Scaffold(body: _phone(context, scheme));
+    return Scaffold(body: _phoneLayout(context, scheme));
   }
 }
 
