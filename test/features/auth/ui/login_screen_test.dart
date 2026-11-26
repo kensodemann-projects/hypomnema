@@ -311,7 +311,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: _RecordingAuthService(),
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
       expect(textField(tester, 'login-email').decoration?.errorText, isNull);
       expect(textField(tester, 'login-password').decoration?.errorText, isNull);
@@ -348,7 +348,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: _RecordingAuthService(),
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
       await tester.enterText(find.byKey(const Key('login-email')), 'person');
       await unfocus(tester);
@@ -375,7 +375,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: auth,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
 
       // Then
@@ -410,7 +410,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: auth,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
 
       // When
@@ -460,7 +460,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: auth,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
       expect(
         textField(tester, 'login-email').textInputAction,
@@ -489,7 +489,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: auth,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
       expect(
         textField(tester, 'login-password').textInputAction,
@@ -528,7 +528,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: auth,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
       await tester.enterText(
         find.byKey(const Key('login-email')),
@@ -558,7 +558,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: auth,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
       await tester.enterText(
         find.byKey(const Key('login-email')),
@@ -594,7 +594,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: _RecordingAuthService(),
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
 
       // Then
@@ -614,7 +614,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: auth,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
       final forgot = find.byKey(const Key('login-forgot-password'));
       expect(tester.widget<TextButton>(forgot).onPressed, isNotNull);
@@ -703,7 +703,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: auth,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
       await tester.enterText(
         find.byKey(const Key('login-email')),
@@ -735,7 +735,7 @@ void main() {
       await pumpLoginScreen(
         tester,
         authService: auth,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
       await tester.enterText(
         find.byKey(const Key('login-email')),
