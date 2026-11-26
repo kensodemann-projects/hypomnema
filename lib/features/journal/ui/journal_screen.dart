@@ -216,6 +216,35 @@ class _JournalScreenState extends State<JournalScreen> {
     });
   }
 
+  Widget _phone(BuildContext context, ColorScheme scheme) {
+    return Column(
+      children: [
+        ColoredBox(
+          color: scheme.surface,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 64),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Text(
+                  'Journal',
+                  key: const Key('journal-title'),
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w400,
+                    color: scheme.onSurface,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(child: _entriesBody(context, scheme, desktop: false)),
+      ],
+    );
+  }
+
   Widget _desktop(BuildContext context, ColorScheme scheme) {
     return Column(
       children: [
@@ -427,34 +456,7 @@ class _JournalScreenState extends State<JournalScreen> {
     if (MediaQuery.sizeOf(context).width > 600) {
       return Scaffold(body: _desktop(context, scheme));
     }
-    return Scaffold(
-      body: Column(
-        children: [
-          ColoredBox(
-            color: scheme.surface,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 64),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Text(
-                    'Journal',
-                    key: const Key('journal-title'),
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w400,
-                      color: scheme.onSurface,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(child: _entriesBody(context, scheme, desktop: false)),
-        ],
-      ),
-    );
+    return Scaffold(body: _phone(context, scheme));
   }
 }
 
