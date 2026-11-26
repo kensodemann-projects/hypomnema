@@ -11,6 +11,16 @@ Keep these constraints unless the user changes them.
 - Import UI widgets from `package:material_ui/material_ui.dart`.
 - The app connects to Firebase. Persistent data lives in Cloud Firestore.
 - Phone and desktop are both required form factors. Build a layout for each; a phone screen stretched to desktop width is not enough.
+
+## Responsive UI: balanced abstraction
+
+Keep the same abstraction level on both form factors and one layer of decision in one place.
+
+- Name shell builders `_phoneLayout` and `_desktopLayout`, matching `login_screen.dart`. When one form factor gets an extracted shell or pane helper, give the other a symmetric helper (`_phoneListPane` / `_desktopListPane`, not only `_listPane` on desktop).
+- Order private helpers top-down: shells (`_phoneLayout`, `_desktopLayout`), then dispatch (`_entriesBody` or equivalent), then pane/content builders. Keep `Scaffold` and breakpoint choice in `build` unless both layouts need the same wrapper.
+- Put cross-screen layout numbers in `lib/core/constants/` (for example `layout.dart`). Application code uses that constant and small helpers (`desktopLayoutForWidth`, `desktopLayoutFor`); do not scatter literal breakpoints. `lib/core/constants/` holds product constants only—not test widths, fixtures, or other test-only values.
+- In tests, import the same constant and derive viewport widths from it (`kDesktopLayoutMinWidth`, `kDesktopLayoutMinWidth + 1`, `kDesktopLayoutMinWidth - 200`, and so on). When a loop exercises multiple widths, every value should be an expression on that constant, not a lone magic number beside it.
+- Do not leave one branch fully extracted and the other inlined in `build`. Do not grow a single method with unrelated phone and desktop trees; split shells and panes instead.
 - Organize `lib/` feature-first. Keep generated `lib/firebase_options.dart` at the package root; FlutterFire writes that path.
 - Mirror that layout under `test/`. A test for `lib/features/auth/ui/login_screen.dart` lives at `test/features/auth/ui/login_screen_test.dart`.
 - When the same or very similar test data is used in more than one test file, put one shared fake or fixture in `test/helpers/` and reuse it. Do not copy it into each file.
