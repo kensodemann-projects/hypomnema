@@ -1,6 +1,6 @@
 ## Summary
 
-Reviewed the resulting diff of [PR 50](https://github.com/kensodemann-projects/hypomnema/pull/50) (`general-refactor` against `main`): centralizing the desktop breakpoint, restructuring the journal screen into symmetric phone and desktop helpers, removing unused widget previews, and recording the responsive-layout convention in `.cursor/rules/hypomnema.mdc`. **Request changes.** The production refactor is sound and behavior-preserving, but the new rule is inserted so that unrelated project constraints sit under it, and the tests this change already edits still hard-code viewport widths the same rule forbids. Neither issue is a product defect; both should be fixed before the convention becomes the standing instruction.
+Reviewed the resulting diff of [PR 50](https://github.com/kensodemann-projects/hypomnema/pull/50) (`general-refactor` against `main`): centralizing the desktop breakpoint, restructuring the journal screen into symmetric phone and desktop helpers, removing unused widget previews, and recording the responsive-layout convention in `.cursor/rules/hypomnema.mdc`. **Request changes.** The production refactor is sound and behavior-preserving. CLN-001 and CLN-002 are resolved: test viewport widths derive from `kDesktopLayoutMinWidth`, and `login_screen.dart` now declares `_phoneLayout` before `_desktopLayout`. The new rule is still inserted so that unrelated project constraints sit under it.
 
 ## Finding counts
 
@@ -8,12 +8,12 @@ Reviewed the resulting diff of [PR 50](https://github.com/kensodemann-projects/h
 | ------------------------------------------ | ----: |
 | 🔒 Security concerns (immediate attention) |     0 |
 | ⚡ Performance issues/optimizations        |     0 |
-| 🧹 Code cleanup and maintainability        |     2 |
+| 🧹 Code cleanup and maintainability        |     0 |
 | 📚 Documentation gaps                      |     1 |
 | ✅ Positive feedback                       |     3 |
 | 🚨 Critical blockers                       |     0 |
 | 💭 Questions for discussion                |     1 |
-| **Total**                                  |     7 |
+| **Total**                                  |     5 |
 
 ## Findings
 
@@ -21,97 +21,21 @@ Reviewed the resulting diff of [PR 50](https://github.com/kensodemann-projects/h
 
 [CLN-001]
 
-**Issue:** The new test convention is only applied to the breakpoint literals this diff happened to touch. The same files still set phone and desktop viewports with raw `400` and `1200`.
+**Issue:** Resolved. Viewport widths in the tests called out here now derive from `kDesktopLayoutMinWidth`. Phone cases use `kDesktopLayoutMinWidth - 200` (and the boundary uses the constant itself). Desktop cases use `kDesktopLayoutMinWidth + 1`, `+ 150`, `+ 400`, or `+ 600`. No remaining `Size(400, …)`, `Size(600, …)`, `Size(601, …)`, or `Size(1200, …)` viewport literals.
 
-`.cursor/rules/hypomnema.mdc` now says every test viewport width is an expression on `kDesktopLayoutMinWidth` (`kDesktopLayoutMinWidth`, `kDesktopLayoutMinWidth + 1`, `kDesktopLayoutMinWidth - 200`, and so on). `shell_test.dart` updates the 600/601 edges and leaves the neighboring layout tests on magic numbers:
+Checked `shell_test.dart`, `app_test.dart`, `login_screen_test.dart`, `confirmation_dialog_test.dart`, `journal_screen_test.dart`, `journal_editor_test.dart`, and `mood_picker_test.dart`. The editor assertion expects the same expression it sets: `Size(kDesktopLayoutMinWidth - 200, 800)`. Widget sizes such as `Size(48, 48)`, `Size(72, 72)`, and the dialog width `720` are measured chrome, not viewports.
 
-```dart
-testWidgets(
-  'Given a width of 400, when the shell builds, then the phone layout is used',
-  (tester) async {
-    await pumpShell(tester, size: const Size(400, 800));
-    // ...
-  },
-);
+**Suggestion:** None for the widths. One test title in `shell_test.dart` still reads “Given a width of above the desktop layout minimum” for the `kDesktopLayoutMinWidth + 150` case. Drop the word “of” if you touch that name.
 
-testWidgets(
-  'Given a width of 1200, when the shell builds, then the desktop layout is used',
-  (tester) async {
-    await pumpShell(tester, size: const Size(1200, 800));
-    // ...
-  },
-);
-```
-
-The same split shows up in files this PR already edits: `test/features/auth/ui/login_screen_test.dart` (the breakpoint loops were converted; later cases still use `Size(400, 800)`), `test/shared/ui/confirmation_dialog_test.dart` (desktop edge converted; phone cases still `400`), and `test/app/app_test.dart` (one `601` converted; other viewports still `400`). `test/features/journal/ui/journal_editor_test.dart` is outside the diff and still uses `Size(400, 800)` and `Size(1200, 800)`, including an assertion that the editor's size equals `Size(400, 800)`.
-
-**Suggestion:** Derive every viewport width in these files from the constant, and use the same expression on both sides of an equality assertion. Heights can stay `800`; they are not the breakpoint.
-
-```dart
-testWidgets(
-  'Given a phone width, when the shell builds, then the phone layout is used',
-  (tester) async {
-    await pumpShell(
-      tester,
-      size: const Size(kDesktopLayoutMinWidth - 200, 800),
-    );
-
-    expectPhoneShellExists();
-  },
-);
-
-testWidgets(
-  'Given a wide desktop width, when the shell builds, then the desktop layout is used',
-  (tester) async {
-    await pumpShell(
-      tester,
-      size: const Size(kDesktopLayoutMinWidth + 600, 800),
-    );
-
-    expectDesktopShellExists();
-  },
-);
-```
-
-For the editor size assertion, set the surface and expect the same expression:
-
-```dart
-const phone = Size(kDesktopLayoutMinWidth - 200, 800);
-
-expect(tester.getSize(find.byKey(_editorKey)), phone);
-```
-
-**Why:** `kDesktopLayoutMinWidth` is the only width that is allowed to change. A later edit of `600` will update the boundary tests and leave the `400` / `1200` cases describing a different layout than the names and the rule claim. The rule is about to be always-on guidance, so the tests in this change should already match it.
+**Why:** A later change to the breakpoint constant now moves these viewports with it, which is what the rule asks for.
 
 [CLN-002]
 
-**Issue:** The new helper order does not match `login_screen.dart`, which the rule cites as the pattern. The rule says shells are ordered `_phoneLayout`, then `_desktopLayout`. Login still declares `_desktopLayout` (around line 371) and then `_phoneLayout` (around line 414). Journal follows the rule: `_phoneLayout`, then `_desktopLayout`, then `_entriesBody`, then the pane builders.
+**Issue:** Resolved. `login_screen.dart` now declares `_phoneLayout` (line 371) and then `_desktopLayout` (line 421), matching the rule and `journal_screen.dart`. The uncommitted diff only moves `_desktopLayout` below `_phoneLayout`. The method bodies are unchanged.
 
-**Suggestion:** Reorder the two login helpers so the cited example matches the order the rule states. Names and `build` can stay as they are:
+**Suggestion:** None. `build` still chooses with `desktopLayoutForWidth` and returns `_desktopLayout()` or `_phoneLayout()` in that order.
 
-```dart
-Widget _phoneLayout() {
-  // existing phone tree
-}
-
-Widget _desktopLayout() {
-  // existing desktop tree
-}
-
-@override
-Widget build(BuildContext context) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      if (desktopLayoutForWidth(constraints.maxWidth)) {
-        return _desktopLayout();
-      }
-      return _phoneLayout();
-    },
-  );
-}
-```
-
-**Why:** The next screen will copy either the rule or the login file. Those two sources currently disagree, which is the drift this refactor is trying to stop.
+**Why:** The cited example and the journal screen now agree on helper order, so the next screen can copy either one.
 
 ### 📚 Documentation gaps
 

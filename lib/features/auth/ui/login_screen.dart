@@ -368,49 +368,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _desktopLayout() {
-    return Row(
-      children: [
-        Expanded(child: _brandPanel()),
-        SizedBox(
-          key: const Key('login-form-side'),
-          width: 520,
-          child: _scaffold(
-            body: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(
-                    child: ConstrainedBox(
-                      key: const Key('login-form-column'),
-                      constraints: const BoxConstraints(maxWidth: 360),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Text(
-                            'Sign in',
-                            key: Key('login-heading'),
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          _form(),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _phoneLayout() {
     final onSurfaceVariant = Theme.of(context).colorScheme.onSurfaceVariant;
     return _scaffold(
@@ -458,6 +415,49 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _desktopLayout() {
+    return Row(
+      children: [
+        Expanded(child: _brandPanel()),
+        SizedBox(
+          key: const Key('login-form-side'),
+          width: 520,
+          child: _scaffold(
+            body: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: ConstrainedBox(
+                      key: const Key('login-form-column'),
+                      constraints: const BoxConstraints(maxWidth: 360),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'Sign in',
+                            key: Key('login-heading'),
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          _form(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
