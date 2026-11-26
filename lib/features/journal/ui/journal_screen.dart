@@ -216,6 +216,35 @@ class _JournalScreenState extends State<JournalScreen> {
     });
   }
 
+  Widget _phoneLayout(BuildContext context, ColorScheme scheme) {
+    return Column(
+      children: [
+        ColoredBox(
+          color: scheme.surface,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 64),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Text(
+                  'Journal',
+                  key: const Key('journal-title'),
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w400,
+                    color: scheme.onSurface,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(child: _entriesBody(context, scheme, desktop: false)),
+      ],
+    );
+  }
+
   Widget _desktopLayout(BuildContext context, ColorScheme scheme) {
     return Column(
       children: [
@@ -255,6 +284,85 @@ class _JournalScreenState extends State<JournalScreen> {
           ),
         ),
         Expanded(child: _entriesBody(context, scheme, desktop: true)),
+      ],
+    );
+  }
+
+  Widget _entriesBody(
+    BuildContext context,
+    ColorScheme scheme, {
+    required bool desktop,
+  }) {
+    if (_watchFailed) {
+      return const SizedBox.shrink();
+    }
+    final entries = _cachedEntries;
+    if (entries == null) {
+      return const Center(
+        child: CircularProgressIndicator(key: Key('journal-loading')),
+      );
+    }
+    if (desktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _desktopListPane(context, scheme, entries),
+          Expanded(child: _desktopDetailPane(context, entries)),
+        ],
+      );
+    }
+    return _phoneListPane(context, scheme, entries);
+  }
+
+  Widget _phoneListPane(
+    BuildContext context,
+    ColorScheme scheme,
+    List<JournalEntry> entries,
+  ) {
+    if (entries.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+          child: EmptyState(
+            key: const Key('journal-empty'),
+            icon: Icons.edit_note,
+            iconSize: 44,
+            title: _emptyTitle,
+            titleSize: 17,
+            message: _emptyMessage,
+            actionLabel: _emptyAction,
+            actionIcon: Icons.edit,
+            onAction: () => _openEditor(context),
+          ),
+        ),
+      );
+    }
+    return Stack(
+      children: [
+        JournalEntryList(
+          key: const Key('journal-list'),
+          entries: entries,
+          now: widget.clock(),
+          headingSize: 12,
+          headingLetterSpacing: 0.72,
+          headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
+          onOpen: (entry) => _openEntry(context, entry),
+        ),
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: FloatingActionButton.extended(
+            key: const Key('journal-write'),
+            onPressed: () => _openEditor(context),
+            backgroundColor: scheme.primaryContainer,
+            foregroundColor: scheme.onPrimaryContainer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            icon: const Icon(Icons.edit),
+            label: const Text('Write'),
+          ),
+        ),
       ],
     );
   }
@@ -316,114 +424,6 @@ class _JournalScreenState extends State<JournalScreen> {
         padding: EdgeInsets.zero,
       ),
     );
-  }
-
-  Widget _phoneLayout(BuildContext context, ColorScheme scheme) {
-    return Column(
-      children: [
-        ColoredBox(
-          color: scheme.surface,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 64),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  'Journal',
-                  key: const Key('journal-title'),
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w400,
-                    color: scheme.onSurface,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Expanded(child: _entriesBody(context, scheme, desktop: false)),
-      ],
-    );
-  }
-
-  Widget _phoneListPane(
-    BuildContext context,
-    ColorScheme scheme,
-    List<JournalEntry> entries,
-  ) {
-    if (entries.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-          child: EmptyState(
-            key: const Key('journal-empty'),
-            icon: Icons.edit_note,
-            iconSize: 44,
-            title: _emptyTitle,
-            titleSize: 17,
-            message: _emptyMessage,
-            actionLabel: _emptyAction,
-            actionIcon: Icons.edit,
-            onAction: () => _openEditor(context),
-          ),
-        ),
-      );
-    }
-    return Stack(
-      children: [
-        JournalEntryList(
-          key: const Key('journal-list'),
-          entries: entries,
-          now: widget.clock(),
-          headingSize: 12,
-          headingLetterSpacing: 0.72,
-          headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
-          onOpen: (entry) => _openEntry(context, entry),
-        ),
-        Positioned(
-          right: 16,
-          bottom: 16,
-          child: FloatingActionButton.extended(
-            key: const Key('journal-write'),
-            onPressed: () => _openEditor(context),
-            backgroundColor: scheme.primaryContainer,
-            foregroundColor: scheme.onPrimaryContainer,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            icon: const Icon(Icons.edit),
-            label: const Text('Write'),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _entriesBody(
-    BuildContext context,
-    ColorScheme scheme, {
-    required bool desktop,
-  }) {
-    if (_watchFailed) {
-      return const SizedBox.shrink();
-    }
-    final entries = _cachedEntries;
-    if (entries == null) {
-      return const Center(
-        child: CircularProgressIndicator(key: Key('journal-loading')),
-      );
-    }
-    if (desktop) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _desktopListPane(context, scheme, entries),
-          Expanded(child: _desktopDetailPane(context, entries)),
-        ],
-      );
-    }
-    return _phoneListPane(context, scheme, entries);
   }
 
   Widget _desktopDetailPane(BuildContext context, List<JournalEntry> entries) {
