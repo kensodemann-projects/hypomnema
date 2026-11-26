@@ -1,4 +1,5 @@
 import 'package:flutter/widget_previews.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -60,7 +61,7 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final desktop = constraints.maxWidth > 600;
+        final desktop = desktopLayoutForWidth(constraints.maxWidth);
         final width = desktop ? 440.0 : constraints.maxWidth - 48;
         final titleSize = desktop ? 22.0 : 20.0;
         final gap = desktop ? 16.0 : 14.0;

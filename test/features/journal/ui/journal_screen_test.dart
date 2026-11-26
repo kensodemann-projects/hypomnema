@@ -146,7 +146,7 @@ void main() {
   );
 
   testWidgets(
-    'Given the journal screen above 600px, when Write is tapped, then the dialog opens and Cancel returns to Write',
+    'Given the journal screen above the desktop layout minimum, when Write is tapped, then the dialog opens and Cancel returns to Write',
     (tester) async {
       await _pumpJournalScreen(tester, size: _desktop);
 

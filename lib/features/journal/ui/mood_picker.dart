@@ -1,4 +1,5 @@
 import 'package:flutter/widget_previews.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/ui/mood_swatch.dart';
 import 'package:material_ui/material_ui.dart';
@@ -17,7 +18,7 @@ class MoodPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final desktop = constraints.maxWidth > 600;
+        final desktop = desktopLayoutForWidth(constraints.maxWidth);
         final options = [
           for (var mood = 1; mood <= 5; mood++)
             _MoodOption(

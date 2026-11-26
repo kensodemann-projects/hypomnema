@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:hypomnema/features/auth/ui/login_screen.dart';
@@ -180,7 +181,7 @@ void main() {
   testWidgets(
     'Given a phone width, when the login screen builds, then the brand stacks above the form',
     (tester) async {
-      for (final width in [400.0, 600.0]) {
+      for (final width in [400.0, kDesktopLayoutMinWidth]) {
         for (final theme in [AppTheme.light, AppTheme.dark]) {
           // Given, when
           await pumpLoginScreen(
@@ -217,7 +218,7 @@ void main() {
   testWidgets(
     'Given a desktop width, when the login screen builds, then the brand panel sits beside the form',
     (tester) async {
-      for (final width in [601.0, 1200.0]) {
+      for (final width in [kDesktopLayoutMinWidth + 1, 1200.0]) {
         for (final theme in [AppTheme.light, AppTheme.dark]) {
           // Given, when
           await pumpLoginScreen(

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widget_previews.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/ui/mood_picker.dart';
 import 'package:material_ui/material_ui.dart';
@@ -556,7 +557,7 @@ class _JournalEditorPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final desktop = MediaQuery.sizeOf(context).width > 600;
+    final desktop = desktopLayoutFor(context);
     return ListView(
       children: [
         _PreviewTheme(theme: AppTheme.light, label: 'Light', desktop: desktop),

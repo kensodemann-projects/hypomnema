@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/app/app.dart';
 import 'package:hypomnema/app/shell.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:material_ui/material_ui.dart';
@@ -315,7 +316,7 @@ void main() {
       // Given
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(601, 800),
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
         chromeKey: const Key('shell-navigation-rail'),
       );
 

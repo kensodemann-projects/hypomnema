@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:hypomnema/features/journal/domain/journal_list.dart';
@@ -106,7 +107,7 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   void _openEditor(BuildContext context) {
-    final desktop = MediaQuery.sizeOf(context).width > 600;
+    final desktop = desktopLayoutFor(context);
     final editor = JournalEditor(desktop: desktop, onSubmit: _submit);
     if (desktop) {
       showDialog<void>(
@@ -461,7 +462,7 @@ class _JournalScreenState extends State<JournalScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    if (MediaQuery.sizeOf(context).width > 600) {
+    if (desktopLayoutFor(context)) {
       return Scaffold(body: _desktopLayout(context, scheme));
     }
     return Scaffold(body: _phoneLayout(context, scheme));

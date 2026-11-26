@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/shared/ui/confirmation_dialog.dart';
 import 'package:material_ui/material_ui.dart';
@@ -88,7 +89,10 @@ void main() {
   testWidgets(
     'Given a desktop width, when the dialog opens, then the desktop layout shows the title, message, Cancel, and confirm label',
     (tester) async {
-      await openDialog(tester, size: const Size(601, 800));
+      await openDialog(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
+      );
 
       expect(find.text(_title), findsOneWidget);
       expect(find.text(_message), findsOneWidget);

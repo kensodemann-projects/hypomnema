@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/ui/mood_picker.dart';
 import 'package:hypomnema/features/journal/ui/mood_swatch.dart';
@@ -241,7 +242,7 @@ void main() {
     },
   );
 
-  for (final width in [400.0, 600.0]) {
+  for (final width in [400.0, kDesktopLayoutMinWidth]) {
     testWidgets(
       'Given a width of $width, when the picker is shown, then the options spread from edge to edge with equal gaps',
       (tester) async {
@@ -265,7 +266,7 @@ void main() {
     );
   }
 
-  for (final width in [601.0, 1000.0]) {
+  for (final width in [kDesktopLayoutMinWidth + 1, 1000.0]) {
     testWidgets(
       'Given a width of $width, when the picker is shown, then the options are 64 wide and 12 apart',
       (tester) async {

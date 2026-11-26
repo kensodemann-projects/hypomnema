@@ -1,3 +1,4 @@
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
 import 'package:hypomnema/features/journal/ui/journal_screen.dart';
@@ -94,7 +95,7 @@ class _ShellState extends State<Shell> {
     final content = destinations[_selectedIndex].build(context);
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth > 600) {
+        if (desktopLayoutForWidth(constraints.maxWidth)) {
           return DesktopScaffold(
             selectedIndex: _selectedIndex,
             content: content,
