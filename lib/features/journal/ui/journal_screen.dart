@@ -158,14 +158,6 @@ class _JournalScreenState extends State<JournalScreen> {
     });
   }
 
-  String _selectedIdFor(List<JournalEntry> entries) {
-    final current = _selectedId;
-    if (current != null && entries.any((entry) => entry.id == current)) {
-      return current;
-    }
-    return _selectedId = entries.first.id;
-  }
-
   Widget _desktop(BuildContext context, ColorScheme scheme) {
     return Column(
       children: [
@@ -218,6 +210,12 @@ class _JournalScreenState extends State<JournalScreen> {
                 );
               }
               final entries = snapshot.data!;
+              final id = _selectedId;
+              if (entries.isEmpty) {
+                _selectedId = null;
+              } else if (id == null || !entries.any((e) => e.id == id)) {
+                _selectedId = entries.first.id;
+              }
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -265,7 +263,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   key: const Key('journal-list'),
                   entries: entries,
                   now: widget.clock(),
-                  selectedId: _selectedIdFor(entries),
+                  selectedId: _selectedId,
                   headingSize: 11,
                   headingLetterSpacing: 0.88,
                   headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 2),
@@ -278,8 +276,7 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   Widget _selectedDetail(List<JournalEntry> entries) {
-    final selectedId = _selectedIdFor(entries);
-    final entry = entries.firstWhere((entry) => entry.id == selectedId);
+    final entry = entries.firstWhere((entry) => entry.id == _selectedId);
     return SingleChildScrollView(
       child: JournalEntryDetail(
         entry: entry,

@@ -21,7 +21,7 @@ This PR delivers journal list and read flows end-to-end: `watch` on the reposito
 
 ### 🧹 Code cleanup and maintainability
 
-[CLN-001]
+[CLN-001] — **Completed**
 
 **Issue:** `_selectedIdFor` assigns `_selectedId` while the `StreamBuilder` is building (`_listPane` and `_selectedDetail` both call it). That makes the build method impure and can surprise future refactors (e.g. calling `setState` nearby or extracting widgets that assume stable selection during a single frame).
 
