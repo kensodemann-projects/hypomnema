@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:hypomnema/features/journal/domain/journal_list.dart';
@@ -106,7 +107,7 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   void _openEditor(BuildContext context) {
-    final desktop = MediaQuery.sizeOf(context).width > 600;
+    final desktop = desktopLayoutFor(context);
     final editor = JournalEditor(desktop: desktop, onSubmit: _submit);
     if (desktop) {
       showDialog<void>(
@@ -216,7 +217,36 @@ class _JournalScreenState extends State<JournalScreen> {
     });
   }
 
-  Widget _desktop(BuildContext context, ColorScheme scheme) {
+  Widget _phoneLayout(BuildContext context, ColorScheme scheme) {
+    return Column(
+      children: [
+        ColoredBox(
+          color: scheme.surface,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 64),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Text(
+                  'Journal',
+                  key: const Key('journal-title'),
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w400,
+                    color: scheme.onSurface,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(child: _entriesBody(context, scheme, desktop: false)),
+      ],
+    );
+  }
+
+  Widget _desktopLayout(BuildContext context, ColorScheme scheme) {
     return Column(
       children: [
         DecoratedBox(
@@ -259,7 +289,86 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _listPane(
+  Widget _entriesBody(
+    BuildContext context,
+    ColorScheme scheme, {
+    required bool desktop,
+  }) {
+    if (_watchFailed) {
+      return const SizedBox.shrink();
+    }
+    final entries = _cachedEntries;
+    if (entries == null) {
+      return const Center(
+        child: CircularProgressIndicator(key: Key('journal-loading')),
+      );
+    }
+    if (desktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _desktopListPane(context, scheme, entries),
+          Expanded(child: _desktopDetailPane(context, entries)),
+        ],
+      );
+    }
+    return _phoneListPane(context, scheme, entries);
+  }
+
+  Widget _phoneListPane(
+    BuildContext context,
+    ColorScheme scheme,
+    List<JournalEntry> entries,
+  ) {
+    if (entries.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+          child: EmptyState(
+            key: const Key('journal-empty'),
+            icon: Icons.edit_note,
+            iconSize: 44,
+            title: _emptyTitle,
+            titleSize: 17,
+            message: _emptyMessage,
+            actionLabel: _emptyAction,
+            actionIcon: Icons.edit,
+            onAction: () => _openEditor(context),
+          ),
+        ),
+      );
+    }
+    return Stack(
+      children: [
+        JournalEntryList(
+          key: const Key('journal-list'),
+          entries: entries,
+          now: widget.clock(),
+          headingSize: 12,
+          headingLetterSpacing: 0.72,
+          headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
+          onOpen: (entry) => _openEntry(context, entry),
+        ),
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: FloatingActionButton.extended(
+            key: const Key('journal-write'),
+            onPressed: () => _openEditor(context),
+            backgroundColor: scheme.primaryContainer,
+            foregroundColor: scheme.onPrimaryContainer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            icon: const Icon(Icons.edit),
+            label: const Text('Write'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _desktopListPane(
     BuildContext context,
     ColorScheme scheme,
     List<JournalEntry> entries,
@@ -318,78 +427,7 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _entriesBody(
-    BuildContext context,
-    ColorScheme scheme, {
-    required bool desktop,
-  }) {
-    if (_watchFailed) {
-      return const SizedBox.shrink();
-    }
-    final entries = _cachedEntries;
-    if (entries == null) {
-      return const Center(
-        child: CircularProgressIndicator(key: Key('journal-loading')),
-      );
-    }
-    if (desktop) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _listPane(context, scheme, entries),
-          Expanded(child: _detailPane(context, entries)),
-        ],
-      );
-    }
-    if (entries.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-          child: EmptyState(
-            key: const Key('journal-empty'),
-            icon: Icons.edit_note,
-            iconSize: 44,
-            title: _emptyTitle,
-            titleSize: 17,
-            message: _emptyMessage,
-            actionLabel: _emptyAction,
-            actionIcon: Icons.edit,
-            onAction: () => _openEditor(context),
-          ),
-        ),
-      );
-    }
-    return Stack(
-      children: [
-        JournalEntryList(
-          key: const Key('journal-list'),
-          entries: entries,
-          now: widget.clock(),
-          headingSize: 12,
-          headingLetterSpacing: 0.72,
-          headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
-          onOpen: (entry) => _openEntry(context, entry),
-        ),
-        Positioned(
-          right: 16,
-          bottom: 16,
-          child: FloatingActionButton.extended(
-            key: const Key('journal-write'),
-            onPressed: () => _openEditor(context),
-            backgroundColor: scheme.primaryContainer,
-            foregroundColor: scheme.onPrimaryContainer,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            icon: const Icon(Icons.edit),
-            label: const Text('Write'),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _detailPane(BuildContext context, List<JournalEntry> entries) {
+  Widget _desktopDetailPane(BuildContext context, List<JournalEntry> entries) {
     return Padding(
       key: const Key('journal-detail-pane'),
       padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
@@ -424,37 +462,10 @@ class _JournalScreenState extends State<JournalScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    if (MediaQuery.sizeOf(context).width > 600) {
-      return Scaffold(body: _desktop(context, scheme));
+    if (desktopLayoutFor(context)) {
+      return Scaffold(body: _desktopLayout(context, scheme));
     }
-    return Scaffold(
-      body: Column(
-        children: [
-          ColoredBox(
-            color: scheme.surface,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 64),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Text(
-                    'Journal',
-                    key: const Key('journal-title'),
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w400,
-                      color: scheme.onSurface,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(child: _entriesBody(context, scheme, desktop: false)),
-        ],
-      ),
-    );
+    return Scaffold(body: _phoneLayout(context, scheme));
   }
 }
 

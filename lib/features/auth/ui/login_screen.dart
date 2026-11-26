@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:hypomnema/features/auth/ui/hypomnema_logo.dart';
@@ -367,49 +368,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _desktopLayout() {
-    return Row(
-      children: [
-        Expanded(child: _brandPanel()),
-        SizedBox(
-          key: const Key('login-form-side'),
-          width: 520,
-          child: _scaffold(
-            body: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(
-                    child: ConstrainedBox(
-                      key: const Key('login-form-column'),
-                      constraints: const BoxConstraints(maxWidth: 360),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Text(
-                            'Sign in',
-                            key: Key('login-heading'),
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          _form(),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _phoneLayout() {
     final onSurfaceVariant = Theme.of(context).colorScheme.onSurfaceVariant;
     return _scaffold(
@@ -460,15 +418,54 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _desktopLayout() {
+    return Row(
+      children: [
+        Expanded(child: _brandPanel()),
+        SizedBox(
+          key: const Key('login-form-side'),
+          width: 520,
+          child: _scaffold(
+            body: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: ConstrainedBox(
+                      key: const Key('login-form-column'),
+                      constraints: const BoxConstraints(maxWidth: 360),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'Sign in',
+                            key: Key('login-heading'),
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          _form(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth > 600) {
-          return _desktopLayout();
-        }
-        return _phoneLayout();
-      },
-    );
+    if (desktopLayoutFor(context)) {
+      return _desktopLayout();
+    }
+    return _phoneLayout();
   }
 }

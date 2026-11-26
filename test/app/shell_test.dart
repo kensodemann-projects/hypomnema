@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/app/shell.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:material_ui/material_ui.dart';
@@ -185,45 +186,57 @@ void expectSignOutFailureSnackBar(WidgetTester tester) {
 
 void main() {
   testWidgets(
-    'Given a width of 400, when the shell builds, then the phone layout is used',
+    'Given a width less than the desktop layout minimum, when the shell builds, then the phone layout is used',
     (tester) async {
-      await pumpShell(tester, size: const Size(400, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
 
       expectPhoneShellExists();
     },
   );
 
   testWidgets(
-    'Given a width of 600, when the shell builds, then the phone layout is used',
+    'Given a width at the desktop layout minimum, when the shell builds, then the phone layout is used',
     (tester) async {
-      await pumpShell(tester, size: const Size(600, 800));
+      await pumpShell(tester, size: const Size(kDesktopLayoutMinWidth, 800));
 
       expectPhoneShellExists();
     },
   );
 
   testWidgets(
-    'Given a width of 601, when the shell builds, then the desktop layout is used',
+    'Given a width above the desktop layout minimum, when the shell builds, then the desktop layout is used',
     (tester) async {
-      await pumpShell(tester, size: const Size(601, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
+      );
 
       expectDesktopShellExists();
     },
   );
 
   testWidgets(
-    'Given a width of 1200, when the shell builds, then the desktop layout is used',
+    'Given a width of above the desktop layout minimum, when the shell builds, then the desktop layout is used',
     (tester) async {
-      await pumpShell(tester, size: const Size(1200, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth + 150, 800),
+      );
 
       expectDesktopShellExists();
     },
   );
 
   testWidgets(
-    'Given a width of 400, when the shell builds, then Dashboard is selected',
+    'Given a width less than the desktop layout minimum, when the shell builds, then Dashboard is selected',
     (tester) async {
-      await pumpShell(tester, size: const Size(400, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
 
       expectPhoneShellExists();
       expectContent(tester, 'Dashboard');
@@ -257,9 +270,12 @@ void main() {
   );
 
   testWidgets(
-    'Given a width of 601, when the shell builds, then Dashboard is selected',
+    'Given a width above the desktop layout minimum, when the shell builds, then Dashboard is selected',
     (tester) async {
-      await pumpShell(tester, size: const Size(601, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
+      );
 
       expectDesktopShellExists();
       expectContent(tester, 'Dashboard');
@@ -315,7 +331,10 @@ void main() {
   testWidgets(
     'Given the phone shell, when Journal and Archive are tapped, then each destination is selected',
     (tester) async {
-      await pumpShell(tester, size: const Size(400, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
       expectContent(tester, 'Dashboard');
 
       await tester.tap(
@@ -353,7 +372,10 @@ void main() {
   testWidgets(
     'Given the desktop shell, when Journal and Archive are tapped, then each destination is selected',
     (tester) async {
-      await pumpShell(tester, size: const Size(601, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
+      );
       expectContent(tester, 'Dashboard');
 
       await tester.tap(
@@ -389,16 +411,19 @@ void main() {
   );
 
   testWidgets(
-    'Given Journal is selected on the phone shell, when the width becomes 601, then Journal stays selected',
+    'Given Journal is selected on the phone shell, when the width becomes desktop, then Journal stays selected',
     (tester) async {
-      await pumpShell(tester, size: const Size(400, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
       await tester.tap(
         chromeLabel(const Key('shell-navigation-bar'), 'Journal'),
       );
       await tester.pumpAndSettle();
       expectJournalEmpty(tester);
 
-      tester.view.physicalSize = const Size(601, 800);
+      tester.view.physicalSize = const Size(kDesktopLayoutMinWidth + 1, 800);
       await tester.pumpAndSettle();
 
       expectDesktopShellExists();
@@ -419,7 +444,7 @@ void main() {
     (tester) async {
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         chromeKey: _phoneChrome,
         destination: 'Journal',
       );
@@ -435,7 +460,10 @@ void main() {
   testWidgets(
     'Given the desktop shell, when Sign out is built, then it is a button named Sign out',
     (tester) async {
-      await pumpShell(tester, size: const Size(601, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
+      );
       final handle = tester.ensureSemantics();
 
       expect(find.byKey(const Key('shell-sign-out')), findsOneWidget);
@@ -460,7 +488,11 @@ void main() {
     'Given Journal is selected on the desktop shell, when Sign out is activated from the keyboard, then the confirmation dialog opens',
     (tester) async {
       final auth = _FakeAuthService();
-      await pumpShell(tester, size: const Size(601, 800), authService: auth);
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
+        authService: auth,
+      );
       await tester.tap(chromeLabel(_desktopChrome, 'Journal'));
       await tester.pumpAndSettle();
 
@@ -494,7 +526,7 @@ void main() {
     (tester) async {
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(601, 800),
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
         chromeKey: _desktopChrome,
         destination: 'Journal',
       );
@@ -512,7 +544,7 @@ void main() {
     (tester) async {
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         chromeKey: _phoneChrome,
         destination: 'Journal',
       );
@@ -533,7 +565,7 @@ void main() {
     (tester) async {
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(601, 800),
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
         chromeKey: _desktopChrome,
         destination: 'Journal',
       );
@@ -554,7 +586,7 @@ void main() {
     (tester) async {
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         chromeKey: _phoneChrome,
         destination: 'Archive',
         throwOnSignOut: true,
@@ -585,7 +617,7 @@ void main() {
     (tester) async {
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(601, 800),
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
         chromeKey: _desktopChrome,
         destination: 'Archive',
         throwOnSignOut: true,

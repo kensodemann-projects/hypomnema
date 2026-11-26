@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/ui/journal_editor.dart';
 import 'package:hypomnema/features/journal/ui/mood_picker.dart';
@@ -185,7 +186,7 @@ void main() {
           tester,
           desktop: false,
           theme: theme,
-          size: const Size(400, 800),
+          size: const Size(kDesktopLayoutMinWidth - 200, 800),
         );
 
         expect(find.text('New entry'), findsOneWidget);
@@ -194,7 +195,10 @@ void main() {
         expect(find.byType(Scaffold), findsWidgets);
         final scaffold = tester.widget<Scaffold>(find.byKey(_editorKey));
         expect(scaffold.backgroundColor, scheme.surface);
-        expect(tester.getSize(find.byKey(_editorKey)), const Size(400, 800));
+        expect(
+          tester.getSize(find.byKey(_editorKey)),
+          const Size(kDesktopLayoutMinWidth - 200, 800),
+        );
         expect(
           tester.getSize(find.byKey(const Key('journal-top-bar'))).height,
           greaterThanOrEqualTo(64),
@@ -249,7 +253,7 @@ void main() {
           tester,
           desktop: true,
           theme: theme,
-          size: const Size(1200, 800),
+          size: const Size(kDesktopLayoutMinWidth + 600, 800),
         );
 
         expect(find.text('New journal entry'), findsOneWidget);
@@ -319,7 +323,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
 
       expectSaveDisabled(tester);
@@ -334,7 +338,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
 
       await enterEntry(tester, subject: '   ', text: 'hello', mood: 3);
@@ -351,7 +355,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
 
       await enterEntry(tester, subject: 'Note', text: '   ', mood: 4);
@@ -368,7 +372,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
 
       await enterEntry(tester, subject: 'Note', text: 'hello');
@@ -385,7 +389,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
       await enterEntry(tester, subject: '  Note  ', text: '  hello  ', mood: 4);
 
@@ -405,7 +409,7 @@ void main() {
         tester,
         desktop: true,
         theme: AppTheme.light,
-        size: const Size(1200, 800),
+        size: const Size(kDesktopLayoutMinWidth + 125, 800),
       );
       await enterEntry(tester, subject: '  Note  ', text: '  hello  ', mood: 2);
 
@@ -424,7 +428,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         subject: '  Note  ',
         mood: 3,
         text: '  hello  ',
@@ -461,7 +465,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         submissions: submissions,
       );
       await enterEntry(tester, subject: 'Note', text: 'hello', mood: 3);
@@ -490,7 +494,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         submissions: submissions,
       );
       await enterEntry(tester, subject: 'Note', text: 'hello', mood: 1);
@@ -528,7 +532,7 @@ void main() {
         tester,
         desktop: true,
         theme: AppTheme.light,
-        size: const Size(1200, 800),
+        size: const Size(kDesktopLayoutMinWidth + 125, 800),
         submissions: submissions,
       );
       await enterEntry(tester, subject: 'Note', text: 'hello', mood: 2);
@@ -561,7 +565,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         submissions: submissions,
       );
       await enterEntry(tester, subject: 'Note', text: 'hello', mood: 5);
@@ -590,7 +594,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
 
       await tester.tap(find.byKey(_closeKey));
@@ -608,7 +612,7 @@ void main() {
         tester,
         desktop: true,
         theme: AppTheme.light,
-        size: const Size(1200, 800),
+        size: const Size(kDesktopLayoutMinWidth + 125, 800),
       );
 
       await tester.tap(find.byKey(const Key('journal-cancel')));
@@ -626,7 +630,7 @@ void main() {
         tester,
         desktop: true,
         theme: AppTheme.light,
-        size: const Size(1200, 800),
+        size: const Size(kDesktopLayoutMinWidth + 125, 800),
       );
 
       await tester.tap(find.byKey(_closeKey));
@@ -644,7 +648,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
 
       await tester.enterText(find.byKey(_textKey), 'First line\nSecond line');
@@ -664,7 +668,7 @@ void main() {
         tester,
         desktop: false,
         theme: AppTheme.light,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
       );
 
       await tester.tap(find.byKey(_subjectKey));

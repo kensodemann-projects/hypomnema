@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/shared/ui/confirmation_dialog.dart';
 import 'package:material_ui/material_ui.dart';
@@ -68,7 +69,10 @@ void main() {
   testWidgets(
     'Given a phone width, when the dialog opens, then the phone layout shows the title, message, Cancel, and confirm label',
     (tester) async {
-      await openDialog(tester, size: const Size(400, 800));
+      await openDialog(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
 
       expect(find.text(_title), findsOneWidget);
       expect(find.text(_message), findsOneWidget);
@@ -88,7 +92,10 @@ void main() {
   testWidgets(
     'Given a desktop width, when the dialog opens, then the desktop layout shows the title, message, Cancel, and confirm label',
     (tester) async {
-      await openDialog(tester, size: const Size(601, 800));
+      await openDialog(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth + 1, 800),
+      );
 
       expect(find.text(_title), findsOneWidget);
       expect(find.text(_message), findsOneWidget);
@@ -108,7 +115,10 @@ void main() {
   testWidgets(
     'Given no warning, when the dialog opens, then the warning banner is absent',
     (tester) async {
-      await openDialog(tester, size: const Size(400, 800));
+      await openDialog(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
 
       expect(find.byKey(const Key('confirmation-warning')), findsNothing);
     },
@@ -117,7 +127,11 @@ void main() {
   testWidgets(
     'Given an empty warning, when the dialog opens, then the warning banner is absent',
     (tester) async {
-      await openDialog(tester, size: const Size(400, 800), warning: '');
+      await openDialog(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+        warning: '',
+      );
 
       expect(find.byKey(const Key('confirmation-warning')), findsNothing);
     },
@@ -128,7 +142,7 @@ void main() {
     (tester) async {
       await openDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         theme: AppTheme.light,
         warning: _warning,
       );
@@ -148,7 +162,7 @@ void main() {
     (tester) async {
       await openDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         theme: AppTheme.dark,
         warning: _warning,
       );
@@ -166,7 +180,10 @@ void main() {
   testWidgets(
     'Given the dialog, when Cancel is tapped, then the dialog closes and the result is false',
     (tester) async {
-      final result = await openDialog(tester, size: const Size(400, 800));
+      final result = await openDialog(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
 
       await tester.tap(find.byKey(const Key('confirmation-cancel')));
       await tester.pumpAndSettle();
@@ -179,7 +196,10 @@ void main() {
   testWidgets(
     'Given the dialog, when the scrim is tapped, then the dialog closes and the result is false',
     (tester) async {
-      final result = await openDialog(tester, size: const Size(400, 800));
+      final result = await openDialog(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
 
       await tester.tapAt(const Offset(8, 8));
       await tester.pumpAndSettle();
@@ -194,7 +214,7 @@ void main() {
     (tester) async {
       final result = await openDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         style: ConfirmationStyle.normal,
       );
 
@@ -215,7 +235,10 @@ void main() {
   testWidgets(
     'Given a MaterialApp nested under another navigator, when the dialog opens, then the dialog is shown',
     (tester) async {
-      setLogicalViewportSize(tester, const Size(400, 800));
+      setLogicalViewportSize(
+        tester,
+        const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
       late Future<bool> result;
       await tester.pumpWidget(
         Directionality(
@@ -272,7 +295,7 @@ void main() {
     (tester) async {
       final result = await openDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         style: ConfirmationStyle.danger,
       );
 

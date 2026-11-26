@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:hypomnema/features/journal/ui/journal_entry_detail.dart';
@@ -24,8 +25,8 @@ const _closeKey = Key('journal-close');
 const _cancelKey = Key('journal-cancel');
 const _subjectKey = Key('journal-subject');
 const _textKey = Key('journal-text');
-const _phone = Size(400, 800);
-const _desktop = Size(1200, 800);
+const _phone = Size(kDesktopLayoutMinWidth - 200, 800);
+const _desktop = Size(kDesktopLayoutMinWidth + 400, 800);
 
 Future<FakeJournalEntryRepository> _pumpJournalScreen(
   WidgetTester tester, {
@@ -146,7 +147,7 @@ void main() {
   );
 
   testWidgets(
-    'Given the journal screen above 600px, when Write is tapped, then the dialog opens and Cancel returns to Write',
+    'Given the journal screen above the desktop layout minimum, when Write is tapped, then the dialog opens and Cancel returns to Write',
     (tester) async {
       await _pumpJournalScreen(tester, size: _desktop);
 

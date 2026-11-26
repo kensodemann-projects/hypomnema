@@ -1,7 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:flutter/widget_previews.dart';
-import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/ui/mood_picker.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -529,82 +527,6 @@ class _CloseButton extends StatelessWidget {
         ),
         onPressed: onPressed,
         icon: Icon(Icons.close, color: color),
-      ),
-    );
-  }
-}
-
-Future<void> _previewSubmit({
-  required String subject,
-  required int mood,
-  required String text,
-}) async {}
-
-@Preview(name: 'Journal editor — Phone', size: Size(400, 800))
-@Preview(name: 'Journal editor — Desktop', size: Size(1000, 700))
-Widget previewJournalEditor() {
-  return MaterialApp(
-    theme: AppTheme.light,
-    darkTheme: AppTheme.dark,
-    themeMode: ThemeMode.system,
-    home: const _JournalEditorPreview(),
-  );
-}
-
-class _JournalEditorPreview extends StatelessWidget {
-  const _JournalEditorPreview();
-
-  @override
-  Widget build(BuildContext context) {
-    final desktop = MediaQuery.sizeOf(context).width > 600;
-    return ListView(
-      children: [
-        _PreviewTheme(theme: AppTheme.light, label: 'Light', desktop: desktop),
-        _PreviewTheme(theme: AppTheme.dark, label: 'Dark', desktop: desktop),
-      ],
-    );
-  }
-}
-
-class _PreviewTheme extends StatelessWidget {
-  const _PreviewTheme({
-    required this.theme,
-    required this.label,
-    required this.desktop,
-  });
-
-  final ThemeData theme;
-  final String label;
-  final bool desktop;
-
-  @override
-  Widget build(BuildContext context) {
-    return Theme(
-      data: theme,
-      child: ColoredBox(
-        color: theme.scaffoldBackgroundColor,
-        child: SizedBox(
-          height: desktop ? 680 : 760,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(padding: const EdgeInsets.all(16), child: Text(label)),
-              Expanded(
-                child: desktop
-                    ? const Center(
-                        child: JournalEditor(
-                          onSubmit: _previewSubmit,
-                          desktop: true,
-                        ),
-                      )
-                    : const JournalEditor(
-                        onSubmit: _previewSubmit,
-                        desktop: false,
-                      ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
