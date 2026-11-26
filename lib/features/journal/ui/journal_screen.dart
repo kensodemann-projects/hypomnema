@@ -458,7 +458,10 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 }
 
-String? _reconcileJournalSelection(List<JournalEntry> entries, String? current) {
+String? _reconcileJournalSelection(
+  List<JournalEntry> entries,
+  String? current,
+) {
   if (entries.isEmpty) {
     return null;
   }
