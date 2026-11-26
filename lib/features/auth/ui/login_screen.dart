@@ -213,39 +213,34 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  Widget _emailField() {
-    return TextField(
-      key: const Key('login-email'),
-      controller: _emailController,
-      focusNode: _emailFocus,
-      keyboardType: TextInputType.emailAddress,
-      textInputAction: TextInputAction.next,
-      autofillHints: const [AutofillHints.email],
-      decoration: InputDecoration(labelText: 'Email', errorText: _emailError),
-      onChanged: (_) => setState(() => _emailError = null),
-      onSubmitted: _submitEmailField,
-    );
-  }
-
   Widget _form() {
     return AutofillGroup(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _emailField(),
+          _LoginField(
+            label: 'Email',
+            fieldKey: const Key('login-email'),
+            controller: _emailController,
+            focusNode: _emailFocus,
+            error: _emailError,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.email],
+            onChanged: (_) => setState(() => _emailError = null),
+            onSubmitted: _submitEmailField,
+          ),
           const SizedBox(height: 16),
-          TextField(
-            key: const Key('login-password'),
+          _LoginField(
+            label: 'Password',
+            fieldKey: const Key('login-password'),
             controller: _passwordController,
             focusNode: _passwordFocus,
+            error: _passwordError,
             obscureText: true,
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.password],
-            decoration: InputDecoration(
-              labelText: 'Password',
-              errorText: _passwordError,
-            ),
             onChanged: (_) => setState(() => _passwordError = null),
             onSubmitted: _submitPasswordField,
           ),
@@ -467,5 +462,123 @@ class _LoginScreenState extends State<LoginScreen> {
       return _desktopLayout();
     }
     return _phoneLayout();
+  }
+}
+
+class _LoginField extends StatefulWidget {
+  const _LoginField({
+    required this.label,
+    required this.fieldKey,
+    required this.controller,
+    required this.focusNode,
+    required this.error,
+    required this.onChanged,
+    required this.onSubmitted,
+    this.keyboardType,
+    this.textInputAction,
+    this.autofillHints,
+    this.obscureText = false,
+  });
+
+  final String label;
+  final Key fieldKey;
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final String? error;
+  final ValueChanged<String> onChanged;
+  final ValueChanged<String> onSubmitted;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final Iterable<String>? autofillHints;
+  final bool obscureText;
+
+  @override
+  State<_LoginField> createState() => _LoginFieldState();
+}
+
+class _LoginFieldState extends State<_LoginField> {
+  @override
+  void initState() {
+    super.initState();
+    widget.focusNode.addListener(_onFocus);
+  }
+
+  @override
+  void didUpdateWidget(_LoginField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.focusNode != widget.focusNode) {
+      oldWidget.focusNode.removeListener(_onFocus);
+      widget.focusNode.addListener(_onFocus);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.focusNode.removeListener(_onFocus);
+    super.dispose();
+  }
+
+  void _onFocus() {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final focused = widget.focusNode.hasFocus;
+    final invalid = widget.error != null;
+    final padding = focused
+        ? const EdgeInsets.symmetric(horizontal: 13, vertical: 10)
+        : const EdgeInsets.symmetric(horizontal: 14, vertical: 11);
+    final borderColor = invalid
+        ? scheme.error
+        : focused
+        ? scheme.primary
+        : scheme.outline;
+    final border = OutlineInputBorder(
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      borderSide: BorderSide(color: borderColor, width: focused ? 2 : 1),
+    );
+    final error = widget.error;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 4,
+      children: [
+        Text.rich(
+          TextSpan(
+            text: '${widget.label} ',
+            style: TextStyle(color: scheme.onSurfaceVariant),
+            children: [
+              TextSpan(
+                text: '*',
+                style: TextStyle(color: scheme.error),
+              ),
+            ],
+          ),
+        ),
+        TextField(
+          key: widget.fieldKey,
+          controller: widget.controller,
+          focusNode: widget.focusNode,
+          keyboardType: widget.keyboardType,
+          textInputAction: widget.textInputAction,
+          autofillHints: widget.autofillHints,
+          obscureText: widget.obscureText,
+          onChanged: widget.onChanged,
+          onSubmitted: widget.onSubmitted,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: scheme.surface,
+            contentPadding: padding,
+            border: border,
+            enabledBorder: border,
+            focusedBorder: border,
+            disabledBorder: border,
+          ),
+        ),
+        if (error != null) Text(error, style: TextStyle(color: scheme.error)),
+      ],
+    );
   }
 }
