@@ -347,29 +347,11 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _entriesBody(
+  Widget _phoneListPane(
     BuildContext context,
-    ColorScheme scheme, {
-    required bool desktop,
-  }) {
-    if (_watchFailed) {
-      return const SizedBox.shrink();
-    }
-    final entries = _cachedEntries;
-    if (entries == null) {
-      return const Center(
-        child: CircularProgressIndicator(key: Key('journal-loading')),
-      );
-    }
-    if (desktop) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _desktopListPane(context, scheme, entries),
-          Expanded(child: _desktopDetailPane(context, entries)),
-        ],
-      );
-    }
+    ColorScheme scheme,
+    List<JournalEntry> entries,
+  ) {
     if (entries.isEmpty) {
       return Center(
         child: Padding(
@@ -416,6 +398,32 @@ class _JournalScreenState extends State<JournalScreen> {
         ),
       ],
     );
+  }
+
+  Widget _entriesBody(
+    BuildContext context,
+    ColorScheme scheme, {
+    required bool desktop,
+  }) {
+    if (_watchFailed) {
+      return const SizedBox.shrink();
+    }
+    final entries = _cachedEntries;
+    if (entries == null) {
+      return const Center(
+        child: CircularProgressIndicator(key: Key('journal-loading')),
+      );
+    }
+    if (desktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _desktopListPane(context, scheme, entries),
+          Expanded(child: _desktopDetailPane(context, entries)),
+        ],
+      );
+    }
+    return _phoneListPane(context, scheme, entries);
   }
 
   Widget _desktopDetailPane(BuildContext context, List<JournalEntry> entries) {
