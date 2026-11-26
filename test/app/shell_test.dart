@@ -186,9 +186,12 @@ void expectSignOutFailureSnackBar(WidgetTester tester) {
 
 void main() {
   testWidgets(
-    'Given a width of 400, when the shell builds, then the phone layout is used',
+    'Given a width less than the desktop layout minimum, when the shell builds, then the phone layout is used',
     (tester) async {
-      await pumpShell(tester, size: const Size(400, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
 
       expectPhoneShellExists();
     },
@@ -216,18 +219,24 @@ void main() {
   );
 
   testWidgets(
-    'Given a width of 1200, when the shell builds, then the desktop layout is used',
+    'Given a width of above the desktop layout minimum, when the shell builds, then the desktop layout is used',
     (tester) async {
-      await pumpShell(tester, size: const Size(1200, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth + 150, 800),
+      );
 
       expectDesktopShellExists();
     },
   );
 
   testWidgets(
-    'Given a width of 400, when the shell builds, then Dashboard is selected',
+    'Given a width less than the desktop layout minimum, when the shell builds, then Dashboard is selected',
     (tester) async {
-      await pumpShell(tester, size: const Size(400, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
 
       expectPhoneShellExists();
       expectContent(tester, 'Dashboard');
@@ -322,7 +331,10 @@ void main() {
   testWidgets(
     'Given the phone shell, when Journal and Archive are tapped, then each destination is selected',
     (tester) async {
-      await pumpShell(tester, size: const Size(400, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
       expectContent(tester, 'Dashboard');
 
       await tester.tap(
@@ -401,7 +413,10 @@ void main() {
   testWidgets(
     'Given Journal is selected on the phone shell, when the width becomes desktop, then Journal stays selected',
     (tester) async {
-      await pumpShell(tester, size: const Size(400, 800));
+      await pumpShell(
+        tester,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
       await tester.tap(
         chromeLabel(const Key('shell-navigation-bar'), 'Journal'),
       );
@@ -429,7 +444,7 @@ void main() {
     (tester) async {
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         chromeKey: _phoneChrome,
         destination: 'Journal',
       );
@@ -529,7 +544,7 @@ void main() {
     (tester) async {
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         chromeKey: _phoneChrome,
         destination: 'Journal',
       );
@@ -571,7 +586,7 @@ void main() {
     (tester) async {
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         chromeKey: _phoneChrome,
         destination: 'Archive',
         throwOnSignOut: true,

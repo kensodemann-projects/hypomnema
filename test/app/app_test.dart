@@ -133,7 +133,10 @@ void main() {
     'Given light platform brightness, when MainApp builds, then the theme is light',
     (tester) async {
       // Given
-      setLogicalViewportSize(tester, const Size(400, 800));
+      setLogicalViewportSize(
+        tester,
+        const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
       addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
 
@@ -156,7 +159,10 @@ void main() {
     'Given dark platform brightness, when MainApp builds, then the theme is dark',
     (tester) async {
       // Given
-      setLogicalViewportSize(tester, const Size(400, 800));
+      setLogicalViewportSize(
+        tester,
+        const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
       addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
 
@@ -180,7 +186,10 @@ void main() {
     (tester) async {
       // Given
       final auth = _authEmitting(true);
-      setLogicalViewportSize(tester, const Size(400, 800));
+      setLogicalViewportSize(
+        tester,
+        const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
       await tester.pumpWidget(
         MainApp(
           authService: auth,
@@ -211,7 +220,10 @@ void main() {
     (tester) async {
       // Given
       final auth = _FakeAuthService();
-      setLogicalViewportSize(tester, const Size(400, 800));
+      setLogicalViewportSize(
+        tester,
+        const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
 
       // When
       await tester.pumpWidget(
@@ -238,7 +250,10 @@ void main() {
     (tester) async {
       // Given
       final auth = _authEmitting(false);
-      setLogicalViewportSize(tester, const Size(400, 800));
+      setLogicalViewportSize(
+        tester,
+        const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
 
       // When
       await tester.pumpWidget(
@@ -261,7 +276,10 @@ void main() {
     (tester) async {
       // Given
       final auth = _authEmitting(false);
-      setLogicalViewportSize(tester, const Size(400, 800));
+      setLogicalViewportSize(
+        tester,
+        const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
       await tester.pumpWidget(
         MainApp(
           authService: auth,
@@ -295,7 +313,7 @@ void main() {
       // Given
       final auth = await _openSignOutDialog(
         tester,
-        size: const Size(400, 800),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
         chromeKey: const Key('shell-navigation-bar'),
       );
 
