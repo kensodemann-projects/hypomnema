@@ -181,7 +181,10 @@ void main() {
   testWidgets(
     'Given a phone width, when the login screen builds, then the brand stacks above the form',
     (tester) async {
-      for (final width in [400.0, kDesktopLayoutMinWidth]) {
+      for (final width in [
+        kDesktopLayoutMinWidth - 200,
+        kDesktopLayoutMinWidth,
+      ]) {
         for (final theme in [AppTheme.light, AppTheme.dark]) {
           // Given, when
           await pumpLoginScreen(
@@ -218,7 +221,10 @@ void main() {
   testWidgets(
     'Given a desktop width, when the login screen builds, then the brand panel sits beside the form',
     (tester) async {
-      for (final width in [kDesktopLayoutMinWidth + 1, 1200.0]) {
+      for (final width in [
+        kDesktopLayoutMinWidth + 1,
+        kDesktopLayoutMinWidth + 400,
+      ]) {
         for (final theme in [AppTheme.light, AppTheme.dark]) {
           // Given, when
           await pumpLoginScreen(
@@ -645,7 +651,10 @@ void main() {
   testWidgets(
     'Given a valid email with surrounding spaces, when Forgot password is tapped, then the trimmed email is sent and the info snackbar is shown',
     (tester) async {
-      for (final size in const [Size(400, 800), Size(1200, 800)]) {
+      for (final size in const [
+        Size(kDesktopLayoutMinWidth - 200, 800),
+        Size(kDesktopLayoutMinWidth + 400, 800),
+      ]) {
         for (final theme in [AppTheme.light, AppTheme.dark]) {
           // Given
           final auth = _RecordingAuthService();

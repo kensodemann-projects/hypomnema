@@ -211,7 +211,10 @@ void main() {
   testWidgets(
     'Given a standalone swatch, when it is shown, then the digit has no Awful or Great label',
     (tester) async {
-      setLogicalViewportSize(tester, const Size(400, 800));
+      setLogicalViewportSize(
+        tester,
+        const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light,
@@ -232,7 +235,7 @@ void main() {
       await pumpPicker(
         tester,
         theme: AppTheme.light,
-        width: 400,
+        width: kDesktopLayoutMinWidth - 200,
         value: null,
         onChanged: (mood) => selected = mood,
       );
@@ -242,7 +245,7 @@ void main() {
     },
   );
 
-  for (final width in [400.0, kDesktopLayoutMinWidth]) {
+  for (final width in [kDesktopLayoutMinWidth - 200, kDesktopLayoutMinWidth]) {
     testWidgets(
       'Given a width of $width, when the picker is shown, then the options spread from edge to edge with equal gaps',
       (tester) async {
@@ -266,7 +269,10 @@ void main() {
     );
   }
 
-  for (final width in [kDesktopLayoutMinWidth + 1, 1000.0]) {
+  for (final width in [
+    kDesktopLayoutMinWidth + 1,
+    kDesktopLayoutMinWidth + 400,
+  ]) {
     testWidgets(
       'Given a width of $width, when the picker is shown, then the options are 64 wide and 12 apart',
       (tester) async {
