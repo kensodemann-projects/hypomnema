@@ -43,13 +43,15 @@ Then pass `_selectedId` into the list and detail without mutating inside `_selec
 
 **Why:** Keeps Flutter’s “build is a pure function of state” rule and avoids subtle ordering bugs if list and detail diverge on the same frame.
 
-[CLN-002]
+[CLN-002] — **Completed**
 
-**Issue:** `_reportWatchError()` runs from inside the `StreamBuilder` `builder` when `snapshot.hasError`, setting `_reportedWatchError` synchronously during build (the snackbar correctly uses a post-frame callback, but the flag still updates in `build`).
+**Issue:** `_reportWatchError()` used to run from inside the `StreamBuilder` `builder` when `snapshot.hasError`, setting `_reportedWatchError` synchronously during build (the snackbar correctly used a post-frame callback, but the flag still updated in `build`).
 
 **Suggestion:** Prefer `StreamBuilder`’s listener pattern, a dedicated `StreamSubscription` in `initState`, or `ref.listen`-style handling: on error, schedule the snackbar once outside `build`.
 
 **Why:** Side effects in `build` are easy to duplicate on rebuilds and conflict with framework guidance, even when a guard flag usually works.
+
+**Resolution:** `JournalScreen` now listens to `repository.watch()` in `initState`. `onError` calls `_onWatchError`, which `setState`s `_watchFailed` and invokes `_reportWatchError()` from the stream callback, not from `build`.
 
 [CLN-003]
 
