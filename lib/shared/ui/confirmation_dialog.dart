@@ -1,4 +1,3 @@
-import 'package:flutter/widget_previews.dart';
 import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart';
@@ -159,104 +158,6 @@ class _WarningBanner extends StatelessWidget {
                 text,
                 style: TextStyle(fontSize: 13, color: foreground),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-@Preview(name: 'Confirmation dialog — Phone', size: Size(400, 800))
-@Preview(name: 'Confirmation dialog — Desktop', size: Size(1000, 700))
-Widget previewConfirmationDialog() {
-  return MaterialApp(
-    theme: AppTheme.light,
-    darkTheme: AppTheme.dark,
-    themeMode: ThemeMode.system,
-    home: const _ConfirmationDialogPreview(),
-  );
-}
-
-class _ConfirmationDialogPreview extends StatefulWidget {
-  const _ConfirmationDialogPreview();
-
-  @override
-  State<_ConfirmationDialogPreview> createState() =>
-      _ConfirmationDialogPreviewState();
-}
-
-class _ConfirmationDialogPreviewState
-    extends State<_ConfirmationDialogPreview> {
-  String _result = 'No result yet.';
-
-  Future<void> _open({
-    required String title,
-    required String message,
-    required String confirmLabel,
-    required ConfirmationStyle style,
-    String? warning,
-  }) async {
-    final confirmed = await showConfirmationDialog(
-      context: context,
-      title: title,
-      message: message,
-      confirmLabel: confirmLabel,
-      style: style,
-      warning: warning,
-    );
-    if (!mounted) return;
-    setState(() {
-      _result = confirmed ? 'Confirmed.' : 'Canceled.';
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 12,
-          children: [
-            Text(_result),
-            FilledButton(
-              onPressed: () => _open(
-                title: 'Continue?',
-                message: 'You can keep going from here.',
-                confirmLabel: 'Continue',
-                style: ConfirmationStyle.normal,
-              ),
-              child: const Text('Normal'),
-            ),
-            FilledButton(
-              onPressed: () => _open(
-                title: 'Continue?',
-                message: 'You can keep going from here.',
-                confirmLabel: 'Continue',
-                style: ConfirmationStyle.normal,
-                warning: "This can't be undone.",
-              ),
-              child: const Text('Normal with warning'),
-            ),
-            FilledButton(
-              onPressed: () => _open(
-                title: 'Delete this goal?',
-                message: 'This permanently removes the goal.',
-                confirmLabel: 'Delete',
-                style: ConfirmationStyle.danger,
-              ),
-              child: const Text('Danger'),
-            ),
-            FilledButton(
-              onPressed: () => _open(
-                title: 'Delete this goal?',
-                message: 'This permanently removes the goal.',
-                confirmLabel: 'Delete',
-                style: ConfirmationStyle.danger,
-                warning: "This can't be undone.",
-              ),
-              child: const Text('Danger with warning'),
             ),
           ],
         ),
