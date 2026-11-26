@@ -216,35 +216,6 @@ class _JournalScreenState extends State<JournalScreen> {
     });
   }
 
-  Widget _phoneLayout(BuildContext context, ColorScheme scheme) {
-    return Column(
-      children: [
-        ColoredBox(
-          color: scheme.surface,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 64),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  'Journal',
-                  key: const Key('journal-title'),
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w400,
-                    color: scheme.onSurface,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Expanded(child: _entriesBody(context, scheme, desktop: false)),
-      ],
-    );
-  }
-
   Widget _desktopLayout(BuildContext context, ColorScheme scheme) {
     return Column(
       children: [
@@ -288,7 +259,7 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _listPane(
+  Widget _desktopListPane(
     BuildContext context,
     ColorScheme scheme,
     List<JournalEntry> entries,
@@ -347,6 +318,35 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
+  Widget _phoneLayout(BuildContext context, ColorScheme scheme) {
+    return Column(
+      children: [
+        ColoredBox(
+          color: scheme.surface,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 64),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Text(
+                  'Journal',
+                  key: const Key('journal-title'),
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w400,
+                    color: scheme.onSurface,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(child: _entriesBody(context, scheme, desktop: false)),
+      ],
+    );
+  }
+
   Widget _entriesBody(
     BuildContext context,
     ColorScheme scheme, {
@@ -365,8 +365,8 @@ class _JournalScreenState extends State<JournalScreen> {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _listPane(context, scheme, entries),
-          Expanded(child: _detailPane(context, entries)),
+          _desktopListPane(context, scheme, entries),
+          Expanded(child: _desktopDetailPane(context, entries)),
         ],
       );
     }
@@ -418,7 +418,7 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _detailPane(BuildContext context, List<JournalEntry> entries) {
+  Widget _desktopDetailPane(BuildContext context, List<JournalEntry> entries) {
     return Padding(
       key: const Key('journal-detail-pane'),
       padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
