@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:hypomnema/features/journal/domain/journal_list.dart';
@@ -30,9 +32,65 @@ class JournalScreen extends StatefulWidget {
 }
 
 class _JournalScreenState extends State<JournalScreen> {
-  late final Stream<List<JournalEntry>> _entries = widget.repository.watch();
+  StreamSubscription<List<JournalEntry>>? _subscription;
+  List<JournalEntry>? _cachedEntries;
+  var _watchFailed = false;
   var _reportedWatchError = false;
   String? _selectedId;
+
+  @override
+  void initState() {
+    super.initState();
+    _listenEntries();
+  }
+
+  @override
+  void didUpdateWidget(JournalScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.repository != widget.repository) {
+      _subscription?.cancel();
+      _cachedEntries = null;
+      _watchFailed = false;
+      _reportedWatchError = false;
+      _listenEntries();
+    }
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
+  void _listenEntries() {
+    _subscription = widget.repository.watch().listen(
+      _onEntries,
+      onError: _onWatchError,
+    );
+  }
+
+  void _onEntries(List<JournalEntry> entries) {
+    if (!mounted) {
+      return;
+    }
+    final nextId = _reconcileJournalSelection(entries, _selectedId);
+    setState(() {
+      _cachedEntries = entries;
+      _watchFailed = false;
+      _selectedId = nextId;
+    });
+  }
+
+  void _onWatchError(Object error, StackTrace stackTrace) {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _watchFailed = true;
+      _cachedEntries = null;
+    });
+    _reportWatchError();
+  }
 
   Future<void> _submit({
     required String subject,
@@ -196,36 +254,7 @@ class _JournalScreenState extends State<JournalScreen> {
             ),
           ),
         ),
-        Expanded(
-          child: StreamBuilder<List<JournalEntry>>(
-            stream: _entries,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                _reportWatchError();
-                return const SizedBox.shrink();
-              }
-              if (!snapshot.hasData) {
-                return const Center(
-                  child: CircularProgressIndicator(key: Key('journal-loading')),
-                );
-              }
-              final entries = snapshot.data!;
-              final id = _selectedId;
-              if (entries.isEmpty) {
-                _selectedId = null;
-              } else if (id == null || !entries.any((e) => e.id == id)) {
-                _selectedId = entries.first.id;
-              }
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _listPane(context, scheme, entries),
-                  Expanded(child: _detailPane(context, entries)),
-                ],
-              );
-            },
-          ),
-        ),
+        Expanded(child: _entriesBody(context, scheme, desktop: true)),
       ],
     );
   }
@@ -286,6 +315,77 @@ class _JournalScreenState extends State<JournalScreen> {
         card: true,
         padding: EdgeInsets.zero,
       ),
+    );
+  }
+
+  Widget _entriesBody(
+    BuildContext context,
+    ColorScheme scheme, {
+    required bool desktop,
+  }) {
+    if (_watchFailed) {
+      return const SizedBox.shrink();
+    }
+    final entries = _cachedEntries;
+    if (entries == null) {
+      return const Center(
+        child: CircularProgressIndicator(key: Key('journal-loading')),
+      );
+    }
+    if (desktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _listPane(context, scheme, entries),
+          Expanded(child: _detailPane(context, entries)),
+        ],
+      );
+    }
+    if (entries.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+          child: EmptyState(
+            key: const Key('journal-empty'),
+            icon: Icons.edit_note,
+            iconSize: 44,
+            title: _emptyTitle,
+            titleSize: 17,
+            message: _emptyMessage,
+            actionLabel: _emptyAction,
+            actionIcon: Icons.edit,
+            onAction: () => _openEditor(context),
+          ),
+        ),
+      );
+    }
+    return Stack(
+      children: [
+        JournalEntryList(
+          key: const Key('journal-list'),
+          entries: entries,
+          now: widget.clock(),
+          headingSize: 12,
+          headingLetterSpacing: 0.72,
+          headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
+          onOpen: (entry) => _openEntry(context, entry),
+        ),
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: FloatingActionButton.extended(
+            key: const Key('journal-write'),
+            onPressed: () => _openEditor(context),
+            backgroundColor: scheme.primaryContainer,
+            foregroundColor: scheme.onPrimaryContainer,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            icon: const Icon(Icons.edit),
+            label: const Text('Write'),
+          ),
+        ),
+      ],
     );
   }
 
@@ -351,76 +451,19 @@ class _JournalScreenState extends State<JournalScreen> {
               ),
             ),
           ),
-          Expanded(
-            child: StreamBuilder<List<JournalEntry>>(
-              stream: _entries,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  _reportWatchError();
-                  return const SizedBox.shrink();
-                }
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      key: Key('journal-loading'),
-                    ),
-                  );
-                }
-                final entries = snapshot.data!;
-                if (entries.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 40,
-                        horizontal: 16,
-                      ),
-                      child: EmptyState(
-                        key: const Key('journal-empty'),
-                        icon: Icons.edit_note,
-                        iconSize: 44,
-                        title: _emptyTitle,
-                        titleSize: 17,
-                        message: _emptyMessage,
-                        actionLabel: _emptyAction,
-                        actionIcon: Icons.edit,
-                        onAction: () => _openEditor(context),
-                      ),
-                    ),
-                  );
-                }
-                return Stack(
-                  children: [
-                    JournalEntryList(
-                      key: const Key('journal-list'),
-                      entries: entries,
-                      now: widget.clock(),
-                      headingSize: 12,
-                      headingLetterSpacing: 0.72,
-                      headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
-                      onOpen: (entry) => _openEntry(context, entry),
-                    ),
-                    Positioned(
-                      right: 16,
-                      bottom: 16,
-                      child: FloatingActionButton.extended(
-                        key: const Key('journal-write'),
-                        onPressed: () => _openEditor(context),
-                        backgroundColor: scheme.primaryContainer,
-                        foregroundColor: scheme.onPrimaryContainer,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        icon: const Icon(Icons.edit),
-                        label: const Text('Write'),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
+          Expanded(child: _entriesBody(context, scheme, desktop: false)),
         ],
       ),
     );
   }
+}
+
+String? _reconcileJournalSelection(List<JournalEntry> entries, String? current) {
+  if (entries.isEmpty) {
+    return null;
+  }
+  if (current != null && entries.any((entry) => entry.id == current)) {
+    return current;
+  }
+  return entries.first.id;
 }
