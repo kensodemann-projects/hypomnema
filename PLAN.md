@@ -25,7 +25,7 @@ Related to [#47](https://github.com/kensodemann-projects/hypomnema/issues/47).
 
 | Order | Step       | Status | Files                                                                              |
 | ----- | ---------- | ------ | ---------------------------------------------------------------------------------- |
-| 1     | [STEP-001] |        | `lib/features/auth/ui/login_screen.dart`, then `test/features/auth/ui/login_screen_test.dart` |
+| 1     | [STEP-001] | complete | `lib/features/auth/ui/login_screen.dart`, then `test/features/auth/ui/login_screen_test.dart` |
 
 **Commit gate** — the human commits. A spot-check does not replace the gate.
 
@@ -38,7 +38,7 @@ make check
 
 ## [STEP-001] Restyle the sign-in fields
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** On phone and desktop, Email and Password show the label and required asterisk above a surface box with the editor’s radius, padding, and valid borders. An invalid field uses the error border and shows the existing message under the box. Those messages still appear and clear for the same cases as today. The label, typed text, and message do not gain local font metrics. Sign-in, forgot password, autofill, and keyboard actions behave as they do today.
 
