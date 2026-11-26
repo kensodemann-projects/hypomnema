@@ -93,37 +93,33 @@ class _ShellState extends State<Shell> {
   Widget build(BuildContext context) {
     final destinations = _destinations();
     final content = destinations[_selectedIndex].build(context);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (desktopLayoutForWidth(constraints.maxWidth)) {
-          return DesktopScaffold(
-            selectedIndex: _selectedIndex,
-            content: content,
-            destinations: [
-              for (final destination in destinations)
-                NavigationRailDestination(
-                  icon: Icon(destination.icon),
-                  label: Text(destination.label),
-                ),
-            ],
-            onDestinationSelected: _selectDestination,
-            onSignOut: _signOut,
-          );
-        }
-        return PhoneScaffold(
-          selectedIndex: _selectedIndex,
-          content: content,
-          destinations: [
-            for (final destination in destinations)
-              NavigationDestination(
-                icon: Icon(destination.icon),
-                label: destination.label,
-              ),
-          ],
-          onDestinationSelected: _selectDestination,
-          onSignOut: _signOut,
-        );
-      },
+    if (desktopLayoutFor(context)) {
+      return DesktopScaffold(
+        selectedIndex: _selectedIndex,
+        content: content,
+        destinations: [
+          for (final destination in destinations)
+            NavigationRailDestination(
+              icon: Icon(destination.icon),
+              label: Text(destination.label),
+            ),
+        ],
+        onDestinationSelected: _selectDestination,
+        onSignOut: _signOut,
+      );
+    }
+    return PhoneScaffold(
+      selectedIndex: _selectedIndex,
+      content: content,
+      destinations: [
+        for (final destination in destinations)
+          NavigationDestination(
+            icon: Icon(destination.icon),
+            label: destination.label,
+          ),
+      ],
+      onDestinationSelected: _selectDestination,
+      onSignOut: _signOut,
     );
   }
 }

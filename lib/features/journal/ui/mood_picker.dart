@@ -16,17 +16,17 @@ class MoodPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final desktop = desktopLayoutForWidth(constraints.maxWidth);
+        final wide = desktopLayoutForWidth(constraints.maxWidth);
         final options = [
           for (var mood = 1; mood <= 5; mood++)
             _MoodOption(
               mood: mood,
               selected: value == mood,
-              width: desktop ? 64 : null,
+              width: wide ? 64 : null,
               onTap: () => onChanged(mood),
             ),
         ];
-        final row = desktop
+        final row = wide
             ? Row(
                 spacing: 12,
                 mainAxisSize: MainAxisSize.min,
@@ -38,7 +38,7 @@ class MoodPicker extends StatelessWidget {
               );
         return SizedBox(
           width: constraints.maxWidth,
-          child: desktop
+          child: wide
               ? Align(alignment: Alignment.centerLeft, child: row)
               : row,
         );

@@ -60,7 +60,7 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final desktop = desktopLayoutForWidth(constraints.maxWidth);
+        final desktop = desktopLayoutFor(context);
         final width = desktop ? 440.0 : constraints.maxWidth - 48;
         final titleSize = desktop ? 22.0 : 20.0;
         final gap = desktop ? 16.0 : 14.0;

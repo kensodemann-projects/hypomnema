@@ -463,13 +463,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (desktopLayoutForWidth(constraints.maxWidth)) {
-          return _desktopLayout();
-        }
-        return _phoneLayout();
-      },
-    );
+    if (desktopLayoutFor(context)) {
+      return _desktopLayout();
+    }
+    return _phoneLayout();
   }
 }
