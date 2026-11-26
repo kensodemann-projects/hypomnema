@@ -51,6 +51,35 @@ class JournalEntry {
     );
   }
 
+  static JournalEntry restore({
+    required String id,
+    required String subject,
+    required int mood,
+    required String text,
+    required bool private,
+    required String localDateTime,
+    required DateTime createdAt,
+  }) {
+    final trimmedSubject = subject.trim();
+    final trimmedText = text.trim();
+    if (id.isEmpty ||
+        trimmedSubject.isEmpty ||
+        !_isMood(mood) ||
+        trimmedText.isEmpty ||
+        !_isStoredLocalDateTime(localDateTime)) {
+      throw const InvalidJournalEntryException();
+    }
+    return JournalEntry._(
+      id: id,
+      subject: trimmedSubject,
+      mood: mood,
+      text: trimmedText,
+      private: private,
+      localDateTime: localDateTime,
+      createdAt: createdAt.toUtc(),
+    );
+  }
+
   JournalEntry revise({
     required String subject,
     required int mood,
@@ -75,6 +104,26 @@ class JournalEntry {
 }
 
 bool _isMood(int mood) => mood >= 1 && mood <= 5;
+
+final _storedLocalDateTime = RegExp(
+  r'^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$',
+);
+
+bool _isStoredLocalDateTime(String value) {
+  final match = _storedLocalDateTime.firstMatch(value);
+  if (match == null) {
+    return false;
+  }
+  final parsed = DateTime(
+    int.parse(match[1]!),
+    int.parse(match[2]!),
+    int.parse(match[3]!),
+    int.parse(match[4]!),
+    int.parse(match[5]!),
+    int.parse(match[6]!),
+  );
+  return _formatLocalDateTime(parsed) == value;
+}
 
 String _formatLocalDateTime(DateTime local) {
   String two(int value) => value.toString().padLeft(2, '0');

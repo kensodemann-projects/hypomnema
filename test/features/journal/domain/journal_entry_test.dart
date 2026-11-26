@@ -193,6 +193,93 @@ void main() {
     expect(revised.createdAt, entry.createdAt);
   });
 
+  test('Given stored fields, when an entry is restored, then the wall-clock string stays and createdAt is that instant in UTC', () {
+    // Given
+    final createdAt = DateTime(2026, 11, 23, 16, 35, 4);
+    const localDateTime = '2026-11-14T08:02:00';
+
+    // When
+    final entry = JournalEntry.restore(
+      id: 'entry-1',
+      subject: '  Note  ',
+      mood: 4,
+      text: '  hello  ',
+      private: true,
+      localDateTime: localDateTime,
+      createdAt: createdAt,
+    );
+
+    // Then
+    expect(entry.id, 'entry-1');
+    expect(entry.subject, 'Note');
+    expect(entry.mood, 4);
+    expect(entry.text, 'hello');
+    expect(entry.private, isTrue);
+    expect(entry.localDateTime, localDateTime);
+    expect(entry.createdAt, createdAt.toUtc());
+    expect(entry.createdAt.isUtc, isTrue);
+  });
+
+  test('Given a blank subject, when an entry is restored, then InvalidJournalEntryException is thrown', () {
+    // Given, when, then
+    expect(
+      () => JournalEntry.restore(
+        id: 'entry-1',
+        subject: '   ',
+        mood: 3,
+        text: 'hello',
+        private: false,
+        localDateTime: '2026-11-14T08:02:00',
+        createdAt: now,
+      ),
+      throwsA(isA<InvalidJournalEntryException>()),
+    );
+  });
+
+  test('Given a mood outside 1 to 5, when an entry is restored, then InvalidJournalEntryException is thrown', () {
+    // Given, when, then
+    expect(
+      () => JournalEntry.restore(
+        id: 'entry-1',
+        subject: 'Note',
+        mood: 0,
+        text: 'hello',
+        private: false,
+        localDateTime: '2026-11-14T08:02:00',
+        createdAt: now,
+      ),
+      throwsA(isA<InvalidJournalEntryException>()),
+    );
+    expect(
+      () => JournalEntry.restore(
+        id: 'entry-1',
+        subject: 'Note',
+        mood: 6,
+        text: 'hello',
+        private: false,
+        localDateTime: '2026-11-14T08:02:00',
+        createdAt: now,
+      ),
+      throwsA(isA<InvalidJournalEntryException>()),
+    );
+  });
+
+  test('Given an impossible localDateTime, when an entry is restored, then InvalidJournalEntryException is thrown', () {
+    // Given, when, then
+    expect(
+      () => JournalEntry.restore(
+        id: 'entry-1',
+        subject: 'Note',
+        mood: 3,
+        text: 'hello',
+        private: false,
+        localDateTime: '2026-02-31T00:00:00',
+        createdAt: now,
+      ),
+      throwsA(isA<InvalidJournalEntryException>()),
+    );
+  });
+
   test('Given an invalid journal entry exception, when it is converted to a string, then the string names that failure', () {
     expect(
       const InvalidJournalEntryException().toString(),
