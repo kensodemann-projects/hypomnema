@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:ui' show SemanticsValidationResult, Tristate;
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
@@ -177,6 +179,78 @@ Color textColor(WidgetTester tester, String text) {
       DefaultTextStyle.of(tester.element(finder)).style.color!;
 }
 
+void expectUnsetTypeMetrics(TextStyle? style) {
+  expect(style?.fontSize, isNull);
+  expect(style?.fontWeight, isNull);
+  expect(style?.height, isNull);
+  expect(style?.letterSpacing, isNull);
+}
+
+void expectMessageUnder(WidgetTester tester, String key, String message) {
+  final messageFinder = find.text(message);
+  expect(messageFinder, findsOneWidget);
+  expect(
+    tester.getRect(messageFinder).top,
+    greaterThanOrEqualTo(tester.getRect(find.byKey(Key(key))).bottom),
+  );
+  final decoration = textField(tester, key).decoration;
+  expect(decoration?.errorText, isNull);
+  expect(decoration?.labelText, isNull);
+}
+
+void expectLabelAbove(WidgetTester tester, String label, String key) {
+  expect(
+    tester.getRect(find.text('$label *')).bottom,
+    lessThanOrEqualTo(tester.getRect(find.byKey(Key(key))).top),
+  );
+}
+
+void expectOutline(
+  WidgetTester tester,
+  String key, {
+  required Color color,
+  required double width,
+  required EdgeInsets padding,
+  required Color fill,
+}) {
+  final decoration = textField(tester, key).decoration!;
+  for (final side in [
+    decoration.border,
+    decoration.enabledBorder,
+    decoration.focusedBorder,
+    decoration.disabledBorder,
+  ]) {
+    final border = side! as OutlineInputBorder;
+    expect(border.borderRadius, const BorderRadius.all(Radius.circular(8)));
+    expect(border.borderSide.color, color);
+    expect(border.borderSide.width, width);
+  }
+  expect(decoration.filled, isTrue);
+  expect(decoration.fillColor, fill);
+  expect(decoration.contentPadding, padding);
+  expect(decoration.errorText, isNull);
+  expect(decoration.labelText, isNull);
+  expectUnsetTypeMetrics(textField(tester, key).style);
+}
+
+void expectRequiredLabel(
+  WidgetTester tester,
+  String label,
+  ColorScheme scheme,
+) {
+  final text = tester.widget<Text>(find.text('$label *'));
+  final span = text.textSpan! as TextSpan;
+  expect(span.style?.color, scheme.onSurfaceVariant);
+  expect(span.style?.fontSize, 12);
+  expect(span.style?.fontWeight, FontWeight.w500);
+  expect(span.style?.height, isNull);
+  expect(span.style?.letterSpacing, isNull);
+  final asterisk = span.children!.single as TextSpan;
+  expect(asterisk.text, '*');
+  expect(asterisk.style?.color, scheme.error);
+  expectUnsetTypeMetrics(asterisk.style);
+}
+
 void main() {
   testWidgets(
     'Given a phone width, when the login screen builds, then the brand stacks above the form',
@@ -305,6 +379,153 @@ void main() {
   );
 
   testWidgets(
+    'Given the sign-in form, when Email and Password render, then the labels sit above the editor chrome',
+    (tester) async {
+      const relaxed = EdgeInsets.symmetric(horizontal: 14, vertical: 11);
+      const tight = EdgeInsets.symmetric(horizontal: 13, vertical: 10);
+
+      for (final width in [
+        kDesktopLayoutMinWidth - 200,
+        kDesktopLayoutMinWidth + 1,
+      ]) {
+        for (final theme in [AppTheme.light, AppTheme.dark]) {
+          // Given
+          await pumpLoginScreen(
+            tester,
+            authService: _RecordingAuthService(),
+            size: Size(width, 800),
+            theme: theme,
+          );
+          final scheme = theme.colorScheme;
+
+          // Then
+          expectLabelAbove(tester, 'Email', 'login-email');
+          expectLabelAbove(tester, 'Password', 'login-password');
+          expectRequiredLabel(tester, 'Email', scheme);
+          expectRequiredLabel(tester, 'Password', scheme);
+          expectOutline(
+            tester,
+            'login-email',
+            color: scheme.outline,
+            width: 1,
+            padding: relaxed,
+            fill: scheme.surface,
+          );
+          expectOutline(
+            tester,
+            'login-password',
+            color: scheme.outline,
+            width: 1,
+            padding: relaxed,
+            fill: scheme.surface,
+          );
+
+          // When
+          await tester.tap(find.byKey(const Key('login-email')));
+          await tester.pump();
+
+          // Then
+          expectOutline(
+            tester,
+            'login-email',
+            color: scheme.primary,
+            width: 2,
+            padding: tight,
+            fill: scheme.surface,
+          );
+
+          // When
+          await unfocus(tester);
+
+          // Then
+          expectMessageUnder(tester, 'login-email', 'Email is required.');
+          expectOutline(
+            tester,
+            'login-email',
+            color: scheme.error,
+            width: 1,
+            padding: relaxed,
+            fill: scheme.surface,
+          );
+          final message = tester.widget<Text>(find.text('Email is required.'));
+          expect(message.style?.color, scheme.error);
+          expectUnsetTypeMetrics(message.style);
+
+          // When
+          await tester.tap(find.byKey(const Key('login-email')));
+          await tester.pump();
+
+          // Then
+          expect(find.text('Email is required.'), findsOneWidget);
+          expectOutline(
+            tester,
+            'login-email',
+            color: scheme.error,
+            width: 2,
+            padding: tight,
+            fill: scheme.surface,
+          );
+        }
+      }
+    },
+  );
+
+  testWidgets(
+    'Given the sign-in fields, when they render and then show a message, then the text field node carries the name and the message',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpLoginScreen(
+        tester,
+        authService: _RecordingAuthService(),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
+
+      SemanticsData fieldData(String key) {
+        return tester.getSemantics(find.byKey(Key(key))).getSemanticsData();
+      }
+
+      final email = fieldData('login-email');
+      expect(email.label, 'Email');
+      expect(email.flagsCollection.isTextField, isTrue);
+      expect(email.flagsCollection.isRequired, Tristate.isTrue);
+      expect(email.hint, isEmpty);
+      expect(email.validationResult, SemanticsValidationResult.none);
+
+      final password = fieldData('login-password');
+      expect(password.label, 'Password');
+      expect(password.flagsCollection.isTextField, isTrue);
+      expect(password.flagsCollection.isRequired, Tristate.isTrue);
+      expect(password.hint, isEmpty);
+      expect(password.validationResult, SemanticsValidationResult.none);
+
+      await tester.tap(find.byKey(const Key('login-email')));
+      await tester.pump();
+      await unfocus(tester);
+
+      final invalidEmail = fieldData('login-email');
+      expect(invalidEmail.label, 'Email');
+      expect(invalidEmail.flagsCollection.isTextField, isTrue);
+      expect(invalidEmail.hint, 'Email is required.');
+      expect(invalidEmail.validationResult, SemanticsValidationResult.invalid);
+
+      await tester.tap(find.byKey(const Key('login-password')));
+      await tester.pump();
+      await unfocus(tester);
+
+      final invalidPassword = fieldData('login-password');
+      expect(invalidPassword.label, 'Password');
+      expect(invalidPassword.flagsCollection.isTextField, isTrue);
+      expect(invalidPassword.hint, 'Password is required.');
+      expect(
+        invalidPassword.validationResult,
+        SemanticsValidationResult.invalid,
+      );
+
+      handle.dispose();
+    },
+  );
+
+  testWidgets(
     'Given empty fields, when a field loses focus, then its required message appears',
     (tester) async {
       // Given
@@ -315,6 +536,8 @@ void main() {
       );
       expect(textField(tester, 'login-email').decoration?.errorText, isNull);
       expect(textField(tester, 'login-password').decoration?.errorText, isNull);
+      expect(find.text('Email is required.'), findsNothing);
+      expect(find.text('Password is required.'), findsNothing);
 
       // When
       await tester.tap(find.byKey(const Key('login-email')));
@@ -323,21 +546,17 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       // Then
-      final emailField = textField(tester, 'login-email');
-      expect(emailField.decoration?.errorText, 'Email is required.');
+      expectMessageUnder(tester, 'login-email', 'Email is required.');
       final errorColor = Theme.of(
         tester.element(find.byKey(const Key('login-email'))),
       ).colorScheme.error;
       expect(textColor(tester, 'Email is required.'), errorColor);
-      expect(textColor(tester, 'Email'), errorColor);
 
       await tester.tap(find.byKey(const Key('login-password')));
       await tester.pump();
       await unfocus(tester);
-      expect(
-        textField(tester, 'login-password').decoration?.errorText,
-        'Password is required.',
-      );
+      expectMessageUnder(tester, 'login-password', 'Password is required.');
+      expect(textColor(tester, 'Password is required.'), errorColor);
     },
   );
 
@@ -352,18 +571,56 @@ void main() {
       );
       await tester.enterText(find.byKey(const Key('login-email')), 'person');
       await unfocus(tester);
-      expect(
-        textField(tester, 'login-email').decoration?.errorText,
-        'Enter a valid email address.',
-      );
+      expectMessageUnder(tester, 'login-email', 'Enter a valid email address.');
+      final scheme = Theme.of(
+        tester.element(find.byKey(const Key('login-email'))),
+      ).colorScheme;
+      expectRequiredLabel(tester, 'Email', scheme);
 
       // When
       await tester.enterText(find.byKey(const Key('login-email')), 'p');
       await tester.pump();
 
       // Then
+      expect(find.text('Enter a valid email address.'), findsNothing);
       expect(textField(tester, 'login-email').decoration?.errorText, isNull);
+      expect(textField(tester, 'login-email').focusNode?.hasFocus, isTrue);
       expect(signInButton(tester).onPressed, isNull);
+    },
+  );
+
+  testWidgets(
+    'Given a required message, when the user types in that field, then the message clears and the field keeps focus',
+    (tester) async {
+      await pumpLoginScreen(
+        tester,
+        authService: _RecordingAuthService(),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
+
+      Future<void> showRequired(String key) async {
+        await tester.tap(find.byKey(Key(key)));
+        await tester.pump();
+        await unfocus(tester);
+      }
+
+      await showRequired('login-email');
+      expect(find.text('Email is required.'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('login-email')));
+      await tester.pump();
+      await tester.enterText(find.byKey(const Key('login-email')), 'a');
+      await tester.pump();
+      expect(find.text('Email is required.'), findsNothing);
+      expect(textField(tester, 'login-email').focusNode?.hasFocus, isTrue);
+
+      await showRequired('login-password');
+      expect(find.text('Password is required.'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('login-password')));
+      await tester.pump();
+      await tester.enterText(find.byKey(const Key('login-password')), 'a');
+      await tester.pump();
+      expect(find.text('Password is required.'), findsNothing);
+      expect(textField(tester, 'login-password').focusNode?.hasFocus, isTrue);
     },
   );
 
@@ -624,10 +881,7 @@ void main() {
       await tester.pump();
 
       // Then
-      expect(
-        textField(tester, 'login-email').decoration?.errorText,
-        'Email is required.',
-      );
+      expectMessageUnder(tester, 'login-email', 'Email is required.');
       expect(find.byKey(const Key('login-snackbar')), findsNothing);
       expect(auth.resetCalls, isEmpty);
 
@@ -639,10 +893,7 @@ void main() {
       await tester.pump();
 
       // Then
-      expect(
-        textField(tester, 'login-email').decoration?.errorText,
-        'Enter a valid email address.',
-      );
+      expectMessageUnder(tester, 'login-email', 'Enter a valid email address.');
       expect(find.byKey(const Key('login-snackbar')), findsNothing);
       expect(auth.resetCalls, isEmpty);
     },

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:hypomnema/features/journal/ui/mood_picker.dart';
+import 'package:hypomnema/shared/ui/form_fields.dart';
 import 'package:material_ui/material_ui.dart';
 
 const _dateNote = 'Date and time are set when you save';
@@ -158,164 +159,29 @@ class _EditorFields extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: desktop ? 16 : 14,
       children: [
-        _Field(
+        OutlineTextField(
           label: 'Subject',
-          child: _OutlineField(
-            fieldKey: const Key('journal-subject'),
-            controller: subjectController,
-            style: const TextStyle(fontSize: 14),
-          ),
+          isRequired: true,
+          fieldKey: const Key('journal-subject'),
+          controller: subjectController,
+          style: const TextStyle(fontSize: 14),
         ),
-        _Field(
+        LabeledField(
           label: 'Mood',
+          isRequired: true,
           child: MoodPicker(value: mood, onChanged: onMoodChanged),
         ),
-        _Field(
+        OutlineTextField(
           label: 'Journal',
-          child: _OutlineField(
-            fieldKey: const Key('journal-text'),
-            controller: textController,
-            style: const TextStyle(fontSize: 16, height: 1.7),
-            hintText: _journalHint,
-            minHeight: desktop ? 260 : 220,
-            minLines: desktop ? 9 : 8,
-          ),
+          isRequired: true,
+          fieldKey: const Key('journal-text'),
+          controller: textController,
+          style: const TextStyle(fontSize: 16, height: 1.7),
+          hintText: _journalHint,
+          minHeight: desktop ? 260 : 220,
+          minLines: desktop ? 9 : 8,
         ),
       ],
-    );
-  }
-}
-
-class _Field extends StatelessWidget {
-  const _Field({required this.label, required this.child});
-
-  final String label;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 4,
-      children: [
-        _RequiredLabel(label: label),
-        child,
-      ],
-    );
-  }
-}
-
-class _RequiredLabel extends StatelessWidget {
-  const _RequiredLabel({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Text.rich(
-      TextSpan(
-        text: '$label ',
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: scheme.onSurfaceVariant,
-        ),
-        children: [
-          TextSpan(
-            text: '*',
-            style: TextStyle(color: scheme.error),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _OutlineField extends StatefulWidget {
-  const _OutlineField({
-    required this.fieldKey,
-    required this.controller,
-    required this.style,
-    this.hintText,
-    this.minHeight,
-    this.minLines,
-  });
-
-  final Key fieldKey;
-  final TextEditingController controller;
-  final TextStyle style;
-  final String? hintText;
-  final double? minHeight;
-  final int? minLines;
-
-  @override
-  State<_OutlineField> createState() => _OutlineFieldState();
-}
-
-class _OutlineFieldState extends State<_OutlineField> {
-  final _focusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(_onFocus);
-  }
-
-  @override
-  void dispose() {
-    _focusNode.removeListener(_onFocus);
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  void _onFocus() {
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final focused = _focusNode.hasFocus;
-    final padding = focused
-        ? const EdgeInsets.symmetric(horizontal: 13, vertical: 10)
-        : const EdgeInsets.symmetric(horizontal: 14, vertical: 11);
-    final border = OutlineInputBorder(
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
-      borderSide: BorderSide(
-        color: focused ? scheme.primary : scheme.outline,
-        width: focused ? 2 : 1,
-      ),
-    );
-    final minHeight = widget.minHeight;
-    final minLines = widget.minLines;
-    final multiline = minLines != null;
-
-    return TextField(
-      key: widget.fieldKey,
-      controller: widget.controller,
-      focusNode: _focusNode,
-      style: widget.style,
-      keyboardType: multiline ? TextInputType.multiline : TextInputType.text,
-      textInputAction: multiline
-          ? TextInputAction.newline
-          : TextInputAction.next,
-      minLines: minLines,
-      maxLines: multiline ? null : 1,
-      textAlignVertical: multiline ? TextAlignVertical.top : null,
-      decoration: InputDecoration(
-        hintText: widget.hintText,
-        filled: true,
-        fillColor: scheme.surface,
-        contentPadding: padding,
-        constraints: minHeight == null
-            ? null
-            : BoxConstraints(minHeight: minHeight),
-        border: border,
-        enabledBorder: border,
-        focusedBorder: border,
-        disabledBorder: border,
-      ),
     );
   }
 }

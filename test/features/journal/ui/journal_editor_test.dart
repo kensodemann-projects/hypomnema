@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:ui' show SemanticsValidationResult, Tristate;
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
@@ -162,7 +164,8 @@ void expectJournalText(WidgetTester tester, {required double minHeight}) {
   final field = tester.widget<TextField>(find.byKey(_textKey));
   expect(field.style?.fontSize, 16);
   expect(field.style?.height, 1.7);
-  expect(field.decoration?.hintText, _journalHint);
+  expect(field.decoration?.hintText, isNull);
+  expect(find.text(_journalHint), findsOneWidget);
   expect(field.minLines, greaterThan(1));
   expect(field.maxLines, isNull);
   expect(field.keyboardType, TextInputType.multiline);
@@ -682,6 +685,74 @@ void main() {
         field.decoration?.contentPadding,
         const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
       );
+    },
+  );
+
+  testWidgets(
+    'Given the editor fields, when they render, then each text field carries its name and the journal hint stays the placeholder',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      await _openEditor(
+        tester,
+        desktop: false,
+        theme: AppTheme.light,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
+
+      SemanticsData fieldData(Key key) {
+        return tester.getSemantics(find.byKey(key)).getSemanticsData();
+      }
+
+      final subject = fieldData(_subjectKey);
+      expect(subject.label, 'Subject');
+      expect(subject.flagsCollection.isTextField, isTrue);
+      expect(subject.flagsCollection.isRequired, Tristate.isTrue);
+      expect(subject.hint, isEmpty);
+      expect(subject.validationResult, SemanticsValidationResult.none);
+
+      final journal = fieldData(_textKey);
+      expect(journal.label, 'Journal');
+      expect(journal.flagsCollection.isTextField, isTrue);
+      expect(journal.flagsCollection.isRequired, Tristate.isTrue);
+      expect(journal.hint, _journalHint);
+      expect(journal.validationResult, SemanticsValidationResult.none);
+
+      final mood = tester.getSemantics(find.text('Mood *')).getSemanticsData();
+      expect(mood.label, 'Mood *');
+
+      handle.dispose();
+    },
+  );
+
+  testWidgets(
+    'Given an empty Subject or Journal, when the field loses focus, then its required message appears',
+    (tester) async {
+      await _openEditor(
+        tester,
+        desktop: false,
+        theme: AppTheme.light,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
+
+      await tester.tap(find.byKey(_subjectKey));
+      await tester.pump();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+      expect(find.text('Subject is required.'), findsOneWidget);
+
+      await tester.enterText(find.byKey(_subjectKey), 'a');
+      await tester.pump();
+      expect(find.text('Subject is required.'), findsNothing);
+      expect(
+        tester.widget<TextField>(find.byKey(_subjectKey)).focusNode?.hasFocus,
+        isTrue,
+      );
+
+      await tester.tap(find.byKey(_textKey));
+      await tester.pump();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+      expect(find.text('Journal is required.'), findsOneWidget);
     },
   );
 }
