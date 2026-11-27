@@ -4,7 +4,7 @@ import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:hypomnema/features/auth/ui/hypomnema_logo.dart';
 import 'package:hypomnema/features/auth/ui/login_snackbar.dart';
-import 'package:hypomnema/shared/ui/required_field.dart';
+import 'package:hypomnema/shared/ui/form_fields.dart';
 import 'package:material_ui/material_ui.dart';
 
 final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');

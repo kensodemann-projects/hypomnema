@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:hypomnema/features/journal/ui/mood_picker.dart';
-import 'package:hypomnema/shared/ui/required_field.dart';
+import 'package:hypomnema/shared/ui/form_fields.dart';
 import 'package:material_ui/material_ui.dart';
 
 const _dateNote = 'Date and time are set when you save';
