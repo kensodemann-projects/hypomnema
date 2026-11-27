@@ -265,6 +265,8 @@ ThemeData _withComponentThemes(ThemeData theme) {
     theme.typography.englishLike,
   ).textTheme.bodyMedium!;
   return theme.copyWith(
+    // The snack bar theme is the failure look. An info or success snack
+    // bar sets its own background and text color.
     snackBarTheme: SnackBarThemeData(
       backgroundColor: scheme.errorContainer,
       contentTextStyle: bodyMedium.copyWith(color: scheme.onErrorContainer),

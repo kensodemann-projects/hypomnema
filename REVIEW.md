@@ -32,7 +32,7 @@ _No findings in this category._
 
 ### 🧹 Code cleanup and maintainability
 
-**[CLN-001]**
+**[CLN-001]** — **Status:** complete
 
 **Issue:** `SnackBarThemeData.backgroundColor` and `contentTextStyle` are set globally on every `ThemeData` from `AppTheme`, so any future `SnackBar` that does not override colors will look like an error snackbar.
 
