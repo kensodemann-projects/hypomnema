@@ -1,11 +1,10 @@
-import 'dart:ui' show SemanticsValidationResult;
-
 import 'package:flutter/services.dart';
 import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/auth/data/auth_service.dart';
 import 'package:hypomnema/features/auth/ui/hypomnema_logo.dart';
 import 'package:hypomnema/features/auth/ui/login_snackbar.dart';
+import 'package:hypomnema/shared/ui/required_field.dart';
 import 'package:material_ui/material_ui.dart';
 
 final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
@@ -221,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _LoginField(
+          OutlineTextField(
             label: 'Email',
             fieldKey: const Key('login-email'),
             controller: _emailController,
@@ -234,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
             onSubmitted: _submitEmailField,
           ),
           const SizedBox(height: 16),
-          _LoginField(
+          OutlineTextField(
             label: 'Password',
             fieldKey: const Key('login-password'),
             controller: _passwordController,
@@ -464,140 +463,5 @@ class _LoginScreenState extends State<LoginScreen> {
       return _desktopLayout();
     }
     return _phoneLayout();
-  }
-}
-
-class _LoginField extends StatefulWidget {
-  const _LoginField({
-    required this.label,
-    required this.fieldKey,
-    required this.controller,
-    required this.focusNode,
-    required this.error,
-    required this.onChanged,
-    required this.onSubmitted,
-    this.keyboardType,
-    this.textInputAction,
-    this.autofillHints,
-    this.obscureText = false,
-  });
-
-  final String label;
-  final Key fieldKey;
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final String? error;
-  final ValueChanged<String> onChanged;
-  final ValueChanged<String> onSubmitted;
-  final TextInputType? keyboardType;
-  final TextInputAction? textInputAction;
-  final Iterable<String>? autofillHints;
-  final bool obscureText;
-
-  @override
-  State<_LoginField> createState() => _LoginFieldState();
-}
-
-class _LoginFieldState extends State<_LoginField> {
-  @override
-  void initState() {
-    super.initState();
-    widget.focusNode.addListener(_onFocus);
-  }
-
-  @override
-  void didUpdateWidget(_LoginField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.focusNode != widget.focusNode) {
-      oldWidget.focusNode.removeListener(_onFocus);
-      widget.focusNode.addListener(_onFocus);
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.focusNode.removeListener(_onFocus);
-    super.dispose();
-  }
-
-  void _onFocus() {
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final focused = widget.focusNode.hasFocus;
-    final invalid = widget.error != null;
-    final padding = focused
-        ? const EdgeInsets.symmetric(horizontal: 13, vertical: 10)
-        : const EdgeInsets.symmetric(horizontal: 14, vertical: 11);
-    final borderColor = invalid
-        ? scheme.error
-        : focused
-        ? scheme.primary
-        : scheme.outline;
-    final border = OutlineInputBorder(
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
-      borderSide: BorderSide(color: borderColor, width: focused ? 2 : 1),
-    );
-    final error = widget.error;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 4,
-      children: [
-        ExcludeSemantics(
-          child: Text.rich(
-            TextSpan(
-              text: '${widget.label} ',
-              style: TextStyle(color: scheme.onSurfaceVariant),
-              children: [
-                TextSpan(
-                  text: '*',
-                  style: TextStyle(color: scheme.error),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Semantics(
-          container: true,
-          explicitChildNodes: false,
-          label: widget.label,
-          isRequired: true,
-          hint: error,
-          validationResult: error == null
-              ? SemanticsValidationResult.none
-              : SemanticsValidationResult.invalid,
-          child: TextField(
-            key: widget.fieldKey,
-            controller: widget.controller,
-            focusNode: widget.focusNode,
-            keyboardType: widget.keyboardType,
-            textInputAction: widget.textInputAction,
-            autofillHints: widget.autofillHints,
-            obscureText: widget.obscureText,
-            onChanged: widget.onChanged,
-            onSubmitted: widget.onSubmitted,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: scheme.surface,
-              contentPadding: padding,
-              border: border,
-              enabledBorder: border,
-              focusedBorder: border,
-              disabledBorder: border,
-            ),
-          ),
-        ),
-        if (error != null)
-          Semantics(
-            container: true,
-            liveRegion: !MediaQuery.supportsAnnounceOf(context),
-            child: Text(error, style: TextStyle(color: scheme.error)),
-          ),
-      ],
-    );
   }
 }

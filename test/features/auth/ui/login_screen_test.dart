@@ -241,7 +241,10 @@ void expectRequiredLabel(
   final text = tester.widget<Text>(find.text('$label *'));
   final span = text.textSpan! as TextSpan;
   expect(span.style?.color, scheme.onSurfaceVariant);
-  expectUnsetTypeMetrics(span.style);
+  expect(span.style?.fontSize, 12);
+  expect(span.style?.fontWeight, FontWeight.w500);
+  expect(span.style?.height, isNull);
+  expect(span.style?.letterSpacing, isNull);
   final asterisk = span.children!.single as TextSpan;
   expect(asterisk.text, '*');
   expect(asterisk.style?.color, scheme.error);
