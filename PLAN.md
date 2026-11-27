@@ -52,7 +52,7 @@ Issue: [#47](https://github.com/kensodemann-projects/hypomnema/issues/47) (CLOSE
 | 2 | [STEP-002] | complete | `lib/shared/ui/form_fields.dart`, then `lib/shared/ui/confirmation_dialog.dart`, then `test/shared/ui/form_fields_test.dart`, then `test/shared/ui/confirmation_dialog_test.dart`, then `test/features/auth/ui/login_screen_test.dart`, then `test/features/journal/ui/journal_editor_test.dart` |
 | 3 | [STEP-003] | complete | `lib/shared/ui/empty_state.dart`, then `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/shared/ui/empty_state_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 4 | [STEP-004] | complete | `lib/features/journal/ui/journal_editor.dart`, then `lib/features/journal/ui/mood_picker.dart`, then `test/features/journal/ui/journal_editor_test.dart`, then `test/features/journal/ui/mood_picker_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
-| 5 | [STEP-005] | | `lib/features/auth/ui/login_screen.dart`, then `test/features/auth/ui/login_screen_test.dart` |
+| 5 | [STEP-005] | complete | `lib/features/auth/ui/login_screen.dart`, then `test/features/auth/ui/login_screen_test.dart` |
 | 6 | [STEP-006] | | `lib/app/shell.dart`, then `test/app/shell_test.dart` |
 | 7 | [STEP-007] | | `.cursor/rules/hypomnema.mdc` |
 
@@ -212,7 +212,7 @@ flutter test test/features/journal/ui/journal_editor_test.dart test/features/jou
 
 ## [STEP-005] Use text roles on the sign-in screen
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** The sign-in name uses `displaySmall` on phone and desktop. Both quotations use `bodyLarge` and stay italic. "Sign in" uses `headlineSmall`. The brand panel still sets the colors that keep its text legible.
 
