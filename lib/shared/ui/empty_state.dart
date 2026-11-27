@@ -1,3 +1,4 @@
+import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart';
 
 class EmptyState extends StatelessWidget {
@@ -5,7 +6,6 @@ class EmptyState extends StatelessWidget {
     required this.icon,
     required this.iconSize,
     required this.title,
-    required this.titleSize,
     required this.message,
     required this.actionLabel,
     required this.onAction,
@@ -16,7 +16,6 @@ class EmptyState extends StatelessWidget {
   final IconData icon;
   final double iconSize;
   final String title;
-  final double titleSize;
   final String message;
   final String actionLabel;
   final IconData? actionIcon;
@@ -24,7 +23,9 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final metrics = theme.extension<AppMetrics>()!;
     final actionIcon = this.actionIcon;
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -34,21 +35,21 @@ class EmptyState extends StatelessWidget {
         Icon(
           icon,
           size: iconSize,
-          color: scheme.primary.withValues(alpha: 0.8),
+          color: scheme.primary.withValues(
+            alpha: metrics.emptyStateIconOpacity,
+          ),
         ),
         Text(
           title,
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: titleSize,
-            fontWeight: FontWeight.w600,
-            color: scheme.onSurface,
-          ),
+          style: theme.textTheme.titleMedium,
         ),
         Text(
           message,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant),
+          style: theme.textTheme.bodyMedium!.copyWith(
+            color: scheme.onSurfaceVariant,
+          ),
         ),
         if (actionIcon == null)
           FilledButton(onPressed: onAction, child: Text(actionLabel))

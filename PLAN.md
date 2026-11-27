@@ -50,7 +50,7 @@ Issue: [#47](https://github.com/kensodemann-projects/hypomnema/issues/47) (CLOSE
 | ----- | ---- | ------ | ----- |
 | 1 | [STEP-001] | complete | `lib/core/theme/app_theme.dart`, then `test/core/theme/app_theme_test.dart` |
 | 2 | [STEP-002] | complete | `lib/shared/ui/form_fields.dart`, then `lib/shared/ui/confirmation_dialog.dart`, then `test/shared/ui/form_fields_test.dart`, then `test/shared/ui/confirmation_dialog_test.dart`, then `test/features/auth/ui/login_screen_test.dart`, then `test/features/journal/ui/journal_editor_test.dart` |
-| 3 | [STEP-003] | | `lib/shared/ui/empty_state.dart`, then `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/shared/ui/empty_state_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
+| 3 | [STEP-003] | complete | `lib/shared/ui/empty_state.dart`, then `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/shared/ui/empty_state_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 4 | [STEP-004] | | `lib/features/journal/ui/journal_editor.dart`, then `lib/features/journal/ui/mood_picker.dart`, then `test/features/journal/ui/journal_editor_test.dart`, then `test/features/journal/ui/mood_picker_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 5 | [STEP-005] | | `lib/features/auth/ui/login_screen.dart`, then `test/features/auth/ui/login_screen_test.dart` |
 | 6 | [STEP-006] | | `lib/app/shell.dart`, then `test/app/shell_test.dart` |
@@ -138,7 +138,7 @@ flutter test test/shared/ui/form_fields_test.dart test/shared/ui/confirmation_di
 
 ## [STEP-003] Use text roles and metrics on the journal
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** `JournalEntryList`, `JournalEntryDetail`, and `EmptyState` take no text-size parameters. Journal titles, week headings, list text, detail text, and empty copy use the Text roles on phone and desktop. Pane, header, bar, radii, borders, and the empty-state icon opacity come from `AppMetrics`. The load error and the phone Write button take their colors from the themes added in [STEP-001].
 

@@ -7,6 +7,13 @@ const _title = 'Nothing here';
 const _message = 'Add something to get started.';
 const _actionLabel = 'Add one';
 
+void _expectRole(TextStyle? style, TextStyle? role) {
+  expect(style?.fontSize, role?.fontSize);
+  expect(style?.fontWeight, role?.fontWeight);
+  expect(style?.height, role?.height);
+  expect(style?.letterSpacing, role?.letterSpacing);
+}
+
 Future<void> _pumpEmptyState(
   WidgetTester tester, {
   required ThemeData theme,
@@ -21,7 +28,6 @@ Future<void> _pumpEmptyState(
           icon: Icons.inbox,
           iconSize: 44,
           title: _title,
-          titleSize: 18,
           message: _message,
           actionLabel: _actionLabel,
           actionIcon: actionIcon,
@@ -51,11 +57,11 @@ void main() {
       expect(column.mainAxisSize, MainAxisSize.min);
       expect(column.crossAxisAlignment, CrossAxisAlignment.center);
       expect(column.spacing, 10);
-      expect(
-        tester.widget<Text>(find.text(_title)).style?.fontWeight,
-        FontWeight.w600,
-      );
-      expect(tester.widget<Text>(find.text(_message)).style?.fontSize, 14);
+      final title = find.text(_title);
+      final message = find.text(_message);
+      final textTheme = Theme.of(tester.element(title)).textTheme;
+      _expectRole(tester.widget<Text>(title).style, textTheme.titleMedium);
+      _expectRole(tester.widget<Text>(message).style, textTheme.bodyMedium);
       expect(
         tester.widget<Text>(find.text(_message)).textAlign,
         TextAlign.center,
@@ -87,17 +93,28 @@ void main() {
         await _pumpEmptyState(tester, theme: theme);
 
         final scheme = theme.colorScheme;
+        final title = find.text(_title);
+        final message = find.text(_message);
+        final icon = find.byIcon(Icons.inbox);
+        final built = Theme.of(tester.element(title));
+        expect(tester.widget<Text>(title).style?.color, scheme.onSurface);
         expect(
-          tester.widget<Text>(find.text(_title)).style?.color,
-          scheme.onSurface,
-        );
-        expect(
-          tester.widget<Text>(find.text(_message)).style?.color,
+          tester.widget<Text>(message).style?.color,
           scheme.onSurfaceVariant,
         );
         expect(
-          tester.widget<Icon>(find.byIcon(Icons.inbox)).color,
-          scheme.primary.withValues(alpha: 0.8),
+          tester.widget<Icon>(icon).color,
+          scheme.primary.withValues(
+            alpha: built.extension<AppMetrics>()!.emptyStateIconOpacity,
+          ),
+        );
+        _expectRole(
+          tester.widget<Text>(title).style,
+          built.textTheme.titleMedium,
+        );
+        _expectRole(
+          tester.widget<Text>(message).style,
+          built.textTheme.bodyMedium,
         );
         expect(find.byType(FilledButton), findsOneWidget);
       },

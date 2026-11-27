@@ -1,3 +1,4 @@
+import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:hypomnema/features/journal/domain/journal_list.dart';
 import 'package:hypomnema/features/journal/ui/mood_swatch.dart';
@@ -8,8 +9,6 @@ class JournalEntryList extends StatelessWidget {
     required this.entries,
     required this.now,
     required this.onOpen,
-    required this.headingSize,
-    required this.headingLetterSpacing,
     required this.headingPadding,
     this.selectedId,
     this.padding = const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -19,15 +18,14 @@ class JournalEntryList extends StatelessWidget {
   final List<JournalEntry> entries;
   final DateTime now;
   final ValueChanged<JournalEntry> onOpen;
-  final double headingSize;
-  final double headingLetterSpacing;
   final EdgeInsets headingPadding;
   final String? selectedId;
   final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final groups = groupJournalEntries(entries: entries, now: now);
     return SingleChildScrollView(
       padding: padding,
@@ -40,10 +38,7 @@ class JournalEntryList extends StatelessWidget {
               padding: headingPadding,
               child: Text(
                 group.heading.toUpperCase(),
-                style: TextStyle(
-                  fontSize: headingSize,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: headingLetterSpacing,
+                style: theme.textTheme.labelSmall!.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
               ),
@@ -77,7 +72,9 @@ class _JournalEntryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final metrics = theme.extension<AppMetrics>()!;
     final labelColor = selected
         ? scheme.onPrimaryContainer
         : scheme.onSurfaceVariant;
@@ -85,10 +82,10 @@ class _JournalEntryRow extends StatelessWidget {
       key: Key('journal-entry-decoration-${entry.id}'),
       decoration: BoxDecoration(
         color: selected ? scheme.primaryContainer : scheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(metrics.rowRadius),
         border: Border.all(
           color: selected ? scheme.primary : scheme.outlineVariant,
-          width: selected ? 2 : 1,
+          width: selected ? metrics.selectedBorderWidth : metrics.borderWidth,
         ),
       ),
       child: Material(
@@ -112,14 +109,17 @@ class _JournalEntryRow extends StatelessWidget {
                         entry.subject,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: selected ? scheme.onPrimaryContainer : null,
-                        ),
+                        style: selected
+                            ? theme.textTheme.titleMedium!.copyWith(
+                                color: scheme.onPrimaryContainer,
+                              )
+                            : theme.textTheme.titleMedium,
                       ),
                       Text(
                         journalRowWhen(entry, now),
-                        style: TextStyle(fontSize: 12, color: labelColor),
+                        style: theme.textTheme.bodySmall!.copyWith(
+                          color: labelColor,
+                        ),
                       ),
                     ],
                   ),
