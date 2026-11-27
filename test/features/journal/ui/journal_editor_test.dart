@@ -116,11 +116,15 @@ void expectSaveDisabled(WidgetTester tester) {
 
 void expectRequiredLabels(WidgetTester tester, ColorScheme scheme) {
   for (final label in ['Subject', 'Mood', 'Journal']) {
-    final text = tester.widget<Text>(find.text('$label *'));
+    final finder = find.text('$label *');
+    final text = tester.widget<Text>(finder);
     final span = text.textSpan! as TextSpan;
+    final role = Theme.of(tester.element(finder)).textTheme.labelMedium;
     expect(span.style?.color, scheme.onSurfaceVariant);
-    expect(span.style?.fontSize, 12);
-    expect(span.style?.fontWeight, FontWeight.w500);
+    expect(span.style?.fontSize, role?.fontSize);
+    expect(span.style?.fontWeight, role?.fontWeight);
+    expect(span.style?.height, role?.height);
+    expect(span.style?.letterSpacing, role?.letterSpacing);
     final asterisk = span.children!.single as TextSpan;
     expect(asterisk.text, '*');
     expect(asterisk.style?.color, scheme.error);

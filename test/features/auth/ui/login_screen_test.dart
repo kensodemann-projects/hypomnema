@@ -230,7 +230,13 @@ void expectOutline(
   expect(decoration.contentPadding, padding);
   expect(decoration.errorText, isNull);
   expect(decoration.labelText, isNull);
-  expectUnsetTypeMetrics(textField(tester, key).style);
+  final field = find.byKey(Key(key));
+  final role = Theme.of(tester.element(field)).textTheme.bodyLarge;
+  final style = textField(tester, key).style;
+  expect(style?.fontSize, role?.fontSize);
+  expect(style?.fontWeight, role?.fontWeight);
+  expect(style?.height, role?.height);
+  expect(style?.letterSpacing, role?.letterSpacing);
 }
 
 void expectRequiredLabel(
@@ -238,13 +244,15 @@ void expectRequiredLabel(
   String label,
   ColorScheme scheme,
 ) {
-  final text = tester.widget<Text>(find.text('$label *'));
+  final finder = find.text('$label *');
+  final text = tester.widget<Text>(finder);
   final span = text.textSpan! as TextSpan;
+  final role = Theme.of(tester.element(finder)).textTheme.labelMedium;
   expect(span.style?.color, scheme.onSurfaceVariant);
-  expect(span.style?.fontSize, 12);
-  expect(span.style?.fontWeight, FontWeight.w500);
-  expect(span.style?.height, isNull);
-  expect(span.style?.letterSpacing, isNull);
+  expect(span.style?.fontSize, role?.fontSize);
+  expect(span.style?.fontWeight, role?.fontWeight);
+  expect(span.style?.height, role?.height);
+  expect(span.style?.letterSpacing, role?.letterSpacing);
   final asterisk = span.children!.single as TextSpan;
   expect(asterisk.text, '*');
   expect(asterisk.style?.color, scheme.error);
@@ -447,9 +455,16 @@ void main() {
             padding: relaxed,
             fill: scheme.surface,
           );
-          final message = tester.widget<Text>(find.text('Email is required.'));
+          final messageFinder = find.text('Email is required.');
+          final message = tester.widget<Text>(messageFinder);
+          final role = Theme.of(tester.element(messageFinder))
+              .textTheme
+              .bodySmall;
           expect(message.style?.color, scheme.error);
-          expectUnsetTypeMetrics(message.style);
+          expect(message.style?.fontSize, role?.fontSize);
+          expect(message.style?.fontWeight, role?.fontWeight);
+          expect(message.style?.height, role?.height);
+          expect(message.style?.letterSpacing, role?.letterSpacing);
 
           // When
           await tester.tap(find.byKey(const Key('login-email')));

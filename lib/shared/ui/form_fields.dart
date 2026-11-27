@@ -44,11 +44,8 @@ class _FieldLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final style = TextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.w500,
-      color: scheme.onSurfaceVariant,
-    );
+    final style = Theme.of(context).textTheme.labelMedium!
+        .copyWith(color: scheme.onSurfaceVariant);
     if (!isRequired) {
       return Text(label, style: style);
     }
@@ -207,7 +204,9 @@ class OutlineTextFieldState extends State<OutlineTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final inputStyle = widget.style ?? theme.textTheme.bodyLarge;
     final focused = _focusNode.hasFocus;
     final error = widget.error ?? _requiredError;
     final invalid = error != null;
@@ -243,7 +242,7 @@ class OutlineTextFieldState extends State<OutlineTextField> {
         key: widget.fieldKey,
         controller: widget.controller,
         focusNode: _focusNode,
-        style: widget.style,
+        style: inputStyle,
         keyboardType:
             widget.keyboardType ??
             (multiline ? TextInputType.multiline : TextInputType.text),
@@ -263,9 +262,7 @@ class OutlineTextFieldState extends State<OutlineTextField> {
               : ExcludeSemantics(
                   child: Text(
                     hintText,
-                    style: widget.style?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
+                    style: inputStyle?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                 ),
           filled: true,
@@ -295,7 +292,10 @@ class OutlineTextFieldState extends State<OutlineTextField> {
             Semantics(
               container: true,
               liveRegion: !MediaQuery.supportsAnnounceOf(context),
-              child: Text(error, style: TextStyle(color: scheme.error)),
+              child: Text(
+                error,
+                style: theme.textTheme.bodySmall!.copyWith(color: scheme.error),
+              ),
             ),
         ],
       ),

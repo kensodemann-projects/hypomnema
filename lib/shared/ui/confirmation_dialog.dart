@@ -62,9 +62,9 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
       builder: (context, constraints) {
         final desktop = desktopLayoutFor(context);
         final width = desktop ? 440.0 : constraints.maxWidth - 48;
-        final titleSize = desktop ? 22.0 : 20.0;
         final gap = desktop ? 16.0 : 14.0;
-        final colorScheme = Theme.of(context).colorScheme;
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
         final warningText = widget.warning;
 
         return AlertDialog(
@@ -79,7 +79,7 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
             widget.title,
             key: const Key('confirmation-title'),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.w400),
+            style: theme.textTheme.headlineSmall,
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -88,8 +88,7 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
               Text(
                 widget.message,
                 key: const Key('confirmation-message'),
-                style: TextStyle(
-                  fontSize: 14,
+                style: theme.textTheme.bodyMedium!.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
@@ -137,7 +136,8 @@ class _WarningBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).extension<AppColors>()!;
+    final theme = Theme.of(context);
+    final colors = theme.extension<AppColors>()!;
     final foreground = colors.warning;
     final background = colors.warningContainer;
 
@@ -156,7 +156,7 @@ class _WarningBanner extends StatelessWidget {
             Expanded(
               child: Text(
                 text,
-                style: TextStyle(fontSize: 13, color: foreground),
+                style: theme.textTheme.bodyMedium!.copyWith(color: foreground),
               ),
             ),
           ],
