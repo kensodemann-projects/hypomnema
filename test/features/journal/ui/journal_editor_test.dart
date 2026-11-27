@@ -723,4 +723,36 @@ void main() {
       handle.dispose();
     },
   );
+
+  testWidgets(
+    'Given an empty Subject or Journal, when the field loses focus, then its required message appears',
+    (tester) async {
+      await _openEditor(
+        tester,
+        desktop: false,
+        theme: AppTheme.light,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
+
+      await tester.tap(find.byKey(_subjectKey));
+      await tester.pump();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+      expect(find.text('Subject is required.'), findsOneWidget);
+
+      await tester.enterText(find.byKey(_subjectKey), 'a');
+      await tester.pump();
+      expect(find.text('Subject is required.'), findsNothing);
+      expect(
+        tester.widget<TextField>(find.byKey(_subjectKey)).focusNode?.hasFocus,
+        isTrue,
+      );
+
+      await tester.tap(find.byKey(_textKey));
+      await tester.pump();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+      expect(find.text('Journal is required.'), findsOneWidget);
+    },
+  );
 }

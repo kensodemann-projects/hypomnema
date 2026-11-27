@@ -584,7 +584,43 @@ void main() {
       // Then
       expect(find.text('Enter a valid email address.'), findsNothing);
       expect(textField(tester, 'login-email').decoration?.errorText, isNull);
+      expect(textField(tester, 'login-email').focusNode?.hasFocus, isTrue);
       expect(signInButton(tester).onPressed, isNull);
+    },
+  );
+
+  testWidgets(
+    'Given a required message, when the user types in that field, then the message clears and the field keeps focus',
+    (tester) async {
+      await pumpLoginScreen(
+        tester,
+        authService: _RecordingAuthService(),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
+
+      Future<void> showRequired(String key) async {
+        await tester.tap(find.byKey(Key(key)));
+        await tester.pump();
+        await unfocus(tester);
+      }
+
+      await showRequired('login-email');
+      expect(find.text('Email is required.'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('login-email')));
+      await tester.pump();
+      await tester.enterText(find.byKey(const Key('login-email')), 'a');
+      await tester.pump();
+      expect(find.text('Email is required.'), findsNothing);
+      expect(textField(tester, 'login-email').focusNode?.hasFocus, isTrue);
+
+      await showRequired('login-password');
+      expect(find.text('Password is required.'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('login-password')));
+      await tester.pump();
+      await tester.enterText(find.byKey(const Key('login-password')), 'a');
+      await tester.pump();
+      expect(find.text('Password is required.'), findsNothing);
+      expect(textField(tester, 'login-password').focusNode?.hasFocus, isTrue);
     },
   );
 

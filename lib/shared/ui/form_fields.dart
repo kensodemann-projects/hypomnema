@@ -61,8 +61,9 @@ class _RequiredLabel extends StatelessWidget {
 
 /// The shared outline text field: label above a surface box.
 ///
-/// [hintText] is placeholder copy on the decoration. [error] is the validation
-/// message: it colors the border, names the field's hint, and is announced
+/// [hintText] is placeholder copy. [error] is a caller's validation message.
+/// An empty field also reports that it is required after it loses focus.
+/// Either message colors the border, names the field's hint, and is announced
 /// under the box. Pass a [focusNode] to keep ownership outside this field;
 /// otherwise the field creates and disposes its own.
 class OutlineTextField extends StatefulWidget {
@@ -107,6 +108,7 @@ class OutlineTextField extends StatefulWidget {
 
 class _OutlineTextFieldState extends State<OutlineTextField> {
   FocusNode? _ownedFocus;
+  String? _requiredError;
 
   FocusNode get _focusNode => widget.focusNode ?? _ownedFocus!;
 
@@ -117,11 +119,16 @@ class _OutlineTextFieldState extends State<OutlineTextField> {
       _ownedFocus = FocusNode();
     }
     _focusNode.addListener(_onFocus);
+    widget.controller.addListener(_onText);
   }
 
   @override
   void didUpdateWidget(OutlineTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_onText);
+      widget.controller.addListener(_onText);
+    }
     if (oldWidget.focusNode == widget.focusNode) {
       return;
     }
@@ -137,12 +144,23 @@ class _OutlineTextFieldState extends State<OutlineTextField> {
 
   @override
   void dispose() {
+    widget.controller.removeListener(_onText);
     _focusNode.removeListener(_onFocus);
     _ownedFocus?.dispose();
     super.dispose();
   }
 
+  void _onText() {
+    if (_requiredError == null) {
+      return;
+    }
+    setState(() => _requiredError = null);
+  }
+
   void _onFocus() {
+    if (!_focusNode.hasFocus && widget.controller.text.trim().isEmpty) {
+      _requiredError = '${widget.label} is required.';
+    }
     setState(() {});
   }
 
@@ -150,7 +168,7 @@ class _OutlineTextFieldState extends State<OutlineTextField> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final focused = _focusNode.hasFocus;
-    final error = widget.error;
+    final error = widget.error ?? _requiredError;
     final invalid = error != null;
     final padding = focused
         ? const EdgeInsets.symmetric(horizontal: 13, vertical: 10)
@@ -226,20 +244,19 @@ class _OutlineTextFieldState extends State<OutlineTextField> {
     return RequiredField(
       label: widget.label,
       excludeLabel: true,
-      child: error == null
-          ? field
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 4,
-              children: [
-                field,
-                Semantics(
-                  container: true,
-                  liveRegion: !MediaQuery.supportsAnnounceOf(context),
-                  child: Text(error, style: TextStyle(color: scheme.error)),
-                ),
-              ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 4,
+        children: [
+          field,
+          if (error != null)
+            Semantics(
+              container: true,
+              liveRegion: !MediaQuery.supportsAnnounceOf(context),
+              child: Text(error, style: TextStyle(color: scheme.error)),
             ),
+        ],
+      ),
     );
   }
 }
