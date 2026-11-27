@@ -9,22 +9,12 @@ import 'package:material_ui/material_ui.dart';
 
 final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
-String? _emailValidationError(String text) {
+String? _emailFormatError(String text) {
   final email = text.trim();
-  if (email.isEmpty) {
-    return 'Email is required.';
+  if (email.isEmpty || _emailPattern.hasMatch(email)) {
+    return null;
   }
-  if (!_emailPattern.hasMatch(email)) {
-    return 'Enter a valid email address.';
-  }
-  return null;
-}
-
-String? _passwordValidationError(String text) {
-  if (text.trim().isEmpty) {
-    return 'Password is required.';
-  }
-  return null;
+  return 'Enter a valid email address.';
 }
 
 const _desktopQuote =
@@ -67,35 +57,35 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _emailField = GlobalKey<OutlineTextFieldState>();
   final _emailFocus = FocusNode();
   final _passwordFocus = FocusNode();
   final _forgotPasswordAnchor = GlobalKey();
 
   String? _emailError;
-  String? _passwordError;
   var _submitting = false;
   LoginNotice? _notice;
   var _noticeId = 0;
 
-  bool get _emailIsValid =>
-      _emailValidationError(_emailController.text) == null;
+  bool get _emailIsValid {
+    final email = _emailController.text.trim();
+    return email.isNotEmpty && _emailPattern.hasMatch(email);
+  }
 
   bool get _canSignIn =>
       !_submitting &&
       _emailIsValid &&
-      _passwordValidationError(_passwordController.text) == null;
+      _passwordController.text.trim().isNotEmpty;
 
   @override
   void initState() {
     super.initState();
     _emailFocus.addListener(_onEmailFocus);
-    _passwordFocus.addListener(_onPasswordFocus);
   }
 
   @override
   void dispose() {
     _emailFocus.removeListener(_onEmailFocus);
-    _passwordFocus.removeListener(_onPasswordFocus);
     _emailController.dispose();
     _passwordController.dispose();
     _emailFocus.dispose();
@@ -107,16 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted || _emailFocus.hasFocus) {
       return;
     }
-    setState(() => _emailError = _emailValidationError(_emailController.text));
-  }
-
-  void _onPasswordFocus() {
-    if (!mounted || _passwordFocus.hasFocus) {
-      return;
-    }
-    setState(
-      () => _passwordError = _passwordValidationError(_passwordController.text),
-    );
+    setState(() => _emailError = _emailFormatError(_emailController.text));
   }
 
   Future<void> _signIn() async {
@@ -150,7 +131,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _forgotPassword() async {
-    final emailError = _emailValidationError(_emailController.text);
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      _emailField.currentState?.validateRequired();
+      return;
+    }
+    final emailError = _emailFormatError(email);
     if (emailError != null) {
       setState(() => _emailError = emailError);
       return;
@@ -221,7 +207,9 @@ class _LoginScreenState extends State<LoginScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           OutlineTextField(
+            key: _emailField,
             label: 'Email',
+            isRequired: true,
             fieldKey: const Key('login-email'),
             controller: _emailController,
             focusNode: _emailFocus,
@@ -235,14 +223,14 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: 16),
           OutlineTextField(
             label: 'Password',
+            isRequired: true,
             fieldKey: const Key('login-password'),
             controller: _passwordController,
             focusNode: _passwordFocus,
-            error: _passwordError,
             obscureText: true,
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.password],
-            onChanged: (_) => setState(() => _passwordError = null),
+            onChanged: (_) => setState(() {}),
             onSubmitted: _submitPasswordField,
           ),
           const SizedBox(height: 24),

@@ -8,20 +8,6 @@ const _dateNote = 'Date and time are set when you save';
 const _journalHint = 'Write whatever is on your mind…';
 const _saveFailed = 'The entry could not be saved.';
 
-String? _subjectValidationError(String text) {
-  if (text.trim().isEmpty) {
-    return 'Subject is required.';
-  }
-  return null;
-}
-
-String? _journalValidationError(String text) {
-  if (text.trim().isEmpty) {
-    return 'Journal is required.';
-  }
-  return null;
-}
-
 class JournalEditor extends StatefulWidget {
   const JournalEditor({
     required this.desktop,
@@ -50,11 +36,7 @@ class JournalEditor extends StatefulWidget {
 class _JournalEditorState extends State<JournalEditor> {
   late final TextEditingController _subjectController;
   late final TextEditingController _textController;
-  final _subjectFocus = FocusNode();
-  final _textFocus = FocusNode();
   int? _mood;
-  String? _subjectError;
-  String? _textError;
   var _saving = false;
 
   @override
@@ -65,37 +47,15 @@ class _JournalEditorState extends State<JournalEditor> {
     _mood = widget.mood;
     _subjectController.addListener(_onEdited);
     _textController.addListener(_onEdited);
-    _subjectFocus.addListener(_onSubjectFocus);
-    _textFocus.addListener(_onTextFocus);
   }
 
   @override
   void dispose() {
-    _subjectFocus.removeListener(_onSubjectFocus);
-    _textFocus.removeListener(_onTextFocus);
     _subjectController.removeListener(_onEdited);
     _textController.removeListener(_onEdited);
     _subjectController.dispose();
     _textController.dispose();
-    _subjectFocus.dispose();
-    _textFocus.dispose();
     super.dispose();
-  }
-
-  void _onSubjectFocus() {
-    if (!mounted || _subjectFocus.hasFocus) {
-      return;
-    }
-    setState(
-      () => _subjectError = _subjectValidationError(_subjectController.text),
-    );
-  }
-
-  void _onTextFocus() {
-    if (!mounted || _textFocus.hasFocus) {
-      return;
-    }
-    setState(() => _textError = _journalValidationError(_textController.text));
   }
 
   void _onEdited() {
@@ -155,12 +115,6 @@ class _JournalEditorState extends State<JournalEditor> {
     final fields = _EditorFields(
       subjectController: _subjectController,
       textController: _textController,
-      subjectFocus: _subjectFocus,
-      textFocus: _textFocus,
-      subjectError: _subjectError,
-      textError: _textError,
-      onSubjectChanged: (_) => setState(() => _subjectError = null),
-      onTextChanged: (_) => setState(() => _textError = null),
       mood: _mood,
       desktop: widget.desktop,
       onMoodChanged: _selectMood,
@@ -187,12 +141,6 @@ class _EditorFields extends StatelessWidget {
   const _EditorFields({
     required this.subjectController,
     required this.textController,
-    required this.subjectFocus,
-    required this.textFocus,
-    required this.subjectError,
-    required this.textError,
-    required this.onSubjectChanged,
-    required this.onTextChanged,
     required this.mood,
     required this.desktop,
     required this.onMoodChanged,
@@ -200,12 +148,6 @@ class _EditorFields extends StatelessWidget {
 
   final TextEditingController subjectController;
   final TextEditingController textController;
-  final FocusNode subjectFocus;
-  final FocusNode textFocus;
-  final String? subjectError;
-  final String? textError;
-  final ValueChanged<String> onSubjectChanged;
-  final ValueChanged<String> onTextChanged;
   final int? mood;
   final bool desktop;
   final ValueChanged<int> onMoodChanged;
@@ -219,28 +161,25 @@ class _EditorFields extends StatelessWidget {
       children: [
         OutlineTextField(
           label: 'Subject',
+          isRequired: true,
           fieldKey: const Key('journal-subject'),
           controller: subjectController,
-          focusNode: subjectFocus,
-          error: subjectError,
           style: const TextStyle(fontSize: 14),
-          onChanged: onSubjectChanged,
         ),
-        RequiredField(
+        LabeledField(
           label: 'Mood',
+          isRequired: true,
           child: MoodPicker(value: mood, onChanged: onMoodChanged),
         ),
         OutlineTextField(
           label: 'Journal',
+          isRequired: true,
           fieldKey: const Key('journal-text'),
           controller: textController,
-          focusNode: textFocus,
-          error: textError,
           style: const TextStyle(fontSize: 16, height: 1.7),
           hintText: _journalHint,
           minHeight: desktop ? 260 : 220,
           minLines: desktop ? 9 : 8,
-          onChanged: onTextChanged,
         ),
       ],
     );
