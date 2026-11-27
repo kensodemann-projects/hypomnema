@@ -48,7 +48,7 @@ Issue: [#47](https://github.com/kensodemann-projects/hypomnema/issues/47) (CLOSE
 
 | Order | Step | Status | Files |
 | ----- | ---- | ------ | ----- |
-| 1 | [STEP-001] | | `lib/core/theme/app_theme.dart`, then `test/core/theme/app_theme_test.dart` |
+| 1 | [STEP-001] | complete | `lib/core/theme/app_theme.dart`, then `test/core/theme/app_theme_test.dart` |
 | 2 | [STEP-002] | | `lib/shared/ui/form_fields.dart`, then `lib/shared/ui/confirmation_dialog.dart`, then `test/shared/ui/form_fields_test.dart`, then `test/shared/ui/confirmation_dialog_test.dart`, then `test/features/auth/ui/login_screen_test.dart`, then `test/features/journal/ui/journal_editor_test.dart` |
 | 3 | [STEP-003] | | `lib/shared/ui/empty_state.dart`, then `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/shared/ui/empty_state_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 4 | [STEP-004] | | `lib/features/journal/ui/journal_editor.dart`, then `lib/features/journal/ui/mood_picker.dart`, then `test/features/journal/ui/journal_editor_test.dart`, then `test/features/journal/ui/mood_picker_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
@@ -69,7 +69,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Add snackbar, button, and metric themes
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** Light and dark `AppTheme` expose `SnackBarTheme`, `floatingActionButtonTheme`, and `AppMetrics` with the values in Decisions, and `textTheme` metrics still match a default `ThemeData` of the same brightness.
 

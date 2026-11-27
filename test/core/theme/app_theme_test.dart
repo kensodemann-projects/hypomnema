@@ -149,6 +149,67 @@ void _expectContractColors(ThemeData theme, _ContractPalette palette) {
   expect(colors.infoContainer, palette.infoContainer);
 }
 
+void _expectTypeMetrics(TextStyle? actual, TextStyle? expected) {
+  expect(actual?.fontSize, expected?.fontSize);
+  expect(actual?.fontWeight, expected?.fontWeight);
+  expect(actual?.height, expected?.height);
+  expect(actual?.letterSpacing, expected?.letterSpacing);
+}
+
+TextTheme _localizedTextTheme(ThemeData theme) {
+  return ThemeData.localize(theme, theme.typography.englishLike).textTheme;
+}
+
+void _expectComponentThemes(ThemeData theme) {
+  final scheme = theme.colorScheme;
+  final snackBar = theme.snackBarTheme;
+  expect(snackBar.backgroundColor, scheme.errorContainer);
+  _expectTypeMetrics(
+    snackBar.contentTextStyle,
+    _localizedTextTheme(theme).bodyMedium,
+  );
+  expect(snackBar.contentTextStyle?.color, scheme.onErrorContainer);
+  final button = theme.floatingActionButtonTheme;
+  expect(button.backgroundColor, scheme.primaryContainer);
+  expect(button.foregroundColor, scheme.onPrimaryContainer);
+  final metrics = theme.extension<AppMetrics>()!;
+  expect(metrics.paneWidth, 380);
+  expect(metrics.headerHeight, 72);
+  expect(metrics.barHeight, 64);
+  expect(metrics.rowRadius, 12);
+  expect(metrics.cardRadius, 16);
+  expect(metrics.borderWidth, 1);
+  expect(metrics.selectedBorderWidth, 2);
+  expect(metrics.emptyStateIconOpacity, 0.8);
+}
+
+void _expectDefaultTextMetrics(ThemeData theme) {
+  final baseline = _localizedTextTheme(
+    ThemeData(brightness: theme.brightness, colorScheme: theme.colorScheme),
+  );
+  final textTheme = _localizedTextTheme(theme);
+  final roles = <(TextStyle?, TextStyle?)>[
+    (textTheme.displayLarge, baseline.displayLarge),
+    (textTheme.displayMedium, baseline.displayMedium),
+    (textTheme.displaySmall, baseline.displaySmall),
+    (textTheme.headlineLarge, baseline.headlineLarge),
+    (textTheme.headlineMedium, baseline.headlineMedium),
+    (textTheme.headlineSmall, baseline.headlineSmall),
+    (textTheme.titleLarge, baseline.titleLarge),
+    (textTheme.titleMedium, baseline.titleMedium),
+    (textTheme.titleSmall, baseline.titleSmall),
+    (textTheme.bodyLarge, baseline.bodyLarge),
+    (textTheme.bodyMedium, baseline.bodyMedium),
+    (textTheme.bodySmall, baseline.bodySmall),
+    (textTheme.labelLarge, baseline.labelLarge),
+    (textTheme.labelMedium, baseline.labelMedium),
+    (textTheme.labelSmall, baseline.labelSmall),
+  ];
+  for (final (actual, expected) in roles) {
+    _expectTypeMetrics(actual, expected);
+  }
+}
+
 Future<void> _pumpTheme(WidgetTester tester, ThemeData theme) async {
   await tester.pumpWidget(
     MaterialApp(
@@ -167,10 +228,14 @@ void main() {
 
       // Then
       _expectContractColors(AppTheme.light, _lightPalette);
-      _expectContractColors(
-        Theme.of(tester.element(find.byKey(const Key('theme-home')))),
-        _lightPalette,
+      _expectComponentThemes(AppTheme.light);
+      _expectDefaultTextMetrics(AppTheme.light);
+      final applied = Theme.of(
+        tester.element(find.byKey(const Key('theme-home'))),
       );
+      _expectContractColors(applied, _lightPalette);
+      _expectComponentThemes(applied);
+      _expectDefaultTextMetrics(applied);
     },
   );
 
@@ -182,10 +247,14 @@ void main() {
 
       // Then
       _expectContractColors(AppTheme.dark, _darkPalette);
-      _expectContractColors(
-        Theme.of(tester.element(find.byKey(const Key('theme-home')))),
-        _darkPalette,
+      _expectComponentThemes(AppTheme.dark);
+      _expectDefaultTextMetrics(AppTheme.dark);
+      final applied = Theme.of(
+        tester.element(find.byKey(const Key('theme-home'))),
       );
+      _expectContractColors(applied, _darkPalette);
+      _expectComponentThemes(applied);
+      _expectDefaultTextMetrics(applied);
     },
   );
 }
