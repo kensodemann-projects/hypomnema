@@ -62,7 +62,8 @@ class _MoodOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final label = switch (mood) {
       1 => 'Awful',
       5 => 'Great',
@@ -96,9 +97,7 @@ class _MoodOption extends StatelessWidget {
                   : Text(
                       label,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        height: 1,
+                      style: theme.textTheme.labelMedium!.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
                     ),

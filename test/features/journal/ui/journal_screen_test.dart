@@ -242,13 +242,18 @@ void main() {
       expect(find.byKey(_editorKey), findsOneWidget);
       expect(find.byKey(_writeKey), findsNothing);
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      final scheme = AppTheme.light.colorScheme;
+      final message = find.text(_saveFailed);
+      final theme = Theme.of(tester.element(find.byType(SnackBar)));
       expect(snackBar.behavior, SnackBarBehavior.floating);
-      expect(snackBar.backgroundColor, scheme.errorContainer);
+      expect(snackBar.backgroundColor, isNull);
+      expect(tester.widget<Text>(message).style, isNull);
       expect(
-        tester.widget<Text>(find.text(_saveFailed)).style?.color,
-        scheme.error,
+        theme.snackBarTheme.backgroundColor,
+        theme.colorScheme.errorContainer,
       );
+      final effective = DefaultTextStyle.of(tester.element(message)).style;
+      expect(effective.color, theme.colorScheme.onErrorContainer);
+      _expectRole(effective, theme.textTheme.bodyMedium);
       expect(entries.saves, hasLength(1));
       expect(entries.updateCalls, 0);
     },
