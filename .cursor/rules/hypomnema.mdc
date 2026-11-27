@@ -22,6 +22,15 @@ Keep the same abstraction level on both form factors and one layer of decision i
 - In tests, import the same constant and derive viewport widths from it (`kDesktopLayoutMinWidth`, `kDesktopLayoutMinWidth + 1`, `kDesktopLayoutMinWidth - 200`, and so on). When a loop exercises multiple widths, every value should be an expression on that constant, not a lone magic number beside it.
 - Do not leave one branch fully extracted and the other inlined in `build`. Do not grow a single method with unrelated phone and desktop trees; split shells and panes instead.
 
+## Text roles
+
+Choose the `textTheme` role that names the kind of text, and use that role as Material defines it.
+
+- Use the same role on phone and desktop.
+- Keep the role's size, weight, height, and letter spacing.
+- Keep uppercase and italic on the widget.
+- Leave the mood digit styles in `MoodSwatch`.
+
 ## Project layout
 
 - Organize `lib/` feature-first. Keep generated `lib/firebase_options.dart` at the package root; FlutterFire writes that path.

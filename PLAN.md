@@ -54,7 +54,7 @@ Issue: [#47](https://github.com/kensodemann-projects/hypomnema/issues/47) (CLOSE
 | 4 | [STEP-004] | complete | `lib/features/journal/ui/journal_editor.dart`, then `lib/features/journal/ui/mood_picker.dart`, then `test/features/journal/ui/journal_editor_test.dart`, then `test/features/journal/ui/mood_picker_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 5 | [STEP-005] | complete | `lib/features/auth/ui/login_screen.dart`, then `test/features/auth/ui/login_screen_test.dart` |
 | 6 | [STEP-006] | complete | `lib/app/shell.dart`, then `test/app/shell_test.dart` |
-| 7 | [STEP-007] | | `.cursor/rules/hypomnema.mdc` |
+| 7 | [STEP-007] | complete | `.cursor/rules/hypomnema.mdc` |
 
 ## Commit gate
 
@@ -269,7 +269,7 @@ flutter test test/app/shell_test.dart
 
 ## [STEP-007] Record the text-role rule
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** `.cursor/rules/hypomnema.mdc` tells later UI work to use the Material `textTheme` role for the kind of text, to keep that role's metrics, to keep transforms in the widget, and to leave the mood digit styles in `MoodSwatch`.
 
