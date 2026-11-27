@@ -48,7 +48,7 @@ _No findings in this category._
 
 ---
 
-**[CLN-002]**
+**[CLN-002]** — **Status:** complete
 
 **Issue:** `journal_screen.dart` reads `Theme.of(context).extension<AppMetrics>()!` in several places, including nested builders where a `metrics` variable already exists in sibling methods (e.g. FAB `shape` uses a fresh `Theme.of` call inside `_phoneListPane`).
 

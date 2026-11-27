@@ -312,6 +312,7 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   Widget _phoneListPane(BuildContext context, List<JournalEntry> entries) {
+    final metrics = Theme.of(context).extension<AppMetrics>()!;
     if (entries.isEmpty) {
       return Center(
         child: Padding(
@@ -345,9 +346,7 @@ class _JournalScreenState extends State<JournalScreen> {
             key: const Key('journal-write'),
             onPressed: () => _openEditor(context),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                Theme.of(context).extension<AppMetrics>()!.cardRadius,
-              ),
+              borderRadius: BorderRadius.circular(metrics.cardRadius),
             ),
             icon: const Icon(Icons.edit),
             label: const Text('Write'),
@@ -362,7 +361,8 @@ class _JournalScreenState extends State<JournalScreen> {
     ColorScheme scheme,
     List<JournalEntry> entries,
   ) {
-    final metrics = Theme.of(context).extension<AppMetrics>()!;
+    final theme = Theme.of(context);
+    final metrics = theme.extension<AppMetrics>()!;
     return SizedBox(
       key: const Key('journal-list-pane'),
       width: metrics.paneWidth,
@@ -388,8 +388,9 @@ class _JournalScreenState extends State<JournalScreen> {
                     child: Text(
                       'No entries yet.',
                       key: const Key('journal-list-empty'),
-                      style: Theme.of(context).textTheme.bodyMedium!
-                          .copyWith(color: scheme.onSurfaceVariant),
+                      style: theme.textTheme.bodyMedium!.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 )
@@ -420,6 +421,7 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   Widget _desktopDetailPane(BuildContext context, List<JournalEntry> entries) {
+    final metrics = Theme.of(context).extension<AppMetrics>()!;
     return Padding(
       key: const Key('journal-detail-pane'),
       padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
@@ -430,11 +432,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   hasScrollBody: false,
                   child: Center(
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: Theme.of(context)
-                            .extension<AppMetrics>()!
-                            .paneWidth,
-                      ),
+                      constraints: BoxConstraints(maxWidth: metrics.paneWidth),
                       child: EmptyState(
                         key: const Key('journal-empty'),
                         icon: Icons.edit_note,
