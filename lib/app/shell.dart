@@ -51,15 +51,10 @@ class _ShellState extends State<Shell> {
       if (!mounted) {
         return;
       }
-      final scheme = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           behavior: SnackBarBehavior.floating,
-          backgroundColor: scheme.errorContainer,
-          content: Text(
-            'Failed to sign out.',
-            style: TextStyle(color: scheme.error),
-          ),
+          content: Text('Failed to sign out.'),
         ),
       );
     }

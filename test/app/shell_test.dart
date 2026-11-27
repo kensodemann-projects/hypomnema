@@ -175,13 +175,20 @@ void expectSignOutDialog(WidgetTester tester) {
 
 void expectSignOutFailureSnackBar(WidgetTester tester) {
   final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-  final scheme = Theme.of(tester.element(find.byType(SnackBar))).colorScheme;
+  final message = find.text(_signOutFailure);
+  final theme = Theme.of(tester.element(find.byType(SnackBar)));
+  final scheme = theme.colorScheme;
+  final bodyMedium = theme.textTheme.bodyMedium;
   expect(snackBar.behavior, SnackBarBehavior.floating);
-  expect(snackBar.backgroundColor, scheme.errorContainer);
-  expect(
-    tester.widget<Text>(find.text(_signOutFailure)).style?.color,
-    scheme.error,
-  );
+  expect(snackBar.backgroundColor, isNull);
+  expect(tester.widget<Text>(message).style, isNull);
+  expect(theme.snackBarTheme.backgroundColor, scheme.errorContainer);
+  final effective = DefaultTextStyle.of(tester.element(message)).style;
+  expect(effective.color, scheme.onErrorContainer);
+  expect(effective.fontSize, bodyMedium?.fontSize);
+  expect(effective.fontWeight, bodyMedium?.fontWeight);
+  expect(effective.height, bodyMedium?.height);
+  expect(effective.letterSpacing, bodyMedium?.letterSpacing);
 }
 
 void main() {

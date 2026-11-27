@@ -53,7 +53,7 @@ Issue: [#47](https://github.com/kensodemann-projects/hypomnema/issues/47) (CLOSE
 | 3 | [STEP-003] | complete | `lib/shared/ui/empty_state.dart`, then `lib/features/journal/ui/journal_entry_list.dart`, then `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/shared/ui/empty_state_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 4 | [STEP-004] | complete | `lib/features/journal/ui/journal_editor.dart`, then `lib/features/journal/ui/mood_picker.dart`, then `test/features/journal/ui/journal_editor_test.dart`, then `test/features/journal/ui/mood_picker_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 5 | [STEP-005] | complete | `lib/features/auth/ui/login_screen.dart`, then `test/features/auth/ui/login_screen_test.dart` |
-| 6 | [STEP-006] | | `lib/app/shell.dart`, then `test/app/shell_test.dart` |
+| 6 | [STEP-006] | complete | `lib/app/shell.dart`, then `test/app/shell_test.dart` |
 | 7 | [STEP-007] | | `.cursor/rules/hypomnema.mdc` |
 
 ## Commit gate
@@ -241,7 +241,7 @@ flutter test test/features/auth/ui/login_screen_test.dart
 
 ## [STEP-006] Use the snackbar theme for sign-out errors
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** The shell sign-out error uses `SnackBarTheme`: `onErrorContainer` text on `errorContainer`, with floating behavior still set at the call site.
 
