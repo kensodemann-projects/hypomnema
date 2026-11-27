@@ -1,3 +1,5 @@
+import 'dart:ui' show SemanticsValidationResult;
+
 import 'package:flutter/services.dart';
 import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
@@ -545,39 +547,56 @@ class _LoginFieldState extends State<_LoginField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 4,
       children: [
-        Text.rich(
-          TextSpan(
-            text: '${widget.label} ',
-            style: TextStyle(color: scheme.onSurfaceVariant),
-            children: [
-              TextSpan(
-                text: '*',
-                style: TextStyle(color: scheme.error),
-              ),
-            ],
+        ExcludeSemantics(
+          child: Text.rich(
+            TextSpan(
+              text: '${widget.label} ',
+              style: TextStyle(color: scheme.onSurfaceVariant),
+              children: [
+                TextSpan(
+                  text: '*',
+                  style: TextStyle(color: scheme.error),
+                ),
+              ],
+            ),
           ),
         ),
-        TextField(
-          key: widget.fieldKey,
-          controller: widget.controller,
-          focusNode: widget.focusNode,
-          keyboardType: widget.keyboardType,
-          textInputAction: widget.textInputAction,
-          autofillHints: widget.autofillHints,
-          obscureText: widget.obscureText,
-          onChanged: widget.onChanged,
-          onSubmitted: widget.onSubmitted,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: scheme.surface,
-            contentPadding: padding,
-            border: border,
-            enabledBorder: border,
-            focusedBorder: border,
-            disabledBorder: border,
+        Semantics(
+          container: true,
+          explicitChildNodes: false,
+          label: widget.label,
+          isRequired: true,
+          hint: error,
+          validationResult: error == null
+              ? SemanticsValidationResult.none
+              : SemanticsValidationResult.invalid,
+          child: TextField(
+            key: widget.fieldKey,
+            controller: widget.controller,
+            focusNode: widget.focusNode,
+            keyboardType: widget.keyboardType,
+            textInputAction: widget.textInputAction,
+            autofillHints: widget.autofillHints,
+            obscureText: widget.obscureText,
+            onChanged: widget.onChanged,
+            onSubmitted: widget.onSubmitted,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: scheme.surface,
+              contentPadding: padding,
+              border: border,
+              enabledBorder: border,
+              focusedBorder: border,
+              disabledBorder: border,
+            ),
           ),
         ),
-        if (error != null) Text(error, style: TextStyle(color: scheme.error)),
+        if (error != null)
+          Semantics(
+            container: true,
+            liveRegion: !MediaQuery.supportsAnnounceOf(context),
+            child: Text(error, style: TextStyle(color: scheme.error)),
+          ),
       ],
     );
   }

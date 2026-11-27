@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:ui' show SemanticsValidationResult, Tristate;
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
@@ -462,6 +464,61 @@ void main() {
           );
         }
       }
+    },
+  );
+
+  testWidgets(
+    'Given the sign-in fields, when they render and then show a message, then the text field node carries the name and the message',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpLoginScreen(
+        tester,
+        authService: _RecordingAuthService(),
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
+
+      SemanticsData fieldData(String key) {
+        return tester.getSemantics(find.byKey(Key(key))).getSemanticsData();
+      }
+
+      final email = fieldData('login-email');
+      expect(email.label, 'Email');
+      expect(email.flagsCollection.isTextField, isTrue);
+      expect(email.flagsCollection.isRequired, Tristate.isTrue);
+      expect(email.hint, isEmpty);
+      expect(email.validationResult, SemanticsValidationResult.none);
+
+      final password = fieldData('login-password');
+      expect(password.label, 'Password');
+      expect(password.flagsCollection.isTextField, isTrue);
+      expect(password.flagsCollection.isRequired, Tristate.isTrue);
+      expect(password.hint, isEmpty);
+      expect(password.validationResult, SemanticsValidationResult.none);
+
+      await tester.tap(find.byKey(const Key('login-email')));
+      await tester.pump();
+      await unfocus(tester);
+
+      final invalidEmail = fieldData('login-email');
+      expect(invalidEmail.label, 'Email');
+      expect(invalidEmail.flagsCollection.isTextField, isTrue);
+      expect(invalidEmail.hint, 'Email is required.');
+      expect(invalidEmail.validationResult, SemanticsValidationResult.invalid);
+
+      await tester.tap(find.byKey(const Key('login-password')));
+      await tester.pump();
+      await unfocus(tester);
+
+      final invalidPassword = fieldData('login-password');
+      expect(invalidPassword.label, 'Password');
+      expect(invalidPassword.flagsCollection.isTextField, isTrue);
+      expect(invalidPassword.hint, 'Password is required.');
+      expect(
+        invalidPassword.validationResult,
+        SemanticsValidationResult.invalid,
+      );
+
+      handle.dispose();
     },
   );
 
