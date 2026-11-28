@@ -78,12 +78,11 @@ String? journalEditableUntilNote({
     return null;
   }
   final deadline = editWindowDeadline(createdAt).toLocal();
-  final day = deadlineDayWord(deadline, now.toLocal());
+  final day = _deadlineDayWord(deadline, now.toLocal());
   return 'Editable until ${_time(deadline)} $day';
 }
 
-/// Returns `today`, `tomorrow`, or the month and day of [deadlineLocal].
-String deadlineDayWord(DateTime deadlineLocal, DateTime nowLocal) {
+String _deadlineDayWord(DateTime deadlineLocal, DateTime nowLocal) {
   final today = _date(nowLocal);
   final deadlineDay = _date(deadlineLocal);
   if (_sameDay(deadlineDay, today)) {

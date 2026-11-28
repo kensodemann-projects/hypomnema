@@ -4,7 +4,7 @@ PR: https://github.com/kensodemann-projects/hypomnema/pull/53
 
 ## Summary
 
-This review covers the resulting diff against `main` for the 24-hour journal edit window. `PLAN.md` is ignored. Request changes. The shared window, the phone and desktop edit affordances, and the tests match the issue: Edit and the note appear only while `createdAt` is inside 24 hours, saving goes through `update`, and the original time stays. CLN-001 is complete: the phone detail paints the entry it opened with, handles watch errors, and pops only while its route is current. CLN-002 remains: the "Editable until" day word says `tomorrow` for any later calendar day, which is wrong when a daylight-saving spring-forward puts the deadline two local days ahead. One question is whether a detail or editor left open past the deadline should still be able to save.
+This review covers the resulting diff against `main` for the 24-hour journal edit window. `PLAN.md` is ignored. Comment only. The shared window, the phone and desktop edit affordances, and the tests match the issue: Edit and the note appear only while `createdAt` is inside 24 hours, saving goes through `update`, and the original time stays. CLN-001 is complete: the phone detail paints the entry it opened with, handles watch errors, and pops only while its route is current. CLN-002 is complete: the note names today, tomorrow, or the deadline's month and day, and a host-independent test covers a deadline more than one calendar day ahead. One question remains: whether a detail or editor left open past the deadline should still be able to save.
 
 ## Finding counts
 
@@ -93,6 +93,8 @@ Add a widget test that pumps a single frame after opening the phone detail and s
 **Why:** Opening an entry used to render the object already in hand. The extra `watch()` is what lets the detail pick up a save, and the first event is asynchronous on both the fake and Firestore, so the empty frame is visible on every phone open, including entries outside the window. An `onError` keeps a bad snapshot from becoming an uncaught error on a route the list already knows how to handle. Checking `isCurrent` keeps a missing-entry pop from closing the editor that was pushed on top of the detail.
 
 [CLN-002]
+
+**Status:** complete
 
 **Issue:** `journalEditableUntilNote` labels every deadline that is not on today's local calendar day as `tomorrow`. A 24-hour absolute duration crosses at most one local midnight when the offset stays put. When the local offset springs forward during the window, the deadline's local calendar day can be two days after `now`. In `America/New_York`, an entry created at 11:30 PM EST on 2026-03-07 has its deadline at 12:30 AM EDT on 2026-03-09. Viewed at 11:45 PM that same Saturday, the window is still open and the note says `Editable until 12:30 AM tomorrow`. Tomorrow is Sunday; the deadline is Monday. The clock time is the real local deadline. The day word is a day early. The same branch is what a fixed-offset zone never hits, so a UTC CI run stays green.
 
