@@ -68,7 +68,8 @@ String journalEntryBarTitle(JournalEntry entry) {
 /// Returns the "Editable until" sentence for [createdAt], or `null` when closed.
 ///
 /// The clock time is the local time of the absolute deadline. The day word is
-/// `today` on [now]'s local calendar day and `tomorrow` after it.
+/// `today` on [now]'s local calendar day, `tomorrow` on the next day, and the
+/// month and day when the deadline falls later.
 String? journalEditableUntilNote({
   required DateTime createdAt,
   required DateTime now,
@@ -77,10 +78,23 @@ String? journalEditableUntilNote({
     return null;
   }
   final deadline = editWindowDeadline(createdAt).toLocal();
-  final day = _sameDay(_date(deadline), _date(now.toLocal()))
-      ? 'today'
-      : 'tomorrow';
+  final day = deadlineDayWord(deadline, now.toLocal());
   return 'Editable until ${_time(deadline)} $day';
+}
+
+/// Returns `today`, `tomorrow`, or the month and day of [deadlineLocal].
+String deadlineDayWord(DateTime deadlineLocal, DateTime nowLocal) {
+  final today = _date(nowLocal);
+  final deadlineDay = _date(deadlineLocal);
+  if (_sameDay(deadlineDay, today)) {
+    return 'today';
+  }
+  final tomorrow = DateTime(today.year, today.month, today.day + 1);
+  if (_sameDay(deadlineDay, tomorrow)) {
+    return 'tomorrow';
+  }
+  final month = _monthAbbreviations[deadlineDay.month - 1];
+  return '$month ${deadlineDay.day}';
 }
 
 const _weekdayAbbreviations = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

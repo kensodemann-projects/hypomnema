@@ -159,6 +159,33 @@ void main() {
     expect(journalEditableUntilNote(createdAt: createdAt, now: now), isNull);
   });
 
+  test('Given a deadline on the same local day, when the day word is read, then it is today', () {
+    // Given
+    final now = DateTime(2026, 3, 7, 23, 45);
+    final deadline = DateTime(2026, 3, 7, 23, 30);
+
+    // When, then
+    expect(deadlineDayWord(deadline, now), 'today');
+  });
+
+  test('Given a deadline on the next local day, when the day word is read, then it is tomorrow', () {
+    // Given
+    final now = DateTime(2026, 3, 7, 23, 45);
+    final deadline = DateTime(2026, 3, 8, 22, 30);
+
+    // When, then
+    expect(deadlineDayWord(deadline, now), 'tomorrow');
+  });
+
+  test('Given a deadline two local days ahead, when the day word is read, then it names that month and day', () {
+    // Given
+    final now = DateTime(2026, 3, 7, 23, 45);
+    final deadline = DateTime(2026, 3, 9, 0, 30);
+
+    // When, then
+    expect(deadlineDayWord(deadline, now), 'Mar 9');
+  });
+
   test('Given a creation instant with seconds, when the note is read, then the displayed time drops the seconds', () {
     // Given
     final createdAt = DateTime(2026, 11, 14, 8, 2, 30);
