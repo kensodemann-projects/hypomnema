@@ -304,6 +304,34 @@ void main() {
   );
 
   testWidgets(
+    'Given a phone journal entry, when its row is tapped, then the first frame already shows the subject',
+    (tester) async {
+      await _pumpJournalScreen(
+        tester,
+        size: _phone,
+        repository: _seededJournal(),
+        clock: () => DateTime(2026, 11, 14, 12),
+      );
+
+      await tester.tap(find.byKey(const Key('journal-entry-today')));
+      await tester.pump();
+
+      final screen = find.byKey(
+        const Key('journal-entry-screen'),
+        skipOffstage: false,
+      );
+      expect(
+        find.descendant(
+          of: screen,
+          matching: find.text('Early run', skipOffstage: false),
+          skipOffstage: false,
+        ),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
     'Given a private entry, when its row is tapped, then the phone entry shows its subject and text and Back returns to the list',
     (tester) async {
       await _pumpJournalScreen(

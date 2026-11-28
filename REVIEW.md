@@ -4,7 +4,7 @@ PR: https://github.com/kensodemann-projects/hypomnema/pull/53
 
 ## Summary
 
-This review covers the resulting diff against `main` for the 24-hour journal edit window. `PLAN.md` is ignored. Request changes. The shared window, the phone and desktop edit affordances, and the tests match the issue: Edit and the note appear only while `createdAt` is inside 24 hours, saving goes through `update`, and the original time stays. Two code issues should be fixed before merge. The phone detail drops the entry it already has and waits on a second `watch()` with no error handler, so every phone open starts blank and a stream error is uncaught. The "Editable until" day word says `tomorrow` for any later calendar day, which is wrong when a daylight-saving spring-forward puts the deadline two local days ahead. One question is whether a detail or editor left open past the deadline should still be able to save.
+This review covers the resulting diff against `main` for the 24-hour journal edit window. `PLAN.md` is ignored. Request changes. The shared window, the phone and desktop edit affordances, and the tests match the issue: Edit and the note appear only while `createdAt` is inside 24 hours, saving goes through `update`, and the original time stays. CLN-001 is complete: the phone detail paints the entry it opened with, handles watch errors, and pops only while its route is current. CLN-002 remains: the "Editable until" day word says `tomorrow` for any later calendar day, which is wrong when a daylight-saving spring-forward puts the deadline two local days ahead. One question is whether a detail or editor left open past the deadline should still be able to save.
 
 ## Finding counts
 
@@ -24,6 +24,8 @@ This review covers the resulting diff against `main` for the 24-hour journal edi
 ### 🧹 Code cleanup and maintainability
 
 [CLN-001]
+
+**Status:** complete
 
 **Issue:** Every phone entry now opens through `_PhoneEntryScreen`, which starts with `_entry == null` and fills it only after a new `repository.watch()` event. The route already received the `JournalEntry` in `_openEntry`. The first frames are a bar with an empty title and no body. `listen` also has no `onError`. The list subscription handles watch failures; this second subscription reports them as uncaught zone errors and leaves the blank page up. `Navigator.pop` from the detail pops the navigator's top route, so a snapshot that omits the id while the editor is open dismisses the editor and then stops (`_closed`), leaving the detail in place.
 

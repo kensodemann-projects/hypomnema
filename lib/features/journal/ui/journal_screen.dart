@@ -152,7 +152,7 @@ class _JournalScreenState extends State<JournalScreen> {
       MaterialPageRoute<void>(
         builder: (context) => _PhoneEntryScreen(
           repository: widget.repository,
-          entryId: entry.id,
+          entry: entry,
           clock: widget.clock,
           onEdit: _openEditor,
         ),
@@ -436,13 +436,13 @@ class _JournalScreenState extends State<JournalScreen> {
 class _PhoneEntryScreen extends StatefulWidget {
   const _PhoneEntryScreen({
     required this.repository,
-    required this.entryId,
+    required this.entry,
     required this.clock,
     required this.onEdit,
   });
 
   final JournalEntryRepository repository;
-  final String entryId;
+  final JournalEntry entry;
   final DateTime Function() clock;
   final void Function(BuildContext context, {JournalEntry? entry}) onEdit;
 
@@ -452,13 +452,17 @@ class _PhoneEntryScreen extends StatefulWidget {
 
 class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
   StreamSubscription<List<JournalEntry>>? _subscription;
-  JournalEntry? _entry;
+  late JournalEntry _entry;
   var _closed = false;
 
   @override
   void initState() {
     super.initState();
-    _subscription = widget.repository.watch().listen(_onEntries);
+    _entry = widget.entry;
+    _subscription = widget.repository.watch().listen(
+      _onEntries,
+      onError: _onWatchError,
+    );
   }
 
   @override
@@ -472,12 +476,12 @@ class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
       return;
     }
     for (final candidate in entries) {
-      if (candidate.id == widget.entryId) {
+      if (candidate.id == widget.entry.id) {
         setState(() => _entry = candidate);
         return;
       }
     }
-    if (_closed) {
+    if (_closed || ModalRoute.of(context)?.isCurrent == false) {
       return;
     }
     _closed = true;
@@ -488,18 +492,20 @@ class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
     });
   }
 
+  void _onWatchError(Object error, StackTrace stackTrace) {
+    // Keep _entry on screen. The list listener already reports the failure.
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final metrics = theme.extension<AppMetrics>()!;
     final entry = _entry;
-    final note = entry == null
-        ? null
-        : journalEditableUntilNote(
-            createdAt: entry.createdAt,
-            now: widget.clock(),
-          );
+    final note = journalEditableUntilNote(
+      createdAt: entry.createdAt,
+      now: widget.clock(),
+    );
     return Scaffold(
       key: const Key('journal-entry-screen'),
       backgroundColor: scheme.surface,
@@ -521,13 +527,13 @@ class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        entry == null ? '' : journalEntryBarTitle(entry),
+                        journalEntryBarTitle(entry),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.titleLarge,
                       ),
                     ),
-                    if (entry != null && note != null)
+                    if (note != null)
                       _BarIconButton(
                         buttonKey: const Key('journal-edit'),
                         tooltip: 'Edit',
@@ -539,16 +545,15 @@ class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
                 ),
               ),
             ),
-            if (entry != null)
-              Expanded(
-                child: SingleChildScrollView(
-                  child: JournalEntryDetail(
-                    entry: entry,
-                    when: journalDetailWhen(entry, includeYear: false),
-                    note: note,
-                  ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: JournalEntryDetail(
+                  entry: entry,
+                  when: journalDetailWhen(entry, includeYear: false),
+                  note: note,
                 ),
               ),
+            ),
           ],
         ),
       ),
