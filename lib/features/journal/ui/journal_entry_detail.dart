@@ -24,6 +24,7 @@ class JournalEntryDetail extends StatelessWidget {
     this.contentRevealed = false,
     this.onShowContent,
     this.onHide,
+    this.onTogglePrivacy,
     super.key,
   });
 
@@ -36,6 +37,7 @@ class JournalEntryDetail extends StatelessWidget {
   final bool contentRevealed;
   final VoidCallback? onShowContent;
   final VoidCallback? onHide;
+  final VoidCallback? onTogglePrivacy;
 
   @override
   Widget build(BuildContext context) {
@@ -82,9 +84,18 @@ class JournalEntryDetail extends StatelessWidget {
                   icon: const Icon(Icons.edit),
                   label: const Text('Edit'),
                 ),
+              if (card) _privacyButton(scheme),
             ],
           ),
-          if (note != null) _EditableUntilNote(text: note!),
+          if (card && note != null) _EditableUntilNote(text: note!),
+          if (!card && entry.private) ...[
+            if (note != null) _EditableUntilNote(text: note!),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: _privacyButton(scheme),
+            ),
+          ],
+          if (!card && !entry.private) _phonePublicPrivacyRow(scheme),
           if (covered)
             _widthBox(
               child: _PrivateCover(desktop: card, onShowContent: onShowContent),
@@ -122,6 +133,44 @@ class JournalEntryDetail extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _phonePublicPrivacyRow(ColorScheme scheme) {
+    final button = _privacyButton(scheme);
+    if (note == null) {
+      return Align(alignment: Alignment.centerLeft, child: button);
+    }
+    return Row(
+      children: [
+        Expanded(child: _EditableUntilNote(text: note!)),
+        button,
+      ],
+    );
+  }
+
+  Widget _privacyButton(ColorScheme scheme) {
+    final makePublic = entry.private;
+    final icon = Icon(makePublic ? Icons.lock_open : Icons.lock);
+    final label = Text(makePublic ? 'Make Public' : 'Make Private');
+    if (card) {
+      return TextButton.icon(
+        key: const Key('journal-privacy'),
+        onPressed: onTogglePrivacy,
+        style: TextButton.styleFrom(foregroundColor: scheme.primary),
+        icon: icon,
+        label: label,
+      );
+    }
+    return OutlinedButton.icon(
+      key: const Key('journal-privacy'),
+      onPressed: onTogglePrivacy,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: scheme.primary,
+        side: BorderSide(color: scheme.outline),
+      ),
+      icon: icon,
+      label: label,
     );
   }
 

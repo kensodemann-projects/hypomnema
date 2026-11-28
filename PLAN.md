@@ -44,7 +44,7 @@ Text roles are the same on both form factors. "Private entry" in the list is `ti
 | ----- | ---- | ------ | ----- |
 | 1 | [STEP-001] | complete | `lib/features/journal/ui/journal_entry_list.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 2 | [STEP-002] | complete | `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
-| 3 | [STEP-003] | | `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/helpers/fake_journal_entry_repository.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
+| 3 | [STEP-003] | complete | `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/helpers/fake_journal_entry_repository.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 4 | [STEP-004] | | `lib/features/journal/ui/journal_editor.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_editor_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 
 **Commit gate**
@@ -134,7 +134,7 @@ flutter test test/features/journal/ui/journal_screen_test.dart
 
 ## [STEP-003] Switch privacy from the entry details
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** Make Private and Make Public are available on the phone and the desktop at any time, including past the 24-hour window and before Show Content. The stored flag flips. The open writing hides or shows with that flag. The date and time stay.
 

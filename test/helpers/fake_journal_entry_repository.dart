@@ -17,6 +17,7 @@ class FakeJournalEntryRepository implements JournalEntryRepository {
   var updateCalls = 0;
   var _nextId = 0;
   Object? saveError;
+  Object? updateError;
   Object? watchError;
   Completer<void>? holdWatch;
 
@@ -56,6 +57,10 @@ class FakeJournalEntryRepository implements JournalEntryRepository {
   }) async {
     updateCalls += 1;
     updates.add((subject: subject, mood: mood, text: text, private: private));
+    final error = updateError;
+    if (error != null) {
+      throw error;
+    }
     final revised = entry.revise(
       subject: subject,
       mood: mood,

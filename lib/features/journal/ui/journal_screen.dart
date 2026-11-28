@@ -16,6 +16,7 @@ const _emptyMessage =
     "Write about anything: how today went, something on your mind, or one good thing. If you're not sure where to start, I'm Stuck gives you a prompt.";
 const _emptyAction = 'Write your first entry';
 const _loadFailed = 'The entries could not be loaded.';
+const _privacyFailed = 'The entry could not be updated.';
 
 class JournalScreen extends StatefulWidget {
   const JournalScreen({
@@ -413,6 +414,8 @@ class _JournalScreenState extends State<JournalScreen> {
         contentRevealed: _contentRevealed,
         onShowContent: () => setState(() => _contentRevealed = true),
         onHide: () => setState(() => _contentRevealed = false),
+        onTogglePrivacy: () =>
+            _toggleEntryPrivacy(context, widget.repository, entry),
         onEdit: showEdit ? () => _openEditor(context, entry: entry) : null,
       ),
     );
@@ -614,6 +617,8 @@ class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
                   contentRevealed: _contentRevealed,
                   onShowContent: () => setState(() => _contentRevealed = true),
                   onHide: () => setState(() => _contentRevealed = false),
+                  onTogglePrivacy: () =>
+                      _toggleEntryPrivacy(context, widget.repository, entry),
                 ),
               ),
             ),
@@ -658,6 +663,32 @@ class _BarIconButton extends StatelessWidget {
         ),
         onPressed: onPressed,
         icon: Icon(icon, color: color),
+      ),
+    );
+  }
+}
+
+Future<void> _toggleEntryPrivacy(
+  BuildContext context,
+  JournalEntryRepository repository,
+  JournalEntry entry,
+) async {
+  try {
+    await repository.update(
+      entry: entry,
+      subject: entry.subject,
+      mood: entry.mood,
+      text: entry.text,
+      private: !entry.private,
+    );
+  } catch (_) {
+    if (!context.mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(_privacyFailed),
       ),
     );
   }

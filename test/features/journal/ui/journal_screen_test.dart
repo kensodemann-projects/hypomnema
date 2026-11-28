@@ -1549,4 +1549,315 @@ void main() {
       expect(swatch.mood, 5);
     },
   );
+
+  const phoneToday = 'Saturday, November 14 · 8:02 AM';
+  const desktopToday = 'Saturday, November 14, 2026 · 8:02 AM';
+  const phonePrivateWhen = 'Thursday, November 12 · 10:15 PM';
+  const desktopPrivateWhen = 'Thursday, November 12, 2026 · 10:15 PM';
+  const phonePastWhen = 'Friday, November 6 · 9:50 PM';
+  const desktopPastWhen = 'Friday, November 6, 2026 · 9:50 PM';
+
+  testWidgets(
+    'Given a phone entry inside or past the window, when privacy is toggled, then the flag flips and the writing hides or shows',
+    (tester) async {
+      final repository = await _pumpJournalScreen(
+        tester,
+        size: _phone,
+        repository: _seededJournal(),
+        clock: () => noon,
+      );
+
+      await tester.tap(find.byKey(const Key('journal-entry-today')));
+      await tester.pumpAndSettle();
+      expect(find.text('Make Private'), findsOneWidget);
+      expect(find.byIcon(Icons.lock), findsWidgets);
+      await tester.tap(find.byKey(const Key('journal-privacy')));
+      await tester.pumpAndSettle();
+
+      expect(repository.updates, [
+        (subject: 'Early run', mood: 4, text: 'Moved early.', private: true),
+      ]);
+      expect(find.text(phoneToday), findsOneWidget);
+      _expectPrivateCover(
+        tester,
+        scope: find.byKey(const Key('journal-entry-screen')),
+        desktop: false,
+        scheme: AppTheme.light.colorScheme,
+      );
+      expect(find.text('Early run'), findsNothing);
+      expect(find.text('Moved early.'), findsNothing);
+
+      expect(find.text('Make Public'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('journal-show-content')));
+      await tester.pumpAndSettle();
+      expect(find.text('Make Public'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('journal-hide')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journal-privacy')));
+      await tester.pumpAndSettle();
+
+      expect(repository.updates, [
+        (subject: 'Early run', mood: 4, text: 'Moved early.', private: true),
+        (subject: 'Early run', mood: 4, text: 'Moved early.', private: false),
+      ]);
+      expect(find.text('Early run'), findsOneWidget);
+      expect(find.text('Moved early.'), findsOneWidget);
+      expect(find.text(phoneToday), findsOneWidget);
+      expect(find.byKey(const Key('journal-private-cover')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('journal-back')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journal-entry-private')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Make Public'), findsOneWidget);
+      expect(find.byIcon(Icons.lock_open), findsOneWidget);
+      expect(find.text('Quiet thought'), findsNothing);
+      await tester.tap(find.byKey(const Key('journal-privacy')));
+      await tester.pumpAndSettle();
+
+      expect(repository.updates.last.private, isFalse);
+      expect(repository.updates.last.subject, 'Quiet thought');
+      expect(repository.updates.last.text, 'Line one\nstill one.\n\nLine two.');
+      expect(repository.updates.last.mood, 2);
+      expect(find.text('Quiet thought'), findsOneWidget);
+      expect(find.text('Line one\nstill one.'), findsOneWidget);
+      expect(find.text('Line two.'), findsOneWidget);
+      expect(find.text(phonePrivateWhen), findsOneWidget);
+      expect(find.byKey(const Key('journal-private-cover')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('journal-back')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journal-entry-last-week')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('journal-edit')), findsNothing);
+      expect(find.text('Make Private'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('journal-privacy')));
+      await tester.pumpAndSettle();
+
+      expect(repository.updates.last.private, isTrue);
+      expect(repository.updates.last.subject, 'Long call');
+      expect(find.text(phonePastWhen), findsOneWidget);
+      expect(find.text('Long call'), findsNothing);
+      expect(find.byKey(const Key('journal-private-cover')), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'Given a desktop entry inside or past the window, when privacy is toggled, then the flag flips and the writing hides or shows',
+    (tester) async {
+      final repository = await _pumpJournalScreen(
+        tester,
+        size: _desktop,
+        repository: _seededJournal(),
+        clock: () => noon,
+      );
+      final detail = find.byKey(const Key('journal-detail-pane'));
+
+      expect(find.text('Make Private'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('journal-privacy')));
+      await tester.pumpAndSettle();
+
+      expect(repository.updates, [
+        (subject: 'Early run', mood: 4, text: 'Moved early.', private: true),
+      ]);
+      expect(
+        inPane(const Key('journal-detail-pane'), desktopToday),
+        findsOneWidget,
+      );
+      _expectPrivateCover(
+        tester,
+        scope: detail,
+        desktop: true,
+        scheme: AppTheme.light.colorScheme,
+      );
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Early run'),
+        findsNothing,
+      );
+
+      expect(find.text('Make Public'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('journal-privacy')));
+      await tester.pumpAndSettle();
+
+      expect(repository.updates.last.private, isFalse);
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Early run'),
+        findsOneWidget,
+      );
+      expect(find.text('Moved early.'), findsOneWidget);
+      expect(
+        inPane(const Key('journal-detail-pane'), desktopToday),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('journal-private-cover')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('journal-entry-private')));
+      await tester.pumpAndSettle();
+      expect(find.text('Make Public'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('journal-show-content')));
+      await tester.pumpAndSettle();
+      expect(find.text('Make Public'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('journal-entry-last-week')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journal-entry-private')));
+      await tester.pumpAndSettle();
+      expect(find.text('Quiet thought'), findsNothing);
+      await tester.tap(find.byKey(const Key('journal-privacy')));
+      await tester.pumpAndSettle();
+
+      expect(repository.updates.last.private, isFalse);
+      expect(repository.updates.last.subject, 'Quiet thought');
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Quiet thought'),
+        findsOneWidget,
+      );
+      expect(find.text('Line one\nstill one.'), findsOneWidget);
+      expect(find.text('Line two.'), findsOneWidget);
+      expect(
+        inPane(const Key('journal-detail-pane'), desktopPrivateWhen),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(const Key('journal-entry-last-week')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('journal-edit')), findsNothing);
+      expect(find.text('Make Private'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('journal-privacy')));
+      await tester.pumpAndSettle();
+
+      expect(repository.updates.last.private, isTrue);
+      expect(repository.updates.last.subject, 'Long call');
+      expect(
+        inPane(const Key('journal-detail-pane'), desktopPastWhen),
+        findsOneWidget,
+      );
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Long call'),
+        findsNothing,
+      );
+      expect(find.byKey(const Key('journal-private-cover')), findsOneWidget);
+    },
+  );
+
+  for (final desktop in [false, true]) {
+    testWidgets(
+      'Given a ${desktop ? 'desktop' : 'phone'} entry, when the privacy update fails, then the snackbar shows and the writing stays',
+      (tester) async {
+        final repository = FakeJournalEntryRepository(
+          entries: [
+            _entry(
+              id: 'today',
+              subject: 'Early run',
+              mood: 4,
+              text: 'Moved early.',
+              localDateTime: '2026-11-14T08:02:00',
+            ),
+          ],
+        )..updateError = Exception('offline');
+        await _pumpJournalScreen(
+          tester,
+          size: desktop ? _desktop : _phone,
+          repository: repository,
+          clock: () => noon,
+        );
+        if (!desktop) {
+          await tester.tap(find.byKey(const Key('journal-entry-today')));
+          await tester.pumpAndSettle();
+        }
+
+        await tester.tap(find.byKey(const Key('journal-privacy')));
+        await tester.pumpAndSettle();
+
+        expect(repository.updates, [
+          (subject: 'Early run', mood: 4, text: 'Moved early.', private: true),
+        ]);
+        expect(find.text('The entry could not be updated.'), findsOneWidget);
+        expect(
+          tester.widget<SnackBar>(find.byType(SnackBar)).behavior,
+          SnackBarBehavior.floating,
+        );
+        final writing = desktop
+            ? find.byKey(const Key('journal-detail-pane'))
+            : find.byKey(const Key('journal-entry-screen'));
+        expect(
+          find.descendant(of: writing, matching: find.text('Early run')),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(of: writing, matching: find.text('Moved early.')),
+          findsOneWidget,
+        );
+        expect(find.byKey(const Key('journal-private-cover')), findsNothing);
+        expect(find.text('Make Private'), findsOneWidget);
+      },
+    );
+  }
+
+  for (final theme in [AppTheme.light, AppTheme.dark]) {
+    testWidgets(
+      'Given a ${theme.brightness.name} journal, when an entry is open, then the privacy button uses primary',
+      (tester) async {
+        final repository = FakeJournalEntryRepository(
+          entries: [
+            _entry(
+              id: 'today',
+              subject: 'Early run',
+              mood: 4,
+              text: 'Moved early.',
+              localDateTime: '2026-11-14T08:02:00',
+            ),
+          ],
+        );
+        final scheme = theme.colorScheme;
+        await _pumpJournalScreen(
+          tester,
+          size: _phone,
+          theme: theme,
+          repository: repository,
+          clock: () => noon,
+        );
+        await tester.tap(find.byKey(const Key('journal-entry-today')));
+        await tester.pumpAndSettle();
+
+        final outlined = tester.widget<OutlinedButton>(
+          find.byKey(const Key('journal-privacy')),
+        );
+        expect(outlined.style?.foregroundColor?.resolve({}), scheme.primary);
+        expect(outlined.style?.side?.resolve({})?.color, scheme.outline);
+      },
+    );
+
+    testWidgets(
+      'Given a ${theme.brightness.name} desktop entry, when it is shown, then Make Private uses primary',
+      (tester) async {
+        await _pumpJournalScreen(
+          tester,
+          size: _desktop,
+          theme: theme,
+          repository: FakeJournalEntryRepository(
+            entries: [
+              _entry(
+                id: 'today',
+                subject: 'Early run',
+                mood: 4,
+                text: 'Moved early.',
+                localDateTime: '2026-11-14T08:02:00',
+              ),
+            ],
+          ),
+          clock: () => noon,
+        );
+        final textButton = tester.widget<TextButton>(
+          find.byKey(const Key('journal-privacy')),
+        );
+        expect(
+          textButton.style?.foregroundColor?.resolve({}),
+          theme.colorScheme.primary,
+        );
+      },
+    );
+  }
 }
