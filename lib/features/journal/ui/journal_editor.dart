@@ -8,6 +8,9 @@ import 'package:material_ui/material_ui.dart';
 const _dateNote = 'Date and time are set when you save';
 const _journalHint = 'Write whatever is on your mind…';
 const _saveFailed = 'The entry could not be saved.';
+const _phonePrivateSupport = 'Hide subject and text until Show Content';
+const _desktopPrivateSupport =
+    'Hide the subject and text until you choose Show Content';
 
 class JournalEditor extends StatefulWidget {
   const JournalEditor({
@@ -16,6 +19,7 @@ class JournalEditor extends StatefulWidget {
     this.subject = '',
     this.mood,
     this.text = '',
+    this.private = false,
     super.key,
   });
 
@@ -23,10 +27,12 @@ class JournalEditor extends StatefulWidget {
   final String subject;
   final int? mood;
   final String text;
+  final bool private;
   final Future<void> Function({
     required String subject,
     required int mood,
     required String text,
+    required bool private,
   })
   onSubmit;
 
@@ -38,6 +44,7 @@ class _JournalEditorState extends State<JournalEditor> {
   late final TextEditingController _subjectController;
   late final TextEditingController _textController;
   int? _mood;
+  late bool _private;
   var _saving = false;
 
   @override
@@ -46,6 +53,7 @@ class _JournalEditorState extends State<JournalEditor> {
     _subjectController = TextEditingController(text: widget.subject);
     _textController = TextEditingController(text: widget.text);
     _mood = widget.mood;
+    _private = widget.private;
     _subjectController.addListener(_onEdited);
     _textController.addListener(_onEdited);
   }
@@ -74,6 +82,10 @@ class _JournalEditorState extends State<JournalEditor> {
     setState(() => _mood = mood);
   }
 
+  void _setPrivate(bool value) {
+    setState(() => _private = value);
+  }
+
   void _dismiss() {
     Navigator.of(context).pop();
   }
@@ -82,6 +94,7 @@ class _JournalEditorState extends State<JournalEditor> {
     final subject = _subjectController.text.trim();
     final text = _textController.text.trim();
     final mood = _mood;
+    final isPrivate = _private;
     if (_saving || subject.isEmpty || mood == null || text.isEmpty) {
       return;
     }
@@ -89,7 +102,12 @@ class _JournalEditorState extends State<JournalEditor> {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     try {
-      await widget.onSubmit(subject: subject, mood: mood, text: text);
+      await widget.onSubmit(
+        subject: subject,
+        mood: mood,
+        text: text,
+        private: isPrivate,
+      );
       if (!mounted) {
         return;
       }
@@ -116,7 +134,9 @@ class _JournalEditorState extends State<JournalEditor> {
       textController: _textController,
       mood: _mood,
       desktop: widget.desktop,
+      private: _private,
       onMoodChanged: _selectMood,
+      onPrivateChanged: _setPrivate,
     );
     if (widget.desktop) {
       return _DesktopEditor(
@@ -142,14 +162,18 @@ class _EditorFields extends StatelessWidget {
     required this.textController,
     required this.mood,
     required this.desktop,
+    required this.private,
     required this.onMoodChanged,
+    required this.onPrivateChanged,
   });
 
   final TextEditingController subjectController;
   final TextEditingController textController;
   final int? mood;
   final bool desktop;
+  final bool private;
   final ValueChanged<int> onMoodChanged;
+  final ValueChanged<bool> onPrivateChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -180,6 +204,11 @@ class _EditorFields extends StatelessWidget {
           hintText: _journalHint,
           minHeight: desktop ? 260 : 220,
           minLines: desktop ? 9 : 8,
+        ),
+        _PrivateSwitch(
+          value: private,
+          desktop: desktop,
+          onChanged: onPrivateChanged,
         ),
       ],
     );
@@ -338,6 +367,45 @@ class _DesktopEditor extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _PrivateSwitch extends StatelessWidget {
+  const _PrivateSwitch({
+    required this.value,
+    required this.desktop,
+    required this.onChanged,
+  });
+
+  final bool value;
+  final bool desktop;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      key: const Key('journal-private'),
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Switch(value: value, onChanged: onChanged),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Private', style: theme.textTheme.titleMedium),
+              Text(
+                desktop ? _desktopPrivateSupport : _phonePrivateSupport,
+                style: theme.textTheme.bodySmall!.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

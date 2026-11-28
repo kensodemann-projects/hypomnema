@@ -21,7 +21,7 @@ const _subjectKey = Key('journal-subject');
 const _textKey = Key('journal-text');
 
 class _Submissions {
-  final calls = <({String subject, int mood, String text})>[];
+  final calls = <({String subject, int mood, String text, bool private})>[];
   Object? error;
   Future<void> Function()? gate;
 
@@ -29,8 +29,9 @@ class _Submissions {
     required String subject,
     required int mood,
     required String text,
+    required bool private,
   }) async {
-    calls.add((subject: subject, mood: mood, text: text));
+    calls.add((subject: subject, mood: mood, text: text, private: private));
     final gate = this.gate;
     if (gate != null) {
       await gate();
@@ -51,6 +52,7 @@ Future<_Submissions> _openEditor(
   String subject = '',
   int? mood,
   String text = '',
+  bool private = false,
 }) async {
   final recorder = submissions ?? _Submissions();
   setLogicalViewportSize(tester, size);
@@ -68,6 +70,7 @@ Future<_Submissions> _openEditor(
                   subject: subject,
                   mood: mood,
                   text: text,
+                  private: private,
                 );
                 if (desktop) {
                   showDialog<void>(
@@ -156,8 +159,48 @@ void expectDateNote(WidgetTester tester, ColorScheme scheme) {
 
 void expectAbsentLaterTasks() {
   expect(find.textContaining("I'm Stuck"), findsNothing);
-  expect(find.textContaining('Private'), findsNothing);
   expect(find.textContaining('Prompt'), findsNothing);
+}
+
+const _phonePrivateSupport = 'Hide subject and text until Show Content';
+const _desktopPrivateSupport =
+    'Hide the subject and text until you choose Show Content';
+
+Finder _privateSwitch() {
+  return find.descendant(
+    of: find.byKey(const Key('journal-private')),
+    matching: find.byType(Switch),
+  );
+}
+
+void expectPrivateSwitch(
+  WidgetTester tester, {
+  required bool desktop,
+  required bool value,
+  required ColorScheme scheme,
+}) {
+  final row = find.byKey(const Key('journal-private'));
+  final title = find.descendant(of: row, matching: find.text('Private'));
+  final support = find.descendant(
+    of: row,
+    matching: find.text(
+      desktop ? _desktopPrivateSupport : _phonePrivateSupport,
+    ),
+  );
+  final textTheme = Theme.of(tester.element(title)).textTheme;
+  _expectRole(tester.widget<Text>(title).style, textTheme.titleMedium);
+  final supportText = tester.widget<Text>(support);
+  _expectRole(supportText.style, textTheme.bodySmall);
+  expect(supportText.style?.color, scheme.onSurfaceVariant);
+  expect(tester.widget<Switch>(_privateSwitch()).value, value);
+  expect(
+    tester.getTopLeft(_privateSwitch()).dx,
+    lessThan(tester.getTopLeft(title).dx),
+  );
+  expect(
+    tester.getTopLeft(row).dy,
+    greaterThan(tester.getBottomLeft(find.byKey(_textKey)).dy),
+  );
 }
 
 void expectUnfocusedSubject(WidgetTester tester, ColorScheme scheme) {
@@ -426,7 +469,9 @@ void main() {
       await tester.tap(find.byKey(_saveKey));
       await tester.pumpAndSettle();
 
-      expect(submissions.calls, [(subject: 'Note', mood: 4, text: 'hello')]);
+      expect(submissions.calls, [
+        (subject: 'Note', mood: 4, text: 'hello', private: false),
+      ]);
       expect(find.byKey(_editorKey), findsNothing);
       expect(find.text('Open'), findsOneWidget);
     },
@@ -446,7 +491,9 @@ void main() {
       await tester.tap(find.byKey(_saveKey));
       await tester.pumpAndSettle();
 
-      expect(submissions.calls, [(subject: 'Note', mood: 2, text: 'hello')]);
+      expect(submissions.calls, [
+        (subject: 'Note', mood: 2, text: 'hello', private: false),
+      ]);
       expect(find.byKey(_editorKey), findsNothing);
     },
   );
@@ -481,7 +528,9 @@ void main() {
       await tester.tap(find.byKey(_saveKey));
       await tester.pumpAndSettle();
 
-      expect(submissions.calls, [(subject: 'Note', mood: 3, text: 'hello')]);
+      expect(submissions.calls, [
+        (subject: 'Note', mood: 3, text: 'hello', private: false),
+      ]);
       expect(find.byKey(_editorKey), findsNothing);
     },
   );
@@ -785,6 +834,209 @@ void main() {
       FocusManager.instance.primaryFocus?.unfocus();
       await tester.pump();
       expect(find.text('Journal is required.'), findsOneWidget);
+    },
+  );
+
+  for (final theme in [AppTheme.light, AppTheme.dark]) {
+    final themeName = theme.brightness.name;
+    final scheme = theme.colorScheme;
+
+    testWidgets(
+      'Given a new $themeName phone editor, when it opens, then Private starts off with the phone support line',
+      (tester) async {
+        await _openEditor(
+          tester,
+          desktop: false,
+          theme: theme,
+          size: const Size(kDesktopLayoutMinWidth - 200, 800),
+        );
+
+        expectPrivateSwitch(
+          tester,
+          desktop: false,
+          value: false,
+          scheme: scheme,
+        );
+        expect(find.text(_desktopPrivateSupport), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Given a new $themeName desktop editor, when it opens, then Private starts off with the desktop support line',
+      (tester) async {
+        await _openEditor(
+          tester,
+          desktop: true,
+          theme: theme,
+          size: const Size(kDesktopLayoutMinWidth + 600, 800),
+        );
+
+        expectPrivateSwitch(
+          tester,
+          desktop: true,
+          value: false,
+          scheme: scheme,
+        );
+        expect(find.text(_phonePrivateSupport), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Given private is on for a $themeName phone edit, when the editor opens, then the switch starts on',
+      (tester) async {
+        await _openEditor(
+          tester,
+          desktop: false,
+          theme: theme,
+          size: const Size(kDesktopLayoutMinWidth - 200, 800),
+          private: true,
+        );
+
+        expectPrivateSwitch(
+          tester,
+          desktop: false,
+          value: true,
+          scheme: scheme,
+        );
+      },
+    );
+
+    testWidgets(
+      'Given private is on for a $themeName desktop edit, when the editor opens, then the switch starts on',
+      (tester) async {
+        await _openEditor(
+          tester,
+          desktop: true,
+          theme: theme,
+          size: const Size(kDesktopLayoutMinWidth + 600, 800),
+          private: true,
+        );
+
+        expectPrivateSwitch(tester, desktop: true, value: true, scheme: scheme);
+      },
+    );
+  }
+
+  testWidgets(
+    'Given an empty phone editor, when Private is toggled, then Save stays disabled',
+    (tester) async {
+      final submissions = await _openEditor(
+        tester,
+        desktop: false,
+        theme: AppTheme.light,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
+
+      await tester.tap(_privateSwitch());
+      await tester.pump();
+
+      expect(tester.widget<Switch>(_privateSwitch()).value, isTrue);
+      expectSaveDisabled(tester);
+      expect(submissions.calls, isEmpty);
+    },
+  );
+
+  testWidgets(
+    'Given a filled phone editor, when Private is turned on and Save is tapped, then onSubmit receives private true',
+    (tester) async {
+      final submissions = await _openEditor(
+        tester,
+        desktop: false,
+        theme: AppTheme.light,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+      );
+      await enterEntry(tester, subject: 'Note', text: 'hello', mood: 4);
+      expect(
+        tester.widget<ButtonStyleButton>(find.byKey(_saveKey)).onPressed,
+        isNotNull,
+      );
+
+      await tester.tap(_privateSwitch());
+      await tester.pump();
+      expect(
+        tester.widget<ButtonStyleButton>(find.byKey(_saveKey)).onPressed,
+        isNotNull,
+      );
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pumpAndSettle();
+
+      expect(submissions.calls, [
+        (subject: 'Note', mood: 4, text: 'hello', private: true),
+      ]);
+    },
+  );
+
+  testWidgets(
+    'Given a filled desktop editor, when Private is turned on and Save is tapped, then onSubmit receives private true',
+    (tester) async {
+      final submissions = await _openEditor(
+        tester,
+        desktop: true,
+        theme: AppTheme.light,
+        size: const Size(kDesktopLayoutMinWidth + 125, 800),
+      );
+      await enterEntry(tester, subject: 'Note', text: 'hello', mood: 2);
+
+      await tester.tap(_privateSwitch());
+      await tester.pump();
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pumpAndSettle();
+
+      expect(submissions.calls, [
+        (subject: 'Note', mood: 2, text: 'hello', private: true),
+      ]);
+    },
+  );
+
+  testWidgets(
+    'Given a phone edit that starts private, when the switch is turned off and Save is tapped, then onSubmit receives private false',
+    (tester) async {
+      final submissions = await _openEditor(
+        tester,
+        desktop: false,
+        theme: AppTheme.light,
+        size: const Size(kDesktopLayoutMinWidth - 200, 800),
+        subject: 'Note',
+        mood: 3,
+        text: 'hello',
+        private: true,
+      );
+
+      expect(tester.widget<Switch>(_privateSwitch()).value, isTrue);
+      await tester.tap(_privateSwitch());
+      await tester.pump();
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pumpAndSettle();
+
+      expect(submissions.calls, [
+        (subject: 'Note', mood: 3, text: 'hello', private: false),
+      ]);
+    },
+  );
+
+  testWidgets(
+    'Given a desktop edit that starts private, when the switch is turned off and Save is tapped, then onSubmit receives private false',
+    (tester) async {
+      final submissions = await _openEditor(
+        tester,
+        desktop: true,
+        theme: AppTheme.light,
+        size: const Size(kDesktopLayoutMinWidth + 125, 800),
+        subject: 'Note',
+        mood: 3,
+        text: 'hello',
+        private: true,
+      );
+
+      expect(tester.widget<Switch>(_privateSwitch()).value, isTrue);
+      await tester.tap(_privateSwitch());
+      await tester.pump();
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pumpAndSettle();
+
+      expect(submissions.calls, [
+        (subject: 'Note', mood: 3, text: 'hello', private: false),
+      ]);
     },
   );
 }

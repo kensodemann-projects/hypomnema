@@ -115,12 +115,13 @@ class _JournalScreenState extends State<JournalScreen> {
     required String subject,
     required int mood,
     required String text,
+    required bool private,
   }) async {
     await widget.repository.save(
       subject: subject,
       mood: mood,
       text: text,
-      private: false,
+      private: private,
     );
   }
 
@@ -130,10 +131,16 @@ class _JournalScreenState extends State<JournalScreen> {
       required String subject,
       required int mood,
       required String text,
+      required bool private,
     }) async {
       final editing = entry;
       if (editing == null) {
-        await _submit(subject: subject, mood: mood, text: text);
+        await _submit(
+          subject: subject,
+          mood: mood,
+          text: text,
+          private: private,
+        );
         return;
       }
       await widget.repository.update(
@@ -141,7 +148,7 @@ class _JournalScreenState extends State<JournalScreen> {
         subject: subject,
         mood: mood,
         text: text,
-        private: editing.private,
+        private: private,
       );
     }
 
@@ -151,6 +158,7 @@ class _JournalScreenState extends State<JournalScreen> {
       subject: entry?.subject ?? '',
       mood: entry?.mood,
       text: entry?.text ?? '',
+      private: entry?.private ?? false,
     );
     if (desktop) {
       showDialog<void>(

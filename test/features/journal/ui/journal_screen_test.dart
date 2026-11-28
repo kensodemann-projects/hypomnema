@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hypomnema/core/constants/layout.dart';
 import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
+import 'package:hypomnema/features/journal/domain/journal_list.dart';
 import 'package:hypomnema/features/journal/ui/journal_entry_detail.dart';
 import 'package:hypomnema/features/journal/ui/journal_screen.dart';
 import 'package:hypomnema/features/journal/ui/mood_swatch.dart';
@@ -1860,4 +1861,73 @@ void main() {
       },
     );
   }
+
+  testWidgets(
+    'Given a new phone entry, when Private is saved on and later turned off, then the row starts covered and the edit shows the subject',
+    (tester) async {
+      const subject = 'Morning note';
+      const text = 'Kept it.';
+      final saved = JournalEntry.create(
+        id: 'entry-1',
+        subject: subject,
+        mood: 4,
+        text: text,
+        private: true,
+        now: DateTime.utc(2026, 11, 24, 18),
+      );
+      final when = journalDetailWhen(saved, includeYear: false);
+      final repository = await _pumpJournalScreen(
+        tester,
+        size: _phone,
+        clock: () => DateTime.utc(2026, 11, 24, 20),
+      );
+      await tester.tap(find.text(_emptyAction));
+      await tester.pumpAndSettle();
+      await _enterEntry(tester, subject: subject, text: text, mood: 4);
+      await tester.tap(find.byType(Switch));
+      await tester.pump();
+
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pumpAndSettle();
+
+      expect(repository.saves, [
+        (subject: subject, mood: 4, text: text, private: true),
+      ]);
+      expect(find.text(_emptyTitle), findsNothing);
+      expect(find.text(subject), findsNothing);
+      expect(find.text('Private entry'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('journal-entry-entry-1')));
+      await tester.pumpAndSettle();
+
+      _expectPrivateCover(
+        tester,
+        scope: find.byKey(const Key('journal-entry-screen')),
+        desktop: false,
+        scheme: AppTheme.light.colorScheme,
+      );
+      expect(find.text(when), findsOneWidget);
+      expect(find.text(subject), findsNothing);
+      expect(find.text(text), findsNothing);
+
+      await tester.tap(find.byKey(const Key('journal-show-content')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journal-edit')));
+      await tester.pumpAndSettle();
+
+      expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
+      await tester.tap(find.byType(Switch));
+      await tester.pump();
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pumpAndSettle();
+
+      expect(repository.updates, [
+        (subject: subject, mood: 4, text: text, private: false),
+      ]);
+      expect(find.text(subject), findsOneWidget);
+      expect(find.text(text), findsOneWidget);
+      expect(find.text(when), findsOneWidget);
+      expect(find.byKey(const Key('journal-private-cover')), findsNothing);
+    },
+  );
 }
