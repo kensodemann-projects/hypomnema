@@ -39,6 +39,39 @@ void _expectTextRole(WidgetTester tester, Finder finder, TextStyle? role) {
   _expectRole(tester.widget<Text>(finder).style, role);
 }
 
+void _expectPrivateListRow(
+  WidgetTester tester, {
+  required Key rowKey,
+  required Color labelColor,
+}) {
+  final row = find.byKey(rowKey);
+  expect(
+    find.descendant(of: row, matching: find.text('Quiet thought')),
+    findsNothing,
+  );
+  final label = find.descendant(of: row, matching: find.text('Private entry'));
+  expect(label, findsOneWidget);
+  final textTheme = Theme.of(tester.element(label)).textTheme;
+  _expectTextRole(tester, label, textTheme.titleMedium);
+  final title = tester.widget<Text>(label);
+  expect(title.maxLines, 1);
+  expect(title.overflow, TextOverflow.ellipsis);
+  expect(title.style?.color, labelColor);
+  final lock = tester.widget<Icon>(
+    find.descendant(of: row, matching: find.byIcon(Icons.lock)),
+  );
+  expect(lock.size, 16);
+  expect(lock.color, labelColor);
+  expect(
+    tester
+        .widget<MoodSwatch>(
+          find.descendant(of: row, matching: find.byType(MoodSwatch)),
+        )
+        .mood,
+    2,
+  );
+}
+
 Future<FakeJournalEntryRepository> _pumpJournalScreen(
   WidgetTester tester, {
   required Size size,
@@ -278,16 +311,17 @@ void main() {
       );
       expect(
         tester.getTopLeft(find.text('Early run')).dy,
-        lessThan(tester.getTopLeft(find.text('Quiet thought')).dy),
+        lessThan(tester.getTopLeft(find.text('Private entry')).dy),
       );
       expect(
-        tester.getTopLeft(find.text('Quiet thought')).dy,
+        tester.getTopLeft(find.text('Private entry')).dy,
         lessThan(tester.getTopLeft(find.text('LAST WEEK')).dy),
       );
       expect(find.text('Today · 8:02 AM'), findsOneWidget);
       expect(find.text('Thu, Nov 12 · 10:15 PM'), findsOneWidget);
       expect(find.text('Fri, Nov 6 · 9:50 PM'), findsOneWidget);
-      expect(find.text('Quiet thought'), findsOneWidget);
+      expect(find.text('Quiet thought'), findsNothing);
+      expect(find.text('Private entry'), findsOneWidget);
       expect(find.byKey(_writeKey), findsOneWidget);
 
       final heading = find.text('THIS WEEK');
@@ -300,6 +334,11 @@ void main() {
       final subject = tester.widget<Text>(subjectFinder);
       expect(subject.maxLines, 1);
       expect(subject.overflow, TextOverflow.ellipsis);
+      _expectPrivateListRow(
+        tester,
+        rowKey: const Key('journal-entry-private'),
+        labelColor: AppTheme.light.colorScheme.onSurfaceVariant,
+      );
     },
   );
 
@@ -469,6 +508,14 @@ void main() {
                 text: 'Moved early.',
                 localDateTime: '2026-11-14T08:02:00',
               ),
+              _entry(
+                id: 'private',
+                subject: 'Quiet thought',
+                mood: 2,
+                text: 'Hidden line.',
+                localDateTime: '2026-11-12T22:15:00',
+                private: true,
+              ),
             ],
           ),
           clock: () => DateTime(2026, 11, 14, 12),
@@ -483,6 +530,11 @@ void main() {
                     .decoration
                 as BoxDecoration;
         expect(decoration.border, Border.all(color: scheme.outlineVariant));
+        _expectPrivateListRow(
+          tester,
+          rowKey: const Key('journal-entry-private'),
+          labelColor: scheme.onSurfaceVariant,
+        );
         expect(
           tester.widget<Text>(find.text('THIS WEEK')).style?.color,
           scheme.onSurfaceVariant,
@@ -604,6 +656,22 @@ void main() {
         tester.getSize(find.byKey(const Key('journal-detail-card'))).width,
         tester.getSize(find.byKey(const Key('journal-detail-pane'))).width - 64,
       );
+      expect(
+        inPane(const Key('journal-list-pane'), 'Quiet thought'),
+        findsNothing,
+      );
+      _expectPrivateListRow(
+        tester,
+        rowKey: const Key('journal-entry-private'),
+        labelColor: AppTheme.light.colorScheme.onSurfaceVariant,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('journal-entry-private')),
+          matching: find.text('Thu, Nov 12 · 10:15 PM'),
+        ),
+        findsOneWidget,
+      );
 
       await tester.tap(find.byKey(const Key('journal-entry-private')));
       await tester.pumpAndSettle();
@@ -662,6 +730,14 @@ void main() {
           repository: FakeJournalEntryRepository(
             entries: [
               _entry(
+                id: 'private',
+                subject: 'Quiet thought',
+                mood: 2,
+                text: 'Hidden line.',
+                localDateTime: '2026-11-14T10:15:00',
+                private: true,
+              ),
+              _entry(
                 id: 'today',
                 subject: 'Early run',
                 mood: 4,
@@ -677,27 +753,48 @@ void main() {
         final decoration =
             tester
                     .widget<DecoratedBox>(
-                      find.byKey(const Key('journal-entry-decoration-today')),
+                      find.byKey(const Key('journal-entry-decoration-private')),
                     )
                     .decoration
                 as BoxDecoration;
         expect(decoration.color, scheme.primaryContainer);
         expect(decoration.border, Border.all(color: scheme.primary, width: 2));
+        _expectPrivateListRow(
+          tester,
+          rowKey: const Key('journal-entry-private'),
+          labelColor: scheme.onSurfaceVariant,
+        );
         expect(
           tester
               .widget<Text>(
                 find.descendant(
-                  of: find.byKey(const Key('journal-entry-today')),
-                  matching: find.text('Early run'),
+                  of: find.byKey(const Key('journal-entry-private')),
+                  matching: find.text('Today · 10:15 AM'),
                 ),
               )
               .style
               ?.color,
           scheme.onPrimaryContainer,
         );
+        final publicSubject = find.descendant(
+          of: find.byKey(const Key('journal-entry-today')),
+          matching: find.text('Early run'),
+        );
         expect(
-          tester.widget<Text>(find.text('Today · 8:02 AM')).style?.color,
-          scheme.onPrimaryContainer,
+          tester.widget<Text>(publicSubject).style?.color,
+          Theme.of(tester.element(publicSubject)).textTheme.titleMedium?.color,
+        );
+        expect(
+          tester
+              .widget<Text>(
+                find.descendant(
+                  of: find.byKey(const Key('journal-entry-today')),
+                  matching: find.text('Today · 8:02 AM'),
+                ),
+              )
+              .style
+              ?.color,
+          scheme.onSurfaceVariant,
         );
         final card =
             tester

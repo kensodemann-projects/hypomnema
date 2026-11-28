@@ -42,7 +42,7 @@ Text roles are the same on both form factors. "Private entry" in the list is `ti
 
 | Order | Step | Status | Files |
 | ----- | ---- | ------ | ----- |
-| 1 | [STEP-001] | | `lib/features/journal/ui/journal_entry_list.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
+| 1 | [STEP-001] | complete | `lib/features/journal/ui/journal_entry_list.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 2 | [STEP-002] | | `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 3 | [STEP-003] | | `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/helpers/fake_journal_entry_repository.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 4 | [STEP-004] | | `lib/features/journal/ui/journal_editor.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_editor_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
@@ -60,7 +60,7 @@ Every commit-gate command must succeed with no warning or error before that comm
 
 ## [STEP-001] Show a private list row as a lock and "Private entry"
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** A private row shows its mood, date, and time, with a lock and "Private entry" in place of the subject, on the phone and the desktop, in light and dark. A public row still shows its subject.
 

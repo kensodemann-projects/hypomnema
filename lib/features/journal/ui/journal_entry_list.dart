@@ -4,6 +4,8 @@ import 'package:hypomnema/features/journal/domain/journal_list.dart';
 import 'package:hypomnema/features/journal/ui/mood_swatch.dart';
 import 'package:material_ui/material_ui.dart';
 
+const _privateLabel = 'Private entry';
+
 class JournalEntryList extends StatelessWidget {
   const JournalEntryList({
     required this.entries,
@@ -105,15 +107,12 @@ class _JournalEntryRow extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        entry.subject,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: selected
-                            ? theme.textTheme.titleMedium!.copyWith(
-                                color: scheme.onPrimaryContainer,
-                              )
-                            : theme.textTheme.titleMedium,
+                      _rowTitle(
+                        entry: entry,
+                        theme: theme,
+                        selected: selected,
+                        selectedColor: scheme.onPrimaryContainer,
+                        privateColor: scheme.onSurfaceVariant,
                       ),
                       Text(
                         journalRowWhen(entry, now),
@@ -131,4 +130,38 @@ class _JournalEntryRow extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _rowTitle({
+  required JournalEntry entry,
+  required ThemeData theme,
+  required bool selected,
+  required Color selectedColor,
+  required Color privateColor,
+}) {
+  final titleMedium = theme.textTheme.titleMedium!;
+  if (!entry.private) {
+    return Text(
+      entry.subject,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: selected
+          ? titleMedium.copyWith(color: selectedColor)
+          : titleMedium,
+    );
+  }
+  return Row(
+    spacing: 6,
+    children: [
+      Icon(Icons.lock, size: 16, color: privateColor),
+      Expanded(
+        child: Text(
+          _privateLabel,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: titleMedium.copyWith(color: privateColor),
+        ),
+      ),
+    ],
+  );
 }
