@@ -32,7 +32,7 @@ A journal entry already stores an absolute `createdAt` and a wall-clock `localDa
 
 | Order | Step       | Status | Files |
 | ----- | ---------- | ------ | ----- |
-| 1     | [STEP-001] |        | `lib/core/utils/edit_window.dart`, then `test/core/utils/edit_window_test.dart`, then `lib/features/journal/domain/journal_list.dart`, then `test/features/journal/domain/journal_list_test.dart` |
+| 1     | [STEP-001] | complete | `lib/core/utils/edit_window.dart`, then `test/core/utils/edit_window_test.dart`, then `lib/features/journal/domain/journal_list.dart`, then `test/features/journal/domain/journal_list_test.dart` |
 | 2     | [STEP-002] |        | `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/helpers/fake_journal_entry_repository.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 
 **Commit gate** — the human commits. A spot-check does not replace the gate.
@@ -46,7 +46,7 @@ make check
 
 ## [STEP-001] Add the shared 24-hour window and the journal note
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** Callers can ask whether an absolute creation timestamp is still inside the 24-hour window, and the journal note names that deadline as today or tomorrow.
 
