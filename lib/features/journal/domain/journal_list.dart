@@ -1,3 +1,4 @@
+import 'package:hypomnema/core/utils/edit_window.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 
 class JournalWeekGroup {
@@ -62,6 +63,37 @@ String journalEntryBarTitle(JournalEntry entry) {
   final local = DateTime.parse(entry.localDateTime);
   return '${_weekdayAbbreviations[local.weekday - 1]}, '
       '${_monthAbbreviations[local.month - 1]} ${local.day}';
+}
+
+/// Returns the "Editable until" sentence for [createdAt], or `null` when closed.
+///
+/// The clock time is the local time of the absolute deadline. The day word is
+/// `today` on [now]'s local calendar day, `tomorrow` on the next day, and the
+/// month and day when the deadline falls later.
+String? journalEditableUntilNote({
+  required DateTime createdAt,
+  required DateTime now,
+}) {
+  if (!isWithinEditWindow(createdAt: createdAt, now: now)) {
+    return null;
+  }
+  final deadline = editWindowDeadline(createdAt).toLocal();
+  final day = _deadlineDayWord(deadline, now.toLocal());
+  return 'Editable until ${_time(deadline)} $day';
+}
+
+String _deadlineDayWord(DateTime deadlineLocal, DateTime nowLocal) {
+  final today = _date(nowLocal);
+  final deadlineDay = _date(deadlineLocal);
+  if (_sameDay(deadlineDay, today)) {
+    return 'today';
+  }
+  final tomorrow = DateTime(today.year, today.month, today.day + 1);
+  if (_sameDay(deadlineDay, tomorrow)) {
+    return 'tomorrow';
+  }
+  final month = _monthAbbreviations[deadlineDay.month - 1];
+  return '$month ${deadlineDay.day}';
 }
 
 const _weekdayAbbreviations = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

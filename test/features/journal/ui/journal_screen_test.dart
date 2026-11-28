@@ -84,6 +84,7 @@ JournalEntry _entry({
   required String text,
   required String localDateTime,
   bool private = false,
+  DateTime? createdAt,
 }) {
   return JournalEntry.restore(
     id: id,
@@ -92,7 +93,7 @@ JournalEntry _entry({
     text: text,
     private: private,
     localDateTime: localDateTime,
-    createdAt: DateTime.parse(localDateTime),
+    createdAt: createdAt ?? DateTime.parse(localDateTime),
   );
 }
 
@@ -299,6 +300,34 @@ void main() {
       final subject = tester.widget<Text>(subjectFinder);
       expect(subject.maxLines, 1);
       expect(subject.overflow, TextOverflow.ellipsis);
+    },
+  );
+
+  testWidgets(
+    'Given a phone journal entry, when its row is tapped, then the first frame already shows the subject',
+    (tester) async {
+      await _pumpJournalScreen(
+        tester,
+        size: _phone,
+        repository: _seededJournal(),
+        clock: () => DateTime(2026, 11, 14, 12),
+      );
+
+      await tester.tap(find.byKey(const Key('journal-entry-today')));
+      await tester.pump();
+
+      final screen = find.byKey(
+        const Key('journal-entry-screen'),
+        skipOffstage: false,
+      );
+      expect(
+        find.descendant(
+          of: screen,
+          matching: find.text('Early run', skipOffstage: false),
+          skipOffstage: false,
+        ),
+        findsOneWidget,
+      );
     },
   );
 
@@ -682,4 +711,367 @@ void main() {
       },
     );
   }
+
+  const openNote = 'Editable until 8:02 AM tomorrow';
+  final noon = DateTime(2026, 11, 14, 12);
+
+  void expectNoDelete() {
+    expect(find.text('Delete'), findsNothing);
+    expect(find.byIcon(Icons.delete), findsNothing);
+  }
+
+  Finder inScreen(Key screen, Finder matching) {
+    return find.descendant(of: find.byKey(screen), matching: matching);
+  }
+
+  testWidgets(
+    'Given the November 14 entry viewed at noon, when the phone detail opens, then Edit and the note are shown, and a November 12 entry has neither',
+    (tester) async {
+      await _pumpJournalScreen(
+        tester,
+        size: _phone,
+        repository: _seededJournal(),
+        clock: () => noon,
+      );
+
+      await tester.tap(find.byKey(const Key('journal-entry-today')));
+      await tester.pumpAndSettle();
+
+      expect(find.text(openNote), findsOneWidget);
+      expect(find.byKey(const Key('journal-edit')), findsOneWidget);
+      expectNoDelete();
+
+      await tester.tap(find.byKey(const Key('journal-back')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journal-entry-private')));
+      await tester.pumpAndSettle();
+
+      expect(find.text(openNote), findsNothing);
+      expect(find.byKey(const Key('journal-edit')), findsNothing);
+      expect(find.byIcon(Icons.schedule), findsNothing);
+      expectNoDelete();
+    },
+  );
+
+  testWidgets(
+    'Given the wall clock and the creation timestamp disagree, when the phone detail opens, then Edit follows the creation timestamp',
+    (tester) async {
+      await _pumpJournalScreen(
+        tester,
+        size: _phone,
+        clock: () => noon,
+        repository: FakeJournalEntryRepository(
+          entries: [
+            _entry(
+              id: 'old-wall',
+              subject: 'Old wall',
+              mood: 3,
+              text: 'Still new.',
+              localDateTime: '2026-11-01T08:00:00',
+              createdAt: DateTime(2026, 11, 14, 8, 2),
+            ),
+            _entry(
+              id: 'fresh-wall',
+              subject: 'Fresh wall',
+              mood: 3,
+              text: 'Already old.',
+              localDateTime: '2026-11-14T08:02:00',
+              createdAt: DateTime(2026, 11, 1, 8),
+            ),
+          ],
+        ),
+      );
+
+      await tester.tap(find.byKey(const Key('journal-entry-old-wall')));
+      await tester.pumpAndSettle();
+
+      expect(find.text(openNote), findsOneWidget);
+      expect(find.byKey(const Key('journal-edit')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('journal-back')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journal-entry-fresh-wall')));
+      await tester.pumpAndSettle();
+
+      expect(find.text(openNote), findsNothing);
+      expect(find.byKey(const Key('journal-edit')), findsNothing);
+    },
+  );
+
+  for (final theme in [AppTheme.light, AppTheme.dark]) {
+    testWidgets(
+      'Given a ${theme.brightness.name} phone detail inside the window, when it is shown, then the note and Edit use the scheme colors',
+      (tester) async {
+        await _pumpJournalScreen(
+          tester,
+          size: _phone,
+          theme: theme,
+          repository: _seededJournal(),
+          clock: () => noon,
+        );
+        await tester.tap(find.byKey(const Key('journal-entry-today')));
+        await tester.pumpAndSettle();
+
+        final scheme = theme.colorScheme;
+        final note = find.text(openNote);
+        _expectTextRole(
+          tester,
+          note,
+          Theme.of(tester.element(note)).textTheme.bodySmall,
+        );
+        expect(tester.widget<Text>(note).style?.color, scheme.onSurfaceVariant);
+        final schedule = tester.widget<Icon>(
+          inScreen(
+            const Key('journal-editable-until'),
+            find.byIcon(Icons.schedule),
+          ),
+        );
+        expect(schedule.size, 16);
+        expect(schedule.color, scheme.onSurfaceVariant);
+        final edit = tester.widget<Icon>(
+          inScreen(const Key('journal-edit'), find.byIcon(Icons.edit)),
+        );
+        expect(edit.color, scheme.onSurfaceVariant);
+        expect(
+          tester.getSize(find.byKey(const Key('journal-edit'))),
+          const Size(48, 48),
+        );
+      },
+    );
+  }
+
+  testWidgets(
+    'Given a private phone entry inside the window, when Edit saves new fields, then the detail updates and the original time and private flag stay',
+    (tester) async {
+      const when = 'Saturday, November 14 · 8:02 AM';
+      final repository = FakeJournalEntryRepository(
+        entries: [
+          _entry(
+            id: 'private-open',
+            subject: 'Quiet thought',
+            mood: 2,
+            text: 'Hidden line.',
+            localDateTime: '2026-11-14T08:02:00',
+            private: true,
+          ),
+        ],
+      );
+      await _pumpJournalScreen(
+        tester,
+        size: _phone,
+        repository: repository,
+        clock: () => noon,
+      );
+      await tester.tap(find.byKey(const Key('journal-entry-private-open')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journal-edit')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('New entry'), findsOneWidget);
+      expect(
+        tester.widget<TextField>(find.byKey(_subjectKey)).controller?.text,
+        'Quiet thought',
+      );
+      expect(
+        tester.widget<TextField>(find.byKey(_textKey)).controller?.text,
+        'Hidden line.',
+      );
+      expectNoDelete();
+
+      await _enterEntry(
+        tester,
+        subject: 'Revised',
+        text: 'Updated line.',
+        mood: 5,
+      );
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pumpAndSettle();
+
+      expect(repository.saves, isEmpty);
+      expect(repository.updates, [
+        (subject: 'Revised', mood: 5, text: 'Updated line.', private: true),
+      ]);
+      expect(find.byKey(const Key('journal-entry-screen')), findsOneWidget);
+      expect(
+        inScreen(const Key('journal-entry-screen'), find.text('Revised')),
+        findsOneWidget,
+      );
+      expect(find.text(when), findsOneWidget);
+      expect(find.text('Updated line.'), findsOneWidget);
+      final swatch = tester.widget<MoodSwatch>(
+        inScreen(const Key('journal-entry-screen'), find.byType(MoodSwatch)),
+      );
+      expect(swatch.mood, 5);
+    },
+  );
+
+  testWidgets(
+    'Given the November 14 entry viewed at noon, when the desktop detail is shown, then Edit and the note are shown, and a November 6 entry has neither',
+    (tester) async {
+      await _pumpJournalScreen(
+        tester,
+        size: _desktop,
+        repository: _seededJournal(),
+        clock: () => noon,
+      );
+
+      expect(
+        inPane(const Key('journal-detail-pane'), openNote),
+        findsOneWidget,
+      );
+      expect(inPane(const Key('journal-detail-pane'), 'Edit'), findsOneWidget);
+      expectNoDelete();
+
+      await tester.tap(find.byKey(const Key('journal-entry-last-week')));
+      await tester.pumpAndSettle();
+
+      expect(find.text(openNote), findsNothing);
+      expect(inPane(const Key('journal-detail-pane'), 'Edit'), findsNothing);
+      expect(find.byIcon(Icons.schedule), findsNothing);
+      expectNoDelete();
+    },
+  );
+
+  testWidgets(
+    'Given the wall clock and the creation timestamp disagree, when the desktop detail is shown, then Edit follows the creation timestamp',
+    (tester) async {
+      await _pumpJournalScreen(
+        tester,
+        size: _desktop,
+        clock: () => noon,
+        repository: FakeJournalEntryRepository(
+          entries: [
+            _entry(
+              id: 'old-wall',
+              subject: 'Old wall',
+              mood: 3,
+              text: 'Still new.',
+              localDateTime: '2026-11-01T08:00:00',
+              createdAt: DateTime(2026, 11, 14, 8, 2),
+            ),
+            _entry(
+              id: 'fresh-wall',
+              subject: 'Fresh wall',
+              mood: 3,
+              text: 'Already old.',
+              localDateTime: '2026-11-14T08:02:00',
+              createdAt: DateTime(2026, 11, 1, 8),
+            ),
+          ],
+        ),
+      );
+
+      expect(
+        inPane(const Key('journal-detail-pane'), openNote),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('journal-edit')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('journal-entry-fresh-wall')));
+      await tester.pumpAndSettle();
+
+      expect(find.text(openNote), findsNothing);
+      expect(find.byKey(const Key('journal-edit')), findsNothing);
+    },
+  );
+
+  for (final theme in [AppTheme.light, AppTheme.dark]) {
+    testWidgets(
+      'Given a ${theme.brightness.name} desktop detail inside the window, when it is shown, then the note and Edit use the scheme colors',
+      (tester) async {
+        await _pumpJournalScreen(
+          tester,
+          size: _desktop,
+          theme: theme,
+          repository: _seededJournal(),
+          clock: () => noon,
+        );
+
+        final scheme = theme.colorScheme;
+        final note = inPane(const Key('journal-detail-pane'), openNote);
+        _expectTextRole(
+          tester,
+          note,
+          Theme.of(tester.element(note)).textTheme.bodySmall,
+        );
+        expect(tester.widget<Text>(note).style?.color, scheme.onSurfaceVariant);
+        final schedule = tester.widget<Icon>(
+          inScreen(
+            const Key('journal-editable-until'),
+            find.byIcon(Icons.schedule),
+          ),
+        );
+        expect(schedule.size, 16);
+        expect(schedule.color, scheme.onSurfaceVariant);
+        final button = tester.widget<OutlinedButton>(
+          find.byKey(const Key('journal-edit')),
+        );
+        expect(button.style?.foregroundColor?.resolve({}), scheme.primary);
+        expect(button.style?.side?.resolve({})?.color, scheme.outline);
+      },
+    );
+  }
+
+  testWidgets(
+    'Given a private desktop entry inside the window, when Edit saves new fields, then the detail updates and the original time and private flag stay',
+    (tester) async {
+      const when = 'Saturday, November 14, 2026 · 8:02 AM';
+      final repository = FakeJournalEntryRepository(
+        entries: [
+          _entry(
+            id: 'private-open',
+            subject: 'Quiet thought',
+            mood: 2,
+            text: 'Hidden line.',
+            localDateTime: '2026-11-14T08:02:00',
+            private: true,
+          ),
+        ],
+      );
+      await _pumpJournalScreen(
+        tester,
+        size: _desktop,
+        repository: repository,
+        clock: () => noon,
+      );
+      await tester.tap(find.byKey(const Key('journal-edit')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('New journal entry'), findsOneWidget);
+      expect(
+        tester.widget<TextField>(find.byKey(_subjectKey)).controller?.text,
+        'Quiet thought',
+      );
+      expect(
+        tester.widget<TextField>(find.byKey(_textKey)).controller?.text,
+        'Hidden line.',
+      );
+      expectNoDelete();
+
+      await _enterEntry(
+        tester,
+        subject: 'Revised',
+        text: 'Updated line.',
+        mood: 5,
+      );
+      await tester.tap(find.byKey(_saveKey));
+      await tester.pumpAndSettle();
+
+      expect(repository.saves, isEmpty);
+      expect(repository.updates, [
+        (subject: 'Revised', mood: 5, text: 'Updated line.', private: true),
+      ]);
+      expect(find.byKey(_editorKey), findsNothing);
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Revised'),
+        findsOneWidget,
+      );
+      expect(inPane(const Key('journal-detail-pane'), when), findsOneWidget);
+      expect(find.text('Updated line.'), findsOneWidget);
+      final swatch = tester.widget<MoodSwatch>(
+        inScreen(const Key('journal-detail-pane'), find.byType(MoodSwatch)),
+      );
+      expect(swatch.mood, 5);
+    },
+  );
 }
