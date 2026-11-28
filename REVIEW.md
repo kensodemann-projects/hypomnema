@@ -4,7 +4,7 @@ PR: https://github.com/kensodemann-projects/hypomnema/pull/53
 
 ## Summary
 
-This review covers the resulting diff against `main` for the 24-hour journal edit window. `PLAN.md` is ignored. Comment only. The shared window, the phone and desktop edit affordances, and the tests match the issue: Edit and the note appear only while `createdAt` is inside 24 hours, saving goes through `update`, and the original time stays. CLN-001 is complete: the phone detail paints the entry it opened with, handles watch errors, and pops only while its route is current. CLN-002 is complete: the note names today, tomorrow, or the deadline's month and day, and a host-independent test covers a deadline more than one calendar day ahead. One question remains: whether a detail or editor left open past the deadline should still be able to save.
+This review covers the resulting diff against `main` for the 24-hour journal edit window. `PLAN.md` is ignored. Approve. The shared window, the phone and desktop edit affordances, and the tests match the issue: Edit and the note appear only while `createdAt` is inside 24 hours, saving goes through `update`, and the original time stays. CLN-001 is complete: the phone detail paints the entry it opened with, handles watch errors, and pops only while its route is current. CLN-002 is complete: the note names today, tomorrow, or the deadline's month and day, and a host-independent test covers a deadline more than one calendar day ahead. QST-001 is answered: the window is a loose restriction, so a detail or editor left open through the deadline may still save.
 
 ## Finding counts
 
@@ -153,6 +153,10 @@ Test `_deadlineDayWord` with the three local dates directly: same day, next day,
 ### 💭 Questions for discussion
 
 [QST-001]
+
+**Status:** complete
+
+**Resolution:** The window stays a loose restriction. Edit is shown from the clock when the detail builds. A detail or editor left open through the deadline may still call `update`.
 
 **Issue:** The window is read when the detail builds. Nothing schedules a rebuild at the deadline, and the edit `submit` calls `repository.update` without `isWithinEditWindow`. A detail left open, or an editor opened just before the deadline, can still save after 24 hours. Issue #37 says security rules leave the window alone, so this is the client boundary.
 
