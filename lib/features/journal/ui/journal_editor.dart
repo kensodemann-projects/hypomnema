@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/ui/mood_picker.dart';
 import 'package:hypomnema/shared/ui/form_fields.dart';
 import 'package:material_ui/material_ui.dart';
@@ -87,7 +88,6 @@ class _JournalEditorState extends State<JournalEditor> {
     setState(() => _saving = true);
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    final scheme = Theme.of(context).colorScheme;
     try {
       await widget.onSubmit(subject: subject, mood: mood, text: text);
       if (!mounted) {
@@ -99,10 +99,9 @@ class _JournalEditorState extends State<JournalEditor> {
         return;
       }
       messenger.showSnackBar(
-        SnackBar(
+        const SnackBar(
           behavior: SnackBarBehavior.floating,
-          backgroundColor: scheme.errorContainer,
-          content: Text(_saveFailed, style: TextStyle(color: scheme.error)),
+          content: Text(_saveFailed),
         ),
       );
       setState(() => _saving = false);
@@ -154,6 +153,7 @@ class _EditorFields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Column(
       key: const Key('journal-fields'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -164,7 +164,7 @@ class _EditorFields extends StatelessWidget {
           isRequired: true,
           fieldKey: const Key('journal-subject'),
           controller: subjectController,
-          style: const TextStyle(fontSize: 14),
+          style: textTheme.titleMedium,
         ),
         LabeledField(
           label: 'Mood',
@@ -176,7 +176,7 @@ class _EditorFields extends StatelessWidget {
           isRequired: true,
           fieldKey: const Key('journal-text'),
           controller: textController,
-          style: const TextStyle(fontSize: 16, height: 1.7),
+          style: textTheme.bodyLarge,
           hintText: _journalHint,
           minHeight: desktop ? 260 : 220,
           minLines: desktop ? 9 : 8,
@@ -203,7 +203,8 @@ class _PhoneEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final metrics = theme.extension<AppMetrics>()!;
     return Scaffold(
       key: const Key('journal-editor'),
       backgroundColor: surface,
@@ -212,7 +213,7 @@ class _PhoneEditor extends StatelessWidget {
           children: [
             ConstrainedBox(
               key: const Key('journal-top-bar'),
-              constraints: const BoxConstraints(minHeight: 64),
+              constraints: BoxConstraints(minHeight: metrics.barHeight),
               child: Padding(
                 padding: const EdgeInsets.only(left: 4, right: 4),
                 child: Row(
@@ -223,14 +224,7 @@ class _PhoneEditor extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            'New entry',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
-                              color: scheme.onSurface,
-                            ),
-                          ),
+                          Text('New entry', style: theme.textTheme.titleLarge),
                           const _DateNote(),
                         ],
                       ),
@@ -274,7 +268,8 @@ class _DesktopEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Dialog(
       key: const Key('journal-editor'),
       backgroundColor: surface,
@@ -301,11 +296,7 @@ class _DesktopEditor extends StatelessWidget {
                         children: [
                           Text(
                             'New journal entry',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w400,
-                              color: scheme.onSurface,
-                            ),
+                            style: theme.textTheme.titleLarge,
                           ),
                           const _DateNote(),
                         ],
@@ -356,12 +347,12 @@ class _DateNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Text(
       _dateNote,
       key: const Key('journal-date-note'),
-      style: TextStyle(
-        fontSize: 12,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      style: theme.textTheme.bodySmall!.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
       ),
     );
   }

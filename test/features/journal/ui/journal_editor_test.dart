@@ -116,21 +116,36 @@ void expectSaveDisabled(WidgetTester tester) {
 
 void expectRequiredLabels(WidgetTester tester, ColorScheme scheme) {
   for (final label in ['Subject', 'Mood', 'Journal']) {
-    final text = tester.widget<Text>(find.text('$label *'));
+    final finder = find.text('$label *');
+    final text = tester.widget<Text>(finder);
     final span = text.textSpan! as TextSpan;
+    final role = Theme.of(tester.element(finder)).textTheme.labelMedium;
     expect(span.style?.color, scheme.onSurfaceVariant);
-    expect(span.style?.fontSize, 12);
-    expect(span.style?.fontWeight, FontWeight.w500);
+    expect(span.style?.fontSize, role?.fontSize);
+    expect(span.style?.fontWeight, role?.fontWeight);
+    expect(span.style?.height, role?.height);
+    expect(span.style?.letterSpacing, role?.letterSpacing);
     final asterisk = span.children!.single as TextSpan;
     expect(asterisk.text, '*');
     expect(asterisk.style?.color, scheme.error);
   }
 }
 
+void _expectRole(TextStyle? style, TextStyle? role) {
+  expect(style?.fontSize, role?.fontSize);
+  expect(style?.fontWeight, role?.fontWeight);
+  expect(style?.height, role?.height);
+  expect(style?.letterSpacing, role?.letterSpacing);
+}
+
 void expectDateNote(WidgetTester tester, ColorScheme scheme) {
-  final note = tester.widget<Text>(find.byKey(const Key('journal-date-note')));
+  final noteFinder = find.byKey(const Key('journal-date-note'));
+  final note = tester.widget<Text>(noteFinder);
   expect(note.data, _dateNote);
-  expect(note.style?.fontSize, 12);
+  _expectRole(
+    note.style,
+    Theme.of(tester.element(noteFinder)).textTheme.bodySmall,
+  );
   expect(note.style?.color, scheme.onSurfaceVariant);
   final title = find.textContaining('New ');
   expect(
@@ -146,10 +161,14 @@ void expectAbsentLaterTasks() {
 }
 
 void expectUnfocusedSubject(WidgetTester tester, ColorScheme scheme) {
-  final field = tester.widget<TextField>(find.byKey(_subjectKey));
+  final fieldFinder = find.byKey(_subjectKey);
+  final field = tester.widget<TextField>(fieldFinder);
   final border = field.decoration!.enabledBorder! as OutlineInputBorder;
   expect(field.maxLines, 1);
-  expect(field.style?.fontSize, 14);
+  _expectRole(
+    field.style,
+    Theme.of(tester.element(fieldFinder)).textTheme.titleMedium,
+  );
   expect(field.decoration?.hintText, isNull);
   expect(border.borderRadius, const BorderRadius.all(Radius.circular(8)));
   expect(border.borderSide.color, scheme.outline);
@@ -161,9 +180,12 @@ void expectUnfocusedSubject(WidgetTester tester, ColorScheme scheme) {
 }
 
 void expectJournalText(WidgetTester tester, {required double minHeight}) {
-  final field = tester.widget<TextField>(find.byKey(_textKey));
-  expect(field.style?.fontSize, 16);
-  expect(field.style?.height, 1.7);
+  final fieldFinder = find.byKey(_textKey);
+  final field = tester.widget<TextField>(fieldFinder);
+  _expectRole(
+    field.style,
+    Theme.of(tester.element(fieldFinder)).textTheme.bodyLarge,
+  );
   expect(field.decoration?.hintText, isNull);
   expect(find.text(_journalHint), findsOneWidget);
   expect(field.minLines, greaterThan(1));
@@ -221,7 +243,11 @@ void main() {
           save.style?.foregroundColor?.resolve(<WidgetState>{}),
           scheme.primary,
         );
-        expect(tester.widget<Text>(find.text('New entry')).style?.fontSize, 18);
+        final title = find.text('New entry');
+        _expectRole(
+          tester.widget<Text>(title).style,
+          Theme.of(tester.element(title)).textTheme.titleLarge,
+        );
         expectDateNote(tester, scheme);
         expectRequiredLabels(tester, scheme);
         expectUnfocusedSubject(tester, scheme);
@@ -289,9 +315,10 @@ void main() {
           tester.widget<Row>(find.byKey(const Key('journal-actions'))).spacing,
           8,
         );
-        expect(
-          tester.widget<Text>(find.text('New journal entry')).style?.fontSize,
-          22,
+        final title = find.text('New journal entry');
+        _expectRole(
+          tester.widget<Text>(title).style,
+          Theme.of(tester.element(title)).textTheme.titleLarge,
         );
         expectDateNote(tester, scheme);
         expectRequiredLabels(tester, scheme);
@@ -579,13 +606,18 @@ void main() {
       expect(find.text('New entry'), findsOneWidget);
       expect(find.byKey(_editorKey), findsOneWidget);
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      final scheme = AppTheme.light.colorScheme;
+      final message = find.text(_saveFailed);
+      final theme = Theme.of(tester.element(find.byType(SnackBar)));
       expect(snackBar.behavior, SnackBarBehavior.floating);
-      expect(snackBar.backgroundColor, scheme.errorContainer);
+      expect(snackBar.backgroundColor, isNull);
+      expect(tester.widget<Text>(message).style, isNull);
       expect(
-        tester.widget<Text>(find.text(_saveFailed)).style?.color,
-        scheme.error,
+        theme.snackBarTheme.backgroundColor,
+        theme.colorScheme.errorContainer,
       );
+      final effective = DefaultTextStyle.of(tester.element(message)).style;
+      expect(effective.color, theme.colorScheme.onErrorContainer);
+      _expectRole(effective, theme.textTheme.bodyMedium);
       expect(submissions.calls, hasLength(1));
     },
   );

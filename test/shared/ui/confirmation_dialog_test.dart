@@ -78,13 +78,8 @@ void main() {
       expect(find.text(_message), findsOneWidget);
       expect(find.text('Cancel'), findsOneWidget);
       expect(find.text(_confirmLabel), findsOneWidget);
-      expect(titled(tester).style?.fontSize, 20);
+      expectDialogRoles(tester);
       expect(titled(tester).textAlign, TextAlign.center);
-      expect(message(tester).style?.fontSize, 14);
-      expect(
-        message(tester).style?.color,
-        AppTheme.light.colorScheme.onSurfaceVariant,
-      );
       expect(dialogWidth(tester), 352);
     },
   );
@@ -101,13 +96,8 @@ void main() {
       expect(find.text(_message), findsOneWidget);
       expect(find.text('Cancel'), findsOneWidget);
       expect(find.text(_confirmLabel), findsOneWidget);
-      expect(titled(tester).style?.fontSize, 22);
+      expectDialogRoles(tester);
       expect(titled(tester).textAlign, TextAlign.center);
-      expect(message(tester).style?.fontSize, 14);
-      expect(
-        message(tester).style?.color,
-        AppTheme.light.colorScheme.onSurfaceVariant,
-      );
       expect(dialogWidth(tester), 440);
     },
   );
@@ -339,6 +329,33 @@ void expectBannerColors(
   expect(decoration.color, background);
   expect(icon.color, foreground);
   expect(text.style?.color, foreground);
+  final role = Theme.of(
+    tester.element(find.byKey(const Key('confirmation-warning'))),
+  ).textTheme.bodyMedium;
+  expect(text.style?.fontSize, role?.fontSize);
+  expect(text.style?.fontWeight, role?.fontWeight);
+  expect(text.style?.height, role?.height);
+  expect(text.style?.letterSpacing, role?.letterSpacing);
+}
+
+void expectDialogRoles(WidgetTester tester) {
+  final titleFinder = find.byKey(const Key('confirmation-title'));
+  final messageFinder = find.byKey(const Key('confirmation-message'));
+  final textTheme = Theme.of(tester.element(titleFinder)).textTheme;
+  final title = tester.widget<Text>(titleFinder);
+  final body = tester.widget<Text>(messageFinder);
+  expect(title.style?.fontSize, textTheme.headlineSmall?.fontSize);
+  expect(title.style?.fontWeight, textTheme.headlineSmall?.fontWeight);
+  expect(title.style?.height, textTheme.headlineSmall?.height);
+  expect(title.style?.letterSpacing, textTheme.headlineSmall?.letterSpacing);
+  expect(body.style?.fontSize, textTheme.bodyMedium?.fontSize);
+  expect(body.style?.fontWeight, textTheme.bodyMedium?.fontWeight);
+  expect(body.style?.height, textTheme.bodyMedium?.height);
+  expect(body.style?.letterSpacing, textTheme.bodyMedium?.letterSpacing);
+  expect(
+    body.style?.color,
+    Theme.of(tester.element(messageFinder)).colorScheme.onSurfaceVariant,
+  );
 }
 
 void expectConfirmColors(

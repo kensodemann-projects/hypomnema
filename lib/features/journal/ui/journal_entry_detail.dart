@@ -1,3 +1,4 @@
+import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:hypomnema/features/journal/ui/mood_swatch.dart';
 import 'package:material_ui/material_ui.dart';
@@ -6,8 +7,6 @@ class JournalEntryDetail extends StatelessWidget {
   const JournalEntryDetail({
     required this.entry,
     required this.when,
-    required this.subjectSize,
-    this.subjectLetterSpacing,
     this.card = false,
     this.padding = const EdgeInsets.fromLTRB(16, 4, 16, 24),
     super.key,
@@ -15,20 +14,17 @@ class JournalEntryDetail extends StatelessWidget {
 
   final JournalEntry entry;
   final String when;
-  final double subjectSize;
-  final double? subjectLetterSpacing;
   final bool card;
   final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final metrics = theme.extension<AppMetrics>()!;
     final paragraphs = [
       for (final paragraph in _paragraphs(entry.text))
-        Text(
-          paragraph,
-          style: TextStyle(fontSize: 16, height: 1.75, color: scheme.onSurface),
-        ),
+        Text(paragraph, style: theme.textTheme.bodyLarge),
     ];
     return Padding(
       padding: padding,
@@ -46,20 +42,11 @@ class JournalEntryDetail extends StatelessWidget {
                   children: [
                     Text(
                       when,
-                      style: TextStyle(
-                        fontSize: 13,
+                      style: theme.textTheme.labelMedium!.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
                     ),
-                    Text(
-                      entry.subject,
-                      style: TextStyle(
-                        fontSize: subjectSize,
-                        fontWeight: FontWeight.w400,
-                        height: 1.25,
-                        letterSpacing: subjectLetterSpacing,
-                      ),
-                    ),
+                    Text(entry.subject, style: theme.textTheme.headlineSmall),
                   ],
                 ),
               ),
@@ -76,8 +63,11 @@ class JournalEntryDetail extends StatelessWidget {
                     key: const Key('journal-detail-card'),
                     decoration: BoxDecoration(
                       color: scheme.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: scheme.outlineVariant),
+                      borderRadius: BorderRadius.circular(metrics.cardRadius),
+                      border: Border.all(
+                        color: scheme.outlineVariant,
+                        width: metrics.borderWidth,
+                      ),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

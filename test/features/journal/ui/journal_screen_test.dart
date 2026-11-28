@@ -28,6 +28,17 @@ const _textKey = Key('journal-text');
 const _phone = Size(kDesktopLayoutMinWidth - 200, 800);
 const _desktop = Size(kDesktopLayoutMinWidth + 400, 800);
 
+void _expectRole(TextStyle? style, TextStyle? role) {
+  expect(style?.fontSize, role?.fontSize);
+  expect(style?.fontWeight, role?.fontWeight);
+  expect(style?.height, role?.height);
+  expect(style?.letterSpacing, role?.letterSpacing);
+}
+
+void _expectTextRole(WidgetTester tester, Finder finder, TextStyle? role) {
+  _expectRole(tester.widget<Text>(finder).style, role);
+}
+
 Future<FakeJournalEntryRepository> _pumpJournalScreen(
   WidgetTester tester, {
   required Size size,
@@ -120,7 +131,13 @@ void main() {
     (tester) async {
       await _pumpJournalScreen(tester, size: _phone);
 
-      expect(find.byKey(const Key('journal-title')), findsOneWidget);
+      final title = find.byKey(const Key('journal-title'));
+      expect(title, findsOneWidget);
+      _expectTextRole(
+        tester,
+        title,
+        Theme.of(tester.element(title)).textTheme.titleLarge,
+      );
       expect(find.text(_emptyTitle), findsOneWidget);
       expect(find.text(_emptyMessage), findsOneWidget);
       expect(find.text(_emptyAction), findsOneWidget);
@@ -225,13 +242,18 @@ void main() {
       expect(find.byKey(_editorKey), findsOneWidget);
       expect(find.byKey(_writeKey), findsNothing);
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      final scheme = AppTheme.light.colorScheme;
+      final message = find.text(_saveFailed);
+      final theme = Theme.of(tester.element(find.byType(SnackBar)));
       expect(snackBar.behavior, SnackBarBehavior.floating);
-      expect(snackBar.backgroundColor, scheme.errorContainer);
+      expect(snackBar.backgroundColor, isNull);
+      expect(tester.widget<Text>(message).style, isNull);
       expect(
-        tester.widget<Text>(find.text(_saveFailed)).style?.color,
-        scheme.error,
+        theme.snackBarTheme.backgroundColor,
+        theme.colorScheme.errorContainer,
       );
+      final effective = DefaultTextStyle.of(tester.element(message)).style;
+      expect(effective.color, theme.colorScheme.onErrorContainer);
+      _expectRole(effective, theme.textTheme.bodyMedium);
       expect(entries.saves, hasLength(1));
       expect(entries.updateCalls, 0);
     },
@@ -267,12 +289,14 @@ void main() {
       expect(find.text('Quiet thought'), findsOneWidget);
       expect(find.byKey(_writeKey), findsOneWidget);
 
-      final heading = tester.widget<Text>(find.text('THIS WEEK'));
-      expect(heading.style?.fontSize, 12);
-      expect(heading.style?.fontWeight, FontWeight.w600);
-      expect(heading.style?.letterSpacing, 0.72);
-      final subject = tester.widget<Text>(find.text('Early run'));
-      expect(subject.style?.fontWeight, FontWeight.w500);
+      final heading = find.text('THIS WEEK');
+      final subjectFinder = find.text('Early run');
+      final when = find.text('Today · 8:02 AM');
+      final textTheme = Theme.of(tester.element(heading)).textTheme;
+      _expectTextRole(tester, heading, textTheme.labelSmall);
+      _expectTextRole(tester, subjectFinder, textTheme.titleMedium);
+      _expectTextRole(tester, when, textTheme.bodySmall);
+      final subject = tester.widget<Text>(subjectFinder);
       expect(subject.maxLines, 1);
       expect(subject.overflow, TextOverflow.ellipsis);
     },
@@ -296,6 +320,20 @@ void main() {
       expect(find.text('Saturday, November 14 · 8:02 AM'), findsOneWidget);
       expect(find.text('Early run'), findsOneWidget);
       expect(find.text('Moved early.'), findsOneWidget);
+      final entry = find.byKey(const Key('journal-entry-screen'));
+      final entryTheme = Theme.of(tester.element(entry)).textTheme;
+      final barTitle = find.text('Sat, Nov 14');
+      final when = find.text('Saturday, November 14 · 8:02 AM');
+      final subject = find.text('Early run');
+      final paragraph = find.text('Moved early.');
+      _expectTextRole(tester, barTitle, entryTheme.titleLarge);
+      _expectTextRole(tester, when, entryTheme.labelMedium);
+      expect(
+        tester.widget<Text>(when).style?.color,
+        AppTheme.light.colorScheme.onSurfaceVariant,
+      );
+      _expectTextRole(tester, subject, entryTheme.headlineSmall);
+      _expectTextRole(tester, paragraph, entryTheme.bodyLarge);
       expect(find.byType(AppBar), findsNothing);
       final todaySwatch = tester.widget<MoodSwatch>(
         find.descendant(
@@ -372,13 +410,16 @@ void main() {
       expect(find.text(_emptyTitle), findsNothing);
       expect(find.byKey(_writeKey), findsNothing);
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      final scheme = AppTheme.light.colorScheme;
+      final message = find.text(_loadFailed);
+      final theme = Theme.of(tester.element(find.byType(SnackBar)));
+      final scheme = theme.colorScheme;
       expect(snackBar.behavior, SnackBarBehavior.floating);
-      expect(snackBar.backgroundColor, scheme.errorContainer);
-      expect(
-        tester.widget<Text>(find.text(_loadFailed)).style?.color,
-        scheme.error,
-      );
+      expect(snackBar.backgroundColor, isNull);
+      expect(tester.widget<Text>(message).style, isNull);
+      expect(theme.snackBarTheme.backgroundColor, scheme.errorContainer);
+      final effective = DefaultTextStyle.of(tester.element(message)).style;
+      expect(effective.color, scheme.onErrorContainer);
+      _expectRole(effective, theme.textTheme.bodyMedium);
     },
   );
 
@@ -424,8 +465,12 @@ void main() {
         final button = tester.widget<FloatingActionButton>(
           find.byKey(_writeKey),
         );
-        expect(button.backgroundColor, scheme.primaryContainer);
-        expect(button.foregroundColor, scheme.onPrimaryContainer);
+        final fabTheme = Theme.of(tester.element(find.byKey(_writeKey)))
+            .floatingActionButtonTheme;
+        expect(button.backgroundColor, isNull);
+        expect(button.foregroundColor, isNull);
+        expect(fabTheme.backgroundColor, scheme.primaryContainer);
+        expect(fabTheme.foregroundColor, scheme.onPrimaryContainer);
       },
     );
   }
@@ -439,8 +484,27 @@ void main() {
     (tester) async {
       await _pumpJournalScreen(tester, size: _desktop);
 
+      final headerTitle = find.descendant(
+        of: find.byKey(const Key('journal-header')),
+        matching: find.byKey(const Key('journal-title')),
+      );
+      final emptyList = find.text('No entries yet.');
       expect(find.byKey(const Key('journal-header')), findsOneWidget);
-      expect(find.text('No entries yet.'), findsOneWidget);
+      expect(emptyList, findsOneWidget);
+      _expectTextRole(
+        tester,
+        headerTitle,
+        Theme.of(tester.element(headerTitle)).textTheme.titleLarge,
+      );
+      _expectTextRole(
+        tester,
+        emptyList,
+        Theme.of(tester.element(emptyList)).textTheme.bodyMedium,
+      );
+      expect(
+        tester.widget<Text>(emptyList).style?.color,
+        AppTheme.light.colorScheme.onSurfaceVariant,
+      );
       expect(find.text(_emptyTitle), findsOneWidget);
       expect(find.text(_emptyMessage), findsOneWidget);
       expect(find.text(_emptyAction), findsOneWidget);
@@ -494,13 +558,11 @@ void main() {
         inPane(const Key('journal-detail-pane'), 'Early run'),
         findsOneWidget,
       );
-      final subject = tester.widget<Text>(
-        inPane(const Key('journal-detail-pane'), 'Early run'),
-      );
-      expect(subject.style?.fontSize, 26);
-      expect(subject.style?.fontWeight, FontWeight.w400);
-      expect(subject.style?.letterSpacing, -0.3);
-      expect(subject.style?.height, 1.25);
+      final subject = inPane(const Key('journal-detail-pane'), 'Early run');
+      final heading = inPane(const Key('journal-list-pane'), 'THIS WEEK');
+      final textTheme = Theme.of(tester.element(subject)).textTheme;
+      _expectTextRole(tester, subject, textTheme.headlineSmall);
+      _expectTextRole(tester, heading, textTheme.labelSmall);
       final swatch = tester.widget<MoodSwatch>(
         find.descendant(
           of: find.byKey(const Key('journal-detail-pane')),

@@ -254,6 +254,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _brandContent() {
+    final textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.all(_brandPadding),
       child: Column(
@@ -262,23 +263,18 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           const HypomnemaLogo(key: Key('login-logo')),
           const SizedBox(height: 28),
-          const Text(
+          Text(
             'Hypomnema',
-            style: TextStyle(
-              color: Color(0xFFFFFFFF),
-              fontSize: 40,
-              fontWeight: FontWeight.w400,
-              letterSpacing: -0.5,
+            style: textTheme.displaySmall!.copyWith(
+              color: const Color(0xFFFFFFFF),
             ),
           ),
           const SizedBox(height: 12),
           Text(
             _desktopQuote,
-            style: TextStyle(
+            style: textTheme.bodyLarge!.copyWith(
               color: const Color(0xFFFFFFFF).withValues(alpha: 0.85),
-              fontSize: 18,
               fontStyle: FontStyle.italic,
-              height: 1.5,
             ),
           ),
         ],
@@ -353,7 +349,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _phoneLayout() {
-    final onSurfaceVariant = Theme.of(context).colorScheme.onSurfaceVariant;
+    final theme = Theme.of(context);
+    final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
+    final textTheme = theme.textTheme;
     return _scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -371,23 +369,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     const Align(child: HypomnemaLogo(key: Key('login-logo'))),
                     const SizedBox(height: 10),
-                    const Text(
+                    Text(
                       'Hypomnema',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style: textTheme.displaySmall,
                     ),
                     const SizedBox(height: 10),
                     Text(
                       _phoneQuote,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: textTheme.bodyLarge!.copyWith(
                         color: onSurfaceVariant,
-                        fontSize: 15,
                         fontStyle: FontStyle.italic,
-                        height: 1.5,
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -422,13 +415,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
+                          Text(
                             'Sign in',
-                            key: Key('login-heading'),
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w400,
-                            ),
+                            key: const Key('login-heading'),
+                            style: Theme.of(context).textTheme.headlineSmall,
                           ),
                           const SizedBox(height: 18),
                           _form(),

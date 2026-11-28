@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:hypomnema/core/constants/layout.dart';
+import 'package:hypomnema/core/theme/app_theme.dart';
 import 'package:hypomnema/features/journal/data/journal_entry_repository.dart';
 import 'package:hypomnema/features/journal/domain/journal_entry.dart';
 import 'package:hypomnema/features/journal/domain/journal_list.dart';
@@ -122,10 +123,12 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   void _openEntry(BuildContext context, JournalEntry entry) {
-    final scheme = Theme.of(context).colorScheme;
     Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute<void>(
         builder: (context) {
+          final theme = Theme.of(context);
+          final scheme = theme.colorScheme;
+          final metrics = theme.extension<AppMetrics>()!;
           return Scaffold(
             key: const Key('journal-entry-screen'),
             backgroundColor: scheme.surface,
@@ -133,7 +136,7 @@ class _JournalScreenState extends State<JournalScreen> {
               child: Column(
                 children: [
                   ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 64),
+                    constraints: BoxConstraints(minHeight: metrics.barHeight),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 4, right: 4),
                       child: Row(
@@ -168,11 +171,7 @@ class _JournalScreenState extends State<JournalScreen> {
                               journalEntryBarTitle(entry),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
-                                color: scheme.onSurface,
-                              ),
+                              style: theme.textTheme.titleLarge,
                             ),
                           ),
                         ],
@@ -184,7 +183,6 @@ class _JournalScreenState extends State<JournalScreen> {
                       child: JournalEntryDetail(
                         entry: entry,
                         when: journalDetailWhen(entry, includeYear: false),
-                        subjectSize: 22,
                       ),
                     ),
                   ),
@@ -206,24 +204,24 @@ class _JournalScreenState extends State<JournalScreen> {
       if (!mounted) {
         return;
       }
-      final scheme = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           behavior: SnackBarBehavior.floating,
-          backgroundColor: scheme.errorContainer,
-          content: Text(_loadFailed, style: TextStyle(color: scheme.error)),
+          content: Text(_loadFailed),
         ),
       );
     });
   }
 
   Widget _phoneLayout(BuildContext context, ColorScheme scheme) {
+    final theme = Theme.of(context);
+    final metrics = theme.extension<AppMetrics>()!;
     return Column(
       children: [
         ColoredBox(
           color: scheme.surface,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 64),
+            constraints: BoxConstraints(minHeight: metrics.barHeight),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Padding(
@@ -231,11 +229,7 @@ class _JournalScreenState extends State<JournalScreen> {
                 child: Text(
                   'Journal',
                   key: const Key('journal-title'),
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w400,
-                    color: scheme.onSurface,
-                  ),
+                  style: theme.textTheme.titleLarge,
                 ),
               ),
             ),
@@ -247,16 +241,23 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   Widget _desktopLayout(BuildContext context, ColorScheme scheme) {
+    final theme = Theme.of(context);
+    final metrics = theme.extension<AppMetrics>()!;
     return Column(
       children: [
         DecoratedBox(
           key: const Key('journal-header'),
           decoration: BoxDecoration(
             color: scheme.surface,
-            border: Border(bottom: BorderSide(color: scheme.outlineVariant)),
+            border: Border(
+              bottom: BorderSide(
+                color: scheme.outlineVariant,
+                width: metrics.borderWidth,
+              ),
+            ),
           ),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 72),
+            constraints: BoxConstraints(minHeight: metrics.headerHeight),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(28, 18, 28, 14),
               child: Row(
@@ -265,12 +266,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     child: Text(
                       'Journal',
                       key: const Key('journal-title'),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: -0.2,
-                        color: scheme.onSurface,
-                      ),
+                      style: theme.textTheme.titleLarge,
                     ),
                   ),
                   FilledButton.icon(
@@ -312,14 +308,11 @@ class _JournalScreenState extends State<JournalScreen> {
         ],
       );
     }
-    return _phoneListPane(context, scheme, entries);
+    return _phoneListPane(context, entries);
   }
 
-  Widget _phoneListPane(
-    BuildContext context,
-    ColorScheme scheme,
-    List<JournalEntry> entries,
-  ) {
+  Widget _phoneListPane(BuildContext context, List<JournalEntry> entries) {
+    final metrics = Theme.of(context).extension<AppMetrics>()!;
     if (entries.isEmpty) {
       return Center(
         child: Padding(
@@ -329,7 +322,6 @@ class _JournalScreenState extends State<JournalScreen> {
             icon: Icons.edit_note,
             iconSize: 44,
             title: _emptyTitle,
-            titleSize: 17,
             message: _emptyMessage,
             actionLabel: _emptyAction,
             actionIcon: Icons.edit,
@@ -344,8 +336,6 @@ class _JournalScreenState extends State<JournalScreen> {
           key: const Key('journal-list'),
           entries: entries,
           now: widget.clock(),
-          headingSize: 12,
-          headingLetterSpacing: 0.72,
           headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
           onOpen: (entry) => _openEntry(context, entry),
         ),
@@ -355,10 +345,8 @@ class _JournalScreenState extends State<JournalScreen> {
           child: FloatingActionButton.extended(
             key: const Key('journal-write'),
             onPressed: () => _openEditor(context),
-            backgroundColor: scheme.primaryContainer,
-            foregroundColor: scheme.onPrimaryContainer,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(metrics.cardRadius),
             ),
             icon: const Icon(Icons.edit),
             label: const Text('Write'),
@@ -373,13 +361,20 @@ class _JournalScreenState extends State<JournalScreen> {
     ColorScheme scheme,
     List<JournalEntry> entries,
   ) {
+    final theme = Theme.of(context);
+    final metrics = theme.extension<AppMetrics>()!;
     return SizedBox(
       key: const Key('journal-list-pane'),
-      width: 380,
+      width: metrics.paneWidth,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: scheme.surfaceContainerLow,
-          border: Border(right: BorderSide(color: scheme.outlineVariant)),
+          border: Border(
+            right: BorderSide(
+              color: scheme.outlineVariant,
+              width: metrics.borderWidth,
+            ),
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -393,7 +388,9 @@ class _JournalScreenState extends State<JournalScreen> {
                     child: Text(
                       'No entries yet.',
                       key: const Key('journal-list-empty'),
-                      style: TextStyle(color: scheme.onSurfaceVariant),
+                      style: theme.textTheme.bodyMedium!.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 )
@@ -402,8 +399,6 @@ class _JournalScreenState extends State<JournalScreen> {
                   entries: entries,
                   now: widget.clock(),
                   selectedId: _selectedId,
-                  headingSize: 11,
-                  headingLetterSpacing: 0.88,
                   headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 2),
                   padding: EdgeInsets.zero,
                   onOpen: (entry) => setState(() => _selectedId = entry.id),
@@ -419,8 +414,6 @@ class _JournalScreenState extends State<JournalScreen> {
       child: JournalEntryDetail(
         entry: entry,
         when: journalDetailWhen(entry, includeYear: true),
-        subjectSize: 26,
-        subjectLetterSpacing: -0.3,
         card: true,
         padding: EdgeInsets.zero,
       ),
@@ -428,6 +421,7 @@ class _JournalScreenState extends State<JournalScreen> {
   }
 
   Widget _desktopDetailPane(BuildContext context, List<JournalEntry> entries) {
+    final metrics = Theme.of(context).extension<AppMetrics>()!;
     return Padding(
       key: const Key('journal-detail-pane'),
       padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
@@ -438,13 +432,12 @@ class _JournalScreenState extends State<JournalScreen> {
                   hasScrollBody: false,
                   child: Center(
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 380),
+                      constraints: BoxConstraints(maxWidth: metrics.paneWidth),
                       child: EmptyState(
                         key: const Key('journal-empty'),
                         icon: Icons.edit_note,
                         iconSize: 48,
                         title: _emptyTitle,
-                        titleSize: 18,
                         message: _emptyMessage,
                         actionLabel: _emptyAction,
                         actionIcon: Icons.edit,

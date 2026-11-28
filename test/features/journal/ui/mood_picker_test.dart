@@ -110,8 +110,13 @@ void main() {
         expect(labels, ['Awful', 'Great']);
 
         for (final label in ['Awful', 'Great']) {
-          final text = tester.widget<Text>(find.text(label));
-          expect(text.style?.fontSize, 12);
+          final caption = find.text(label);
+          final text = tester.widget<Text>(caption);
+          final role = Theme.of(tester.element(caption)).textTheme.labelMedium;
+          expect(text.style?.fontSize, role?.fontSize);
+          expect(text.style?.fontWeight, role?.fontWeight);
+          expect(text.style?.height, role?.height);
+          expect(text.style?.letterSpacing, role?.letterSpacing);
           expect(text.style?.color, theme.colorScheme.onSurfaceVariant);
           final line = find
               .ancestor(

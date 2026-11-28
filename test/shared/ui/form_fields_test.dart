@@ -76,26 +76,29 @@ Future<void> _unfocus(WidgetTester tester) async {
   await tester.pump();
 }
 
+void _expectRole(TextStyle? style, TextStyle? role) {
+  expect(style?.fontSize, role?.fontSize);
+  expect(style?.fontWeight, role?.fontWeight);
+  expect(style?.height, role?.height);
+  expect(style?.letterSpacing, role?.letterSpacing);
+}
+
 void _expectAsterisk(WidgetTester tester, String label, ColorScheme scheme) {
-  final text = tester.widget<Text>(find.text('$label *'));
+  final finder = find.text('$label *');
+  final text = tester.widget<Text>(finder);
   final span = text.textSpan! as TextSpan;
   expect(span.style?.color, scheme.onSurfaceVariant);
-  expect(span.style?.fontSize, 12);
-  expect(span.style?.fontWeight, FontWeight.w500);
-  expect(span.style?.height, isNull);
-  expect(span.style?.letterSpacing, isNull);
+  _expectRole(
+    span.style,
+    Theme.of(tester.element(finder)).textTheme.labelMedium,
+  );
   final asterisk = span.children!.single as TextSpan;
   expect(asterisk.text, '*');
   expect(asterisk.style?.color, scheme.error);
   expect(asterisk.style?.fontSize, isNull);
   expect(asterisk.style?.fontWeight, isNull);
-}
-
-void _expectNoTypeMetrics(TextStyle? style) {
-  expect(style?.fontSize, isNull);
-  expect(style?.fontWeight, isNull);
-  expect(style?.height, isNull);
-  expect(style?.letterSpacing, isNull);
+  expect(asterisk.style?.height, isNull);
+  expect(asterisk.style?.letterSpacing, isNull);
 }
 
 void main() {
@@ -118,6 +121,17 @@ void main() {
       );
       expect(find.bySemanticsLabel('Subject *'), findsNothing);
       expect(find.text(_hint), findsOneWidget);
+      final hint = tester.widget<Text>(find.text(_hint));
+      _expectRole(
+        hint.style,
+        Theme.of(tester.element(find.text(_hint))).textTheme.bodyLarge,
+      );
+      expect(hint.style?.color, scheme.onSurfaceVariant);
+      final field = tester.widget<TextField>(find.byKey(_fieldKey));
+      _expectRole(
+        field.style,
+        Theme.of(tester.element(find.byKey(_fieldKey))).textTheme.bodyLarge,
+      );
 
       SemanticsData fieldData() {
         return tester.getSemantics(find.byKey(_fieldKey)).getSemanticsData();
@@ -137,9 +151,13 @@ void main() {
       expect(find.text('Subject is required.'), findsOneWidget);
       expect(fieldData().hint, 'Subject is required.');
       expect(fieldData().validationResult, SemanticsValidationResult.invalid);
-      final message = tester.widget<Text>(find.text('Subject is required.'));
+      final messageFinder = find.text('Subject is required.');
+      final message = tester.widget<Text>(messageFinder);
       expect(message.style?.color, scheme.error);
-      _expectNoTypeMetrics(message.style);
+      _expectRole(
+        message.style,
+        Theme.of(tester.element(messageFinder)).textTheme.bodySmall,
+      );
       expect(
         tester.getRect(find.text('Subject is required.')).top,
         greaterThanOrEqualTo(tester.getRect(find.byKey(_fieldKey)).bottom),
@@ -227,10 +245,10 @@ void main() {
 
       expect(find.text('Note *'), findsNothing);
       expect(find.text('Note'), findsOneWidget);
-      expect(tester.widget<Text>(find.text('Note')).style?.fontSize, 12);
-      expect(
-        tester.widget<Text>(find.text('Note')).style?.fontWeight,
-        FontWeight.w500,
+      final note = find.text('Note');
+      _expectRole(
+        tester.widget<Text>(note).style,
+        Theme.of(tester.element(note)).textTheme.labelMedium,
       );
       expect(find.bySemanticsLabel('Note *'), findsNothing);
 

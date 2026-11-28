@@ -179,6 +179,14 @@ Color textColor(WidgetTester tester, String text) {
       DefaultTextStyle.of(tester.element(finder)).style.color!;
 }
 
+void expectRole(WidgetTester tester, Finder finder, TextStyle? role) {
+  final style = tester.widget<Text>(finder).style;
+  expect(style?.fontSize, role?.fontSize);
+  expect(style?.fontWeight, role?.fontWeight);
+  expect(style?.height, role?.height);
+  expect(style?.letterSpacing, role?.letterSpacing);
+}
+
 void expectUnsetTypeMetrics(TextStyle? style) {
   expect(style?.fontSize, isNull);
   expect(style?.fontWeight, isNull);
@@ -230,7 +238,13 @@ void expectOutline(
   expect(decoration.contentPadding, padding);
   expect(decoration.errorText, isNull);
   expect(decoration.labelText, isNull);
-  expectUnsetTypeMetrics(textField(tester, key).style);
+  final field = find.byKey(Key(key));
+  final role = Theme.of(tester.element(field)).textTheme.bodyLarge;
+  final style = textField(tester, key).style;
+  expect(style?.fontSize, role?.fontSize);
+  expect(style?.fontWeight, role?.fontWeight);
+  expect(style?.height, role?.height);
+  expect(style?.letterSpacing, role?.letterSpacing);
 }
 
 void expectRequiredLabel(
@@ -238,13 +252,15 @@ void expectRequiredLabel(
   String label,
   ColorScheme scheme,
 ) {
-  final text = tester.widget<Text>(find.text('$label *'));
+  final finder = find.text('$label *');
+  final text = tester.widget<Text>(finder);
   final span = text.textSpan! as TextSpan;
+  final role = Theme.of(tester.element(finder)).textTheme.labelMedium;
   expect(span.style?.color, scheme.onSurfaceVariant);
-  expect(span.style?.fontSize, 12);
-  expect(span.style?.fontWeight, FontWeight.w500);
-  expect(span.style?.height, isNull);
-  expect(span.style?.letterSpacing, isNull);
+  expect(span.style?.fontSize, role?.fontSize);
+  expect(span.style?.fontWeight, role?.fontWeight);
+  expect(span.style?.height, role?.height);
+  expect(span.style?.letterSpacing, role?.letterSpacing);
   final asterisk = span.children!.single as TextSpan;
   expect(asterisk.text, '*');
   expect(asterisk.style?.color, scheme.error);
@@ -272,14 +288,14 @@ void main() {
           expect(find.byKey(const Key('login-brand')), findsNothing);
           expect(find.byKey(const Key('login-heading')), findsNothing);
           expect(find.text(_desktopQuote), findsNothing);
-          expect(find.text('Hypomnema'), findsOneWidget);
-          expect(
-            tester.widget<Text>(find.text('Hypomnema')).style?.fontSize,
-            28,
-          );
-          expect(find.text(_phoneQuote), findsOneWidget);
-          final quote = tester.widget<Text>(find.text(_phoneQuote));
-          expect(quote.style?.fontSize, 15);
+          final name = find.text('Hypomnema');
+          final quoteFinder = find.text(_phoneQuote);
+          final textTheme = Theme.of(tester.element(name)).textTheme;
+          expect(name, findsOneWidget);
+          expectRole(tester, name, textTheme.displaySmall);
+          expect(quoteFinder, findsOneWidget);
+          final quote = tester.widget<Text>(quoteFinder);
+          expectRole(tester, quoteFinder, textTheme.bodyLarge);
           expect(quote.style?.fontStyle, FontStyle.italic);
           expect(quote.style?.color, theme.colorScheme.onSurfaceVariant);
           expect(
@@ -310,40 +326,41 @@ void main() {
 
           // Then
           expect(find.text(_phoneQuote), findsNothing);
-          expect(find.text(_desktopQuote), findsOneWidget);
-          final quote = tester.widget<Text>(find.text(_desktopQuote));
-          expect(quote.style?.fontSize, 18);
+          final quoteFinder = find.text(_desktopQuote);
+          final name = find.text('Hypomnema');
+          final textTheme = Theme.of(tester.element(quoteFinder)).textTheme;
+          expect(quoteFinder, findsOneWidget);
+          final quote = tester.widget<Text>(quoteFinder);
+          expectRole(tester, quoteFinder, textTheme.bodyLarge);
           expect(quote.style?.fontStyle, FontStyle.italic);
           expect(
             quote.style?.color,
             const Color(0xFFFFFFFF).withValues(alpha: 0.85),
           );
-          final name = tester.widget<Text>(find.text('Hypomnema'));
-          expect(name.style?.fontSize, 40);
-          expect(name.style?.color, const Color(0xFFFFFFFF));
-          final nameStyle = effectiveStyle(tester, find.text('Hypomnema'));
-          final quoteStyle = effectiveStyle(tester, find.text(_desktopQuote));
+          expectRole(tester, name, textTheme.displaySmall);
+          expect(
+            tester.widget<Text>(name).style?.color,
+            const Color(0xFFFFFFFF),
+          );
+          final nameStyle = effectiveStyle(tester, name);
+          final quoteStyle = effectiveStyle(tester, quoteFinder);
           expect(
             nameStyle.decoration ?? TextDecoration.none,
             TextDecoration.none,
           );
-          expect(nameStyle.fontWeight, FontWeight.w400);
+          expect(nameStyle.fontWeight, textTheme.displaySmall?.fontWeight);
           expect(
             quoteStyle.decoration ?? TextDecoration.none,
             TextDecoration.none,
           );
-          expect(
-            quoteStyle.fontWeight,
-            Theme.of(tester.element(find.text(_desktopQuote)))
-                .textTheme
-                .bodyMedium
-                ?.fontWeight,
+          expect(quoteStyle.fontWeight, textTheme.bodyLarge?.fontWeight);
+          final heading = find.byKey(const Key('login-heading'));
+          expect(tester.widget<Text>(heading).data, 'Sign in');
+          expectRole(
+            tester,
+            heading,
+            Theme.of(tester.element(heading)).textTheme.headlineSmall,
           );
-          final heading = tester.widget<Text>(
-            find.byKey(const Key('login-heading')),
-          );
-          expect(heading.data, 'Sign in');
-          expect(heading.style?.fontSize, 26);
           expect(
             tester.getSize(find.byKey(const Key('login-logo'))),
             const Size(72, 72),
@@ -447,9 +464,16 @@ void main() {
             padding: relaxed,
             fill: scheme.surface,
           );
-          final message = tester.widget<Text>(find.text('Email is required.'));
+          final messageFinder = find.text('Email is required.');
+          final message = tester.widget<Text>(messageFinder);
+          final role = Theme.of(tester.element(messageFinder))
+              .textTheme
+              .bodySmall;
           expect(message.style?.color, scheme.error);
-          expectUnsetTypeMetrics(message.style);
+          expect(message.style?.fontSize, role?.fontSize);
+          expect(message.style?.fontWeight, role?.fontWeight);
+          expect(message.style?.height, role?.height);
+          expect(message.style?.letterSpacing, role?.letterSpacing);
 
           // When
           await tester.tap(find.byKey(const Key('login-email')));
