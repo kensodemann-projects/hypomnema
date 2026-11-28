@@ -107,9 +107,34 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  void _openEditor(BuildContext context) {
+  void _openEditor(BuildContext context, {JournalEntry? entry}) {
     final desktop = desktopLayoutFor(context);
-    final editor = JournalEditor(desktop: desktop, onSubmit: _submit);
+    Future<void> submit({
+      required String subject,
+      required int mood,
+      required String text,
+    }) async {
+      final editing = entry;
+      if (editing == null) {
+        await _submit(subject: subject, mood: mood, text: text);
+        return;
+      }
+      await widget.repository.update(
+        entry: editing,
+        subject: subject,
+        mood: mood,
+        text: text,
+        private: editing.private,
+      );
+    }
+
+    final editor = JournalEditor(
+      desktop: desktop,
+      onSubmit: submit,
+      subject: entry?.subject ?? '',
+      mood: entry?.mood,
+      text: entry?.text ?? '',
+    );
     if (desktop) {
       showDialog<void>(
         context: context,
@@ -125,72 +150,12 @@ class _JournalScreenState extends State<JournalScreen> {
   void _openEntry(BuildContext context, JournalEntry entry) {
     Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute<void>(
-        builder: (context) {
-          final theme = Theme.of(context);
-          final scheme = theme.colorScheme;
-          final metrics = theme.extension<AppMetrics>()!;
-          return Scaffold(
-            key: const Key('journal-entry-screen'),
-            backgroundColor: scheme.surface,
-            body: SafeArea(
-              child: Column(
-                children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: metrics.barHeight),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 4, right: 4),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: 48,
-                            height: 48,
-                            child: IconButton(
-                              key: const Key('journal-back'),
-                              tooltip: 'Back',
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints.tightFor(
-                                width: 48,
-                                height: 48,
-                              ),
-                              style: IconButton.styleFrom(
-                                foregroundColor: scheme.onSurfaceVariant,
-                                padding: EdgeInsets.zero,
-                                minimumSize: Size.zero,
-                                fixedSize: const Size(48, 48),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              onPressed: () => Navigator.of(context).pop(),
-                              icon: Icon(
-                                Icons.arrow_back,
-                                color: scheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              journalEntryBarTitle(entry),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.titleLarge,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: JournalEntryDetail(
-                        entry: entry,
-                        when: journalDetailWhen(entry, includeYear: false),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+        builder: (context) => _PhoneEntryScreen(
+          repository: widget.repository,
+          entryId: entry.id,
+          clock: widget.clock,
+          onEdit: _openEditor,
+        ),
       ),
     );
   }
@@ -408,14 +373,20 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _selectedDetail(List<JournalEntry> entries) {
+  Widget _selectedDetail(BuildContext context, List<JournalEntry> entries) {
     final entry = entries.firstWhere((entry) => entry.id == _selectedId);
+    final note = journalEditableUntilNote(
+      createdAt: entry.createdAt,
+      now: widget.clock(),
+    );
     return SingleChildScrollView(
       child: JournalEntryDetail(
         entry: entry,
         when: journalDetailWhen(entry, includeYear: true),
         card: true,
         padding: EdgeInsets.zero,
+        note: note,
+        onEdit: note == null ? null : () => _openEditor(context, entry: entry),
       ),
     );
   }
@@ -448,7 +419,7 @@ class _JournalScreenState extends State<JournalScreen> {
                 ),
               ],
             )
-          : _selectedDetail(entries),
+          : _selectedDetail(context, entries),
     );
   }
 
@@ -459,6 +430,168 @@ class _JournalScreenState extends State<JournalScreen> {
       return Scaffold(body: _desktopLayout(context, scheme));
     }
     return Scaffold(body: _phoneLayout(context, scheme));
+  }
+}
+
+class _PhoneEntryScreen extends StatefulWidget {
+  const _PhoneEntryScreen({
+    required this.repository,
+    required this.entryId,
+    required this.clock,
+    required this.onEdit,
+  });
+
+  final JournalEntryRepository repository;
+  final String entryId;
+  final DateTime Function() clock;
+  final void Function(BuildContext context, {JournalEntry? entry}) onEdit;
+
+  @override
+  State<_PhoneEntryScreen> createState() => _PhoneEntryScreenState();
+}
+
+class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
+  StreamSubscription<List<JournalEntry>>? _subscription;
+  JournalEntry? _entry;
+  var _closed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = widget.repository.watch().listen(_onEntries);
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
+  void _onEntries(List<JournalEntry> entries) {
+    if (!mounted) {
+      return;
+    }
+    for (final candidate in entries) {
+      if (candidate.id == widget.entryId) {
+        setState(() => _entry = candidate);
+        return;
+      }
+    }
+    if (_closed) {
+      return;
+    }
+    _closed = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final metrics = theme.extension<AppMetrics>()!;
+    final entry = _entry;
+    final note = entry == null
+        ? null
+        : journalEditableUntilNote(
+            createdAt: entry.createdAt,
+            now: widget.clock(),
+          );
+    return Scaffold(
+      key: const Key('journal-entry-screen'),
+      backgroundColor: scheme.surface,
+      body: SafeArea(
+        child: Column(
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(minHeight: metrics.barHeight),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4, right: 4),
+                child: Row(
+                  children: [
+                    _BarIconButton(
+                      buttonKey: const Key('journal-back'),
+                      tooltip: 'Back',
+                      icon: Icons.arrow_back,
+                      color: scheme.onSurfaceVariant,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    Expanded(
+                      child: Text(
+                        entry == null ? '' : journalEntryBarTitle(entry),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleLarge,
+                      ),
+                    ),
+                    if (entry != null && note != null)
+                      _BarIconButton(
+                        buttonKey: const Key('journal-edit'),
+                        tooltip: 'Edit',
+                        icon: Icons.edit,
+                        color: scheme.onSurfaceVariant,
+                        onPressed: () => widget.onEdit(context, entry: entry),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            if (entry != null)
+              Expanded(
+                child: SingleChildScrollView(
+                  child: JournalEntryDetail(
+                    entry: entry,
+                    when: journalDetailWhen(entry, includeYear: false),
+                    note: note,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BarIconButton extends StatelessWidget {
+  const _BarIconButton({
+    required this.buttonKey,
+    required this.tooltip,
+    required this.icon,
+    required this.color,
+    required this.onPressed,
+  });
+
+  final Key buttonKey;
+  final String tooltip;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: IconButton(
+        key: buttonKey,
+        tooltip: tooltip,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints.tightFor(width: 48, height: 48),
+        style: IconButton.styleFrom(
+          foregroundColor: color,
+          padding: EdgeInsets.zero,
+          minimumSize: Size.zero,
+          fixedSize: const Size(48, 48),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        onPressed: onPressed,
+        icon: Icon(icon, color: color),
+      ),
+    );
   }
 }
 

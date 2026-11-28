@@ -11,6 +11,7 @@ class FakeJournalEntryRepository implements JournalEntryRepository {
   }
 
   final saves = <({String subject, int mood, String text, bool private})>[];
+  final updates = <({String subject, int mood, String text, bool private})>[];
   final _stored = <JournalEntry>[];
   final _updates = StreamController<List<JournalEntry>>.broadcast();
   var updateCalls = 0;
@@ -54,6 +55,7 @@ class FakeJournalEntryRepository implements JournalEntryRepository {
     required bool private,
   }) async {
     updateCalls += 1;
+    updates.add((subject: subject, mood: mood, text: text, private: private));
     final revised = entry.revise(
       subject: subject,
       mood: mood,

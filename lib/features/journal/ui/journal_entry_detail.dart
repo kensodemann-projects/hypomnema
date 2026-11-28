@@ -9,6 +9,8 @@ class JournalEntryDetail extends StatelessWidget {
     required this.when,
     this.card = false,
     this.padding = const EdgeInsets.fromLTRB(16, 4, 16, 24),
+    this.note,
+    this.onEdit,
     super.key,
   });
 
@@ -16,6 +18,8 @@ class JournalEntryDetail extends StatelessWidget {
   final String when;
   final bool card;
   final EdgeInsetsGeometry padding;
+  final String? note;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -50,8 +54,20 @@ class JournalEntryDetail extends StatelessWidget {
                   ],
                 ),
               ),
+              if (onEdit != null)
+                OutlinedButton.icon(
+                  key: const Key('journal-edit'),
+                  onPressed: onEdit,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: scheme.primary,
+                    side: BorderSide(color: scheme.outline),
+                  ),
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Edit'),
+                ),
             ],
           ),
+          if (note != null) _EditableUntilNote(text: note!),
           if (card)
             Align(
               alignment: Alignment.topCenter,
@@ -88,6 +104,31 @@ class JournalEntryDetail extends StatelessWidget {
             ...paragraphs,
         ],
       ),
+    );
+  }
+}
+
+class _EditableUntilNote extends StatelessWidget {
+  const _EditableUntilNote({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurfaceVariant;
+    return Row(
+      key: const Key('journal-editable-until'),
+      spacing: 6,
+      children: [
+        Icon(Icons.schedule, size: 16, color: color),
+        Flexible(
+          child: Text(
+            text,
+            style: theme.textTheme.bodySmall!.copyWith(color: color),
+          ),
+        ),
+      ],
     );
   }
 }
