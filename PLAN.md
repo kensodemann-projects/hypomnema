@@ -43,7 +43,7 @@ Text roles are the same on both form factors. "Private entry" in the list is `ti
 | Order | Step | Status | Files |
 | ----- | ---- | ------ | ----- |
 | 1 | [STEP-001] | complete | `lib/features/journal/ui/journal_entry_list.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
-| 2 | [STEP-002] | | `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
+| 2 | [STEP-002] | complete | `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 3 | [STEP-003] | | `lib/features/journal/ui/journal_entry_detail.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/helpers/fake_journal_entry_repository.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 | 4 | [STEP-004] | | `lib/features/journal/ui/journal_editor.dart`, then `lib/features/journal/ui/journal_screen.dart`, then `test/features/journal/ui/journal_editor_test.dart`, then `test/features/journal/ui/journal_screen_test.dart` |
 
@@ -93,7 +93,7 @@ flutter test test/features/journal/ui/journal_screen_test.dart
 
 ## [STEP-002] Hide private writing behind Show Content for one viewing
 
-**Status:**
+**Status:** complete
 
 **Acceptance criteria:** A private detail shows the date, time, mood, and a private cover in place of the subject and text. Show Content reveals the writing for that viewing only. Hide, Back, and selecting another desktop entry return the cover. The private flag is unchanged. Edit appears only after Show Content, and only while the 24-hour window is open.
 

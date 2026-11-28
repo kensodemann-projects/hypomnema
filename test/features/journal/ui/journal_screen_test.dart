@@ -39,6 +39,158 @@ void _expectTextRole(WidgetTester tester, Finder finder, TextStyle? role) {
   _expectRole(tester.widget<Text>(finder).style, role);
 }
 
+const _phoneCoverBody =
+    "Showing it is for this viewing only and won't change the private setting.";
+const _desktopCoverBody =
+    "The subject and text are hidden. Showing them is for this viewing only and won't change the private setting.";
+const _revealSentence = ' · Showing private content for this viewing';
+
+void _expectPrivateHeadline(WidgetTester tester, Finder scope, Color color) {
+  final headline = find.descendant(
+    of: scope,
+    matching: find.text('Private entry'),
+  );
+  expect(headline, findsOneWidget);
+  _expectTextRole(
+    tester,
+    headline,
+    Theme.of(tester.element(headline)).textTheme.headlineSmall,
+  );
+  expect(tester.widget<Text>(headline).style?.color, color);
+  final lock = tester.widget<Icon>(
+    find.descendant(of: scope, matching: find.byIcon(Icons.lock)),
+  );
+  expect(lock.size, 24);
+  expect(lock.color, color);
+}
+
+void _expectPrivateCover(
+  WidgetTester tester, {
+  required Finder scope,
+  required bool desktop,
+  required ColorScheme scheme,
+}) {
+  final cover = find.descendant(
+    of: scope,
+    matching: find.byKey(const Key('journal-private-cover')),
+  );
+  expect(cover, findsOneWidget);
+  final decoration =
+      tester.widget<DecoratedBox>(cover).decoration as BoxDecoration;
+  expect(decoration.color, scheme.surface);
+  final metrics = Theme.of(tester.element(cover)).extension<AppMetrics>()!;
+  final painter =
+      tester
+              .widget<CustomPaint>(
+                find.descendant(
+                  of: cover,
+                  matching: find.byWidgetPredicate(
+                    (widget) =>
+                        widget is CustomPaint &&
+                        widget.painter is DashedRoundedBorderPainter,
+                  ),
+                ),
+              )
+              .painter!
+          as DashedRoundedBorderPainter;
+  expect(painter.color, scheme.outline);
+  expect(painter.strokeWidth, metrics.borderWidth);
+  expect(painter.radius, metrics.cardRadius);
+  final title = find.descendant(
+    of: cover,
+    matching: find.text('This entry is private'),
+  );
+  final body = find.descendant(
+    of: cover,
+    matching: find.text(desktop ? _desktopCoverBody : _phoneCoverBody),
+  );
+  final textTheme = Theme.of(tester.element(title)).textTheme;
+  _expectTextRole(tester, title, textTheme.titleMedium);
+  expect(tester.widget<Text>(title).style?.color, scheme.onSurface);
+  _expectTextRole(tester, body, textTheme.bodyMedium);
+  expect(tester.widget<Text>(body).style?.color, scheme.onSurfaceVariant);
+  final icon = tester.widget<Icon>(
+    find.descendant(of: cover, matching: find.byIcon(Icons.visibility_off)),
+  );
+  expect(icon.size, 44);
+  expect(icon.color, scheme.onSurfaceVariant.withValues(alpha: 0.6));
+  expect(
+    find.descendant(
+      of: cover,
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is Padding &&
+            widget.padding ==
+                (desktop
+                    ? const EdgeInsets.symmetric(horizontal: 32, vertical: 48)
+                    : const EdgeInsets.symmetric(horizontal: 20, vertical: 36)),
+      ),
+    ),
+    findsOneWidget,
+  );
+  expect(
+    find.descendant(
+      of: cover,
+      matching: find.byKey(const Key('journal-show-content')),
+    ),
+    findsOneWidget,
+  );
+  expect(find.byKey(const Key('journal-detail-card')), findsNothing);
+}
+
+void _expectPrivateBanner(
+  WidgetTester tester, {
+  required Finder scope,
+  required bool desktop,
+  required String subject,
+  required ColorScheme scheme,
+}) {
+  final banner = find.descendant(
+    of: scope,
+    matching: find.byKey(const Key('journal-private-banner')),
+  );
+  expect(banner, findsOneWidget);
+  final decoration =
+      tester.widget<DecoratedBox>(banner).decoration as BoxDecoration;
+  expect(decoration.color, scheme.surfaceContainerHigh);
+  expect(
+    decoration.borderRadius,
+    BorderRadius.circular(
+      Theme.of(tester.element(banner)).extension<AppMetrics>()!.rowRadius,
+    ),
+  );
+  final subjectText = find.descendant(of: banner, matching: find.text(subject));
+  final textTheme = Theme.of(tester.element(subjectText)).textTheme;
+  _expectTextRole(tester, subjectText, textTheme.titleSmall);
+  expect(
+    tester.widget<Text>(subjectText).style?.color,
+    scheme.onSurfaceVariant,
+  );
+  final sentence = find.descendant(
+    of: banner,
+    matching: find.text(_revealSentence),
+  );
+  if (desktop) {
+    _expectTextRole(tester, sentence, textTheme.bodyMedium);
+    expect(tester.widget<Text>(sentence).style?.color, scheme.onSurfaceVariant);
+  } else {
+    expect(sentence, findsNothing);
+  }
+  final icon = tester.widget<Icon>(
+    find.descendant(of: banner, matching: find.byIcon(Icons.visibility)),
+  );
+  expect(icon.size, 20);
+  expect(icon.color, scheme.onSurfaceVariant);
+  expect(
+    find.descendant(
+      of: banner,
+      matching: find.byKey(const Key('journal-hide')),
+    ),
+    findsOneWidget,
+  );
+  expect(find.byKey(const Key('journal-private-cover')), findsNothing);
+}
+
 void _expectPrivateListRow(
   WidgetTester tester, {
   required Key rowKey,
@@ -371,9 +523,9 @@ void main() {
   );
 
   testWidgets(
-    'Given a private entry, when its row is tapped, then the phone entry shows its subject and text and Back returns to the list',
+    'Given a private entry, when its row is tapped, then Show Content reveals it for that viewing and Back returns to the list',
     (tester) async {
-      await _pumpJournalScreen(
+      final repository = await _pumpJournalScreen(
         tester,
         size: _phone,
         repository: _seededJournal(),
@@ -425,10 +577,24 @@ void main() {
       await tester.tap(find.byKey(const Key('journal-entry-private')));
       await tester.pumpAndSettle();
 
-      expect(find.text('Quiet thought'), findsOneWidget);
-      expect(find.text('Line one\nstill one.'), findsOneWidget);
-      expect(find.text('Line two.'), findsOneWidget);
+      final screen = find.byKey(const Key('journal-entry-screen'));
+      final scheme = AppTheme.light.colorScheme;
+      _expectPrivateCover(
+        tester,
+        scope: screen,
+        desktop: false,
+        scheme: scheme,
+      );
+      _expectPrivateHeadline(tester, screen, scheme.onSurfaceVariant);
+      expect(find.text('Quiet thought'), findsNothing);
+      expect(find.text('Line one\nstill one.'), findsNothing);
+      expect(find.text('Line two.'), findsNothing);
       expect(find.text('Thursday, November 12 · 10:15 PM'), findsOneWidget);
+      final swatch = tester.widget<MoodSwatch>(
+        find.descendant(of: screen, matching: find.byType(MoodSwatch)),
+      );
+      expect(swatch.mood, 2);
+      expect(swatch.size, MoodSwatchSize.large);
       final detail = tester.widget<Column>(
         find
             .descendant(
@@ -438,6 +604,48 @@ void main() {
             .first,
       );
       expect(detail.spacing, 14);
+
+      await tester.tap(find.byKey(const Key('journal-show-content')));
+      await tester.pumpAndSettle();
+
+      _expectPrivateBanner(
+        tester,
+        scope: screen,
+        desktop: false,
+        subject: 'Quiet thought',
+        scheme: scheme,
+      );
+      expect(find.text('Line one\nstill one.'), findsOneWidget);
+      expect(find.text('Line two.'), findsOneWidget);
+      expect(repository.updates, isEmpty);
+      expect(repository.saves, isEmpty);
+
+      await tester.tap(find.byKey(const Key('journal-hide')));
+      await tester.pumpAndSettle();
+
+      _expectPrivateCover(
+        tester,
+        scope: screen,
+        desktop: false,
+        scheme: scheme,
+      );
+      expect(find.text('Quiet thought'), findsNothing);
+      expect(find.text('Line one\nstill one.'), findsNothing);
+      expect(repository.updates, isEmpty);
+
+      await tester.tap(find.byKey(const Key('journal-back')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journal-entry-private')));
+      await tester.pumpAndSettle();
+
+      _expectPrivateCover(
+        tester,
+        scope: find.byKey(const Key('journal-entry-screen')),
+        desktop: false,
+        scheme: scheme,
+      );
+      expect(find.text('Quiet thought'), findsNothing);
+      expect(repository.updates, isEmpty);
     },
   );
 
@@ -676,16 +884,76 @@ void main() {
       await tester.tap(find.byKey(const Key('journal-entry-private')));
       await tester.pumpAndSettle();
 
+      final detailPane = find.byKey(const Key('journal-detail-pane'));
+      final scheme = AppTheme.light.colorScheme;
+      _expectPrivateCover(
+        tester,
+        scope: detailPane,
+        desktop: true,
+        scheme: scheme,
+      );
+      _expectPrivateHeadline(tester, detailPane, scheme.onSurfaceVariant);
       expect(
         inPane(const Key('journal-detail-pane'), 'Quiet thought'),
+        findsNothing,
+      );
+      expect(find.text('Line one\nstill one.'), findsNothing);
+      expect(find.text('Line two.'), findsNothing);
+      expect(
+        inPane(
+          const Key('journal-detail-pane'),
+          'Thursday, November 12, 2026 · 10:15 PM',
+        ),
         findsOneWidget,
       );
-      expect(find.text('Line one\nstill one.'), findsOneWidget);
-      expect(find.text('Line two.'), findsOneWidget);
+      expect(
+        tester
+            .widget<MoodSwatch>(
+              find.descendant(
+                of: detailPane,
+                matching: find.byType(MoodSwatch),
+              ),
+            )
+            .mood,
+        2,
+      );
       expect(
         inPane(const Key('journal-detail-pane'), 'Early run'),
         findsNothing,
       );
+
+      await tester.tap(find.byKey(const Key('journal-show-content')));
+      await tester.pumpAndSettle();
+
+      _expectPrivateBanner(
+        tester,
+        scope: detailPane,
+        desktop: true,
+        subject: 'Quiet thought',
+        scheme: scheme,
+      );
+      expect(find.text('Line one\nstill one.'), findsOneWidget);
+      expect(find.text('Line two.'), findsOneWidget);
+      expect(find.byKey(const Key('journal-edit')), findsNothing);
+      expect(repository.updates, isEmpty);
+      expect(repository.saves, isEmpty);
+
+      await tester.tap(find.byKey(const Key('journal-entry-last-week')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('journal-entry-private')));
+      await tester.pumpAndSettle();
+
+      _expectPrivateCover(
+        tester,
+        scope: detailPane,
+        desktop: true,
+        scheme: scheme,
+      );
+      expect(
+        inPane(const Key('journal-detail-pane'), 'Quiet thought'),
+        findsNothing,
+      );
+      expect(repository.updates, isEmpty);
 
       await tester.tap(find.byKey(const Key('journal-entry-last-week')));
       await tester.pumpAndSettle();
@@ -796,6 +1064,25 @@ void main() {
               ?.color,
           scheme.onSurfaceVariant,
         );
+        final detailPane = find.byKey(const Key('journal-detail-pane'));
+        _expectPrivateCover(
+          tester,
+          scope: detailPane,
+          desktop: true,
+          scheme: scheme,
+        );
+        _expectPrivateHeadline(tester, detailPane, scheme.onSurfaceVariant);
+
+        await tester.tap(find.byKey(const Key('journal-show-content')));
+        await tester.pumpAndSettle();
+
+        _expectPrivateBanner(
+          tester,
+          scope: detailPane,
+          desktop: true,
+          subject: 'Quiet thought',
+          scheme: scheme,
+        );
         final card =
             tester
                     .widget<DecoratedBox>(
@@ -805,6 +1092,58 @@ void main() {
                 as BoxDecoration;
         expect(card.color, scheme.surface);
         expect(card.border, Border.all(color: scheme.outlineVariant));
+      },
+    );
+  }
+
+  for (final theme in [AppTheme.light, AppTheme.dark]) {
+    testWidgets(
+      'Given a ${theme.brightness.name} private phone entry, when it opens and Show Content is tapped, then the cover and banner use the scheme colors',
+      (tester) async {
+        await _pumpJournalScreen(
+          tester,
+          size: _phone,
+          theme: theme,
+          repository: FakeJournalEntryRepository(
+            entries: [
+              _entry(
+                id: 'private',
+                subject: 'Quiet thought',
+                mood: 2,
+                text: 'Hidden line.',
+                localDateTime: '2026-11-12T22:15:00',
+                private: true,
+              ),
+            ],
+          ),
+          clock: () => DateTime(2026, 11, 14, 12),
+        );
+        await tester.tap(find.byKey(const Key('journal-entry-private')));
+        await tester.pumpAndSettle();
+
+        final screen = find.byKey(const Key('journal-entry-screen'));
+        _expectPrivateCover(
+          tester,
+          scope: screen,
+          desktop: false,
+          scheme: theme.colorScheme,
+        );
+        _expectPrivateHeadline(
+          tester,
+          screen,
+          theme.colorScheme.onSurfaceVariant,
+        );
+
+        await tester.tap(find.byKey(const Key('journal-show-content')));
+        await tester.pumpAndSettle();
+
+        _expectPrivateBanner(
+          tester,
+          scope: screen,
+          desktop: false,
+          subject: 'Quiet thought',
+          scheme: theme.colorScheme,
+        );
       },
     );
   }
@@ -847,6 +1186,18 @@ void main() {
       expect(find.byKey(const Key('journal-edit')), findsNothing);
       expect(find.byIcon(Icons.schedule), findsNothing);
       expectNoDelete();
+
+      await tester.tap(find.byKey(const Key('journal-show-content')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('journal-edit')), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('journal-entry-screen')),
+          matching: find.text('Quiet thought'),
+        ),
+        findsOneWidget,
+      );
     },
   );
 
@@ -961,6 +1312,14 @@ void main() {
       );
       await tester.tap(find.byKey(const Key('journal-entry-private-open')));
       await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('journal-edit')), findsNothing);
+      expect(find.text(openNote), findsOneWidget);
+      expect(find.text('Hidden line.'), findsNothing);
+
+      await tester.tap(find.byKey(const Key('journal-show-content')));
+      await tester.pumpAndSettle();
+      expect(repository.updates, isEmpty);
       await tester.tap(find.byKey(const Key('journal-edit')));
       await tester.pumpAndSettle();
 
@@ -990,7 +1349,11 @@ void main() {
       ]);
       expect(find.byKey(const Key('journal-entry-screen')), findsOneWidget);
       expect(
-        inScreen(const Key('journal-entry-screen'), find.text('Revised')),
+        inScreen(const Key('journal-entry-screen'), find.text('Private entry')),
+        findsOneWidget,
+      );
+      expect(
+        inScreen(const Key('journal-private-banner'), find.text('Revised')),
         findsOneWidget,
       );
       expect(find.text(when), findsOneWidget);
@@ -1131,6 +1494,17 @@ void main() {
         repository: repository,
         clock: () => noon,
       );
+
+      expect(find.byKey(const Key('journal-edit')), findsNothing);
+      expect(
+        inPane(const Key('journal-detail-pane'), openNote),
+        findsOneWidget,
+      );
+      expect(find.text('Hidden line.'), findsNothing);
+
+      await tester.tap(find.byKey(const Key('journal-show-content')));
+      await tester.pumpAndSettle();
+      expect(repository.updates, isEmpty);
       await tester.tap(find.byKey(const Key('journal-edit')));
       await tester.pumpAndSettle();
 
@@ -1160,7 +1534,11 @@ void main() {
       ]);
       expect(find.byKey(_editorKey), findsNothing);
       expect(
-        inPane(const Key('journal-detail-pane'), 'Revised'),
+        inPane(const Key('journal-detail-pane'), 'Private entry'),
+        findsOneWidget,
+      );
+      expect(
+        inPane(const Key('journal-private-banner'), 'Revised'),
         findsOneWidget,
       );
       expect(inPane(const Key('journal-detail-pane'), when), findsOneWidget);

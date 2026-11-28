@@ -39,6 +39,9 @@ class _JournalScreenState extends State<JournalScreen> {
   var _watchFailed = false;
   var _reportedWatchError = false;
   String? _selectedId;
+  var _contentRevealed = false;
+  String? _revealEntryId;
+  var _revealEntryPrivate = false;
 
   @override
   void initState() {
@@ -54,6 +57,9 @@ class _JournalScreenState extends State<JournalScreen> {
       _cachedEntries = null;
       _watchFailed = false;
       _reportedWatchError = false;
+      _contentRevealed = false;
+      _revealEntryId = null;
+      _revealEntryPrivate = false;
       _listenEntries();
     }
   }
@@ -76,10 +82,20 @@ class _JournalScreenState extends State<JournalScreen> {
       return;
     }
     final nextId = _reconcileJournalSelection(entries, _selectedId);
+    JournalEntry? selected;
+    if (nextId != null) {
+      for (final entry in entries) {
+        if (entry.id == nextId) {
+          selected = entry;
+          break;
+        }
+      }
+    }
     setState(() {
       _cachedEntries = entries;
       _watchFailed = false;
       _selectedId = nextId;
+      _rememberViewedEntry(selected);
     });
   }
 
@@ -366,7 +382,10 @@ class _JournalScreenState extends State<JournalScreen> {
                   selectedId: _selectedId,
                   headingPadding: const EdgeInsets.fromLTRB(4, 8, 4, 2),
                   padding: EdgeInsets.zero,
-                  onOpen: (entry) => setState(() => _selectedId = entry.id),
+                  onOpen: (entry) => setState(() {
+                    _selectedId = entry.id;
+                    _rememberViewedEntry(entry);
+                  }),
                 ),
         ),
       ),
@@ -379,6 +398,11 @@ class _JournalScreenState extends State<JournalScreen> {
       createdAt: entry.createdAt,
       now: widget.clock(),
     );
+    final showEdit = _showJournalEdit(
+      inWindow: note != null,
+      private: entry.private,
+      contentRevealed: _contentRevealed,
+    );
     return SingleChildScrollView(
       child: JournalEntryDetail(
         entry: entry,
@@ -386,9 +410,24 @@ class _JournalScreenState extends State<JournalScreen> {
         card: true,
         padding: EdgeInsets.zero,
         note: note,
-        onEdit: note == null ? null : () => _openEditor(context, entry: entry),
+        contentRevealed: _contentRevealed,
+        onShowContent: () => setState(() => _contentRevealed = true),
+        onHide: () => setState(() => _contentRevealed = false),
+        onEdit: showEdit ? () => _openEditor(context, entry: entry) : null,
       ),
     );
+  }
+
+  void _rememberViewedEntry(JournalEntry? entry) {
+    _contentRevealed = _nextContentRevealed(
+      revealed: _contentRevealed,
+      previousId: _revealEntryId,
+      id: entry?.id,
+      previousPrivate: _revealEntryPrivate,
+      private: entry?.private ?? false,
+    );
+    _revealEntryId = entry?.id;
+    _revealEntryPrivate = entry?.private ?? false;
   }
 
   Widget _desktopDetailPane(BuildContext context, List<JournalEntry> entries) {
@@ -454,11 +493,16 @@ class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
   StreamSubscription<List<JournalEntry>>? _subscription;
   late JournalEntry _entry;
   var _closed = false;
+  var _contentRevealed = false;
+  late String _revealEntryId;
+  late bool _revealEntryPrivate;
 
   @override
   void initState() {
     super.initState();
     _entry = widget.entry;
+    _revealEntryId = _entry.id;
+    _revealEntryPrivate = _entry.private;
     _subscription = widget.repository.watch().listen(
       _onEntries,
       onError: _onWatchError,
@@ -477,7 +521,18 @@ class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
     }
     for (final candidate in entries) {
       if (candidate.id == widget.entry.id) {
-        setState(() => _entry = candidate);
+        setState(() {
+          _contentRevealed = _nextContentRevealed(
+            revealed: _contentRevealed,
+            previousId: _revealEntryId,
+            id: candidate.id,
+            previousPrivate: _revealEntryPrivate,
+            private: candidate.private,
+          );
+          _revealEntryId = candidate.id;
+          _revealEntryPrivate = candidate.private;
+          _entry = candidate;
+        });
         return;
       }
     }
@@ -506,6 +561,11 @@ class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
       createdAt: entry.createdAt,
       now: widget.clock(),
     );
+    final showEdit = _showJournalEdit(
+      inWindow: note != null,
+      private: entry.private,
+      contentRevealed: _contentRevealed,
+    );
     return Scaffold(
       key: const Key('journal-entry-screen'),
       backgroundColor: scheme.surface,
@@ -533,7 +593,7 @@ class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
                         style: theme.textTheme.titleLarge,
                       ),
                     ),
-                    if (note != null)
+                    if (showEdit)
                       _BarIconButton(
                         buttonKey: const Key('journal-edit'),
                         tooltip: 'Edit',
@@ -551,6 +611,9 @@ class _PhoneEntryScreenState extends State<_PhoneEntryScreen> {
                   entry: entry,
                   when: journalDetailWhen(entry, includeYear: false),
                   note: note,
+                  contentRevealed: _contentRevealed,
+                  onShowContent: () => setState(() => _contentRevealed = true),
+                  onHide: () => setState(() => _contentRevealed = false),
                 ),
               ),
             ),
@@ -598,6 +661,36 @@ class _BarIconButton extends StatelessWidget {
       ),
     );
   }
+}
+
+bool _nextContentRevealed({
+  required bool revealed,
+  required String? previousId,
+  required String? id,
+  required bool previousPrivate,
+  required bool private,
+}) {
+  if (previousId != id) {
+    return false;
+  }
+  if (!previousPrivate && private) {
+    return false;
+  }
+  return revealed;
+}
+
+bool _showJournalEdit({
+  required bool inWindow,
+  required bool private,
+  required bool contentRevealed,
+}) {
+  if (!inWindow) {
+    return false;
+  }
+  if (private && !contentRevealed) {
+    return false;
+  }
+  return true;
 }
 
 String? _reconcileJournalSelection(
